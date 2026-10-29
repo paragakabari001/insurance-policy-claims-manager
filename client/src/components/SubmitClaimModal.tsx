@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Policy } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import {
   FilePlus,
   X,
@@ -11,8 +10,9 @@ import {
   ShieldAlert,
   AlertTriangle,
   ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
+  RefreshCw,
+  Sparkles,
+  ChevronDown,
 } from 'lucide-react';
 
 interface SubmitClaimModalProps {
@@ -43,6 +43,17 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
   const [customId, setCustomId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const generateAutoClaimId = () => {
+    return `CLM-${Math.floor(1000 + Math.random() * 9000)}`;
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      setCustomId(generateAutoClaimId());
+      setError(null);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (preselectedPolicyId) {
@@ -96,7 +107,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
 
     if (parsedAmount > remainingSI) {
       setError(
-        `Claim amount (${formatCurrency(parsedAmount)}) exceeds remaining claimable SI (${formatCurrency(remainingSI)}).`
+        `Claim amount (${formatCurrency(parsedAmount)}) exceeds remaining coverage (${formatCurrency(remainingSI)}).`
       );
       return;
     }
@@ -120,7 +131,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150">
-        {/* Clean Pure White Header (shadcn style) */}
+        {/* Header */}
         <div className="px-6 py-5 bg-white border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700 shadow-2xs">
@@ -157,23 +168,28 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             </div>
           )}
 
-          {/* Linked Policy Selection */}
+          {/* Linked Policy Selection (shadcn styled) */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
               <ShieldAlert className="w-3.5 h-3.5 text-emerald-700" /> Linked Coverage Policy
             </label>
-            <select
-              value={selectedPolicyId}
-              onChange={(e) => setSelectedPolicyId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-bold text-slate-800 bg-slate-50/70 focus:bg-white transition-all shadow-2xs"
-              required
-            >
-              {policies.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.id} &bull; Available: {formatCurrency(p.remainingClaimableSI)} (SI: {formatCurrency(p.sumInsured)})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={selectedPolicyId}
+                onChange={(e) => setSelectedPolicyId(e.target.value)}
+                className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50/50 appearance-none transition-all shadow-2xs"
+                required
+              >
+                {policies.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.id} • Available: {formatCurrency(p.remainingClaimableSI)} (SI: {formatCurrency(p.sumInsured)})
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                <ChevronDown className="w-4 h-4" />
+              </div>
+            </div>
           </div>
 
           {/* Policy Information Card */}
@@ -194,20 +210,29 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             </div>
           )}
 
-          {/* Incident Date Picker */}
+          {/* Incident Date Picker (shadcn styled) */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-emerald-700" /> Incident Date (Calendar Date)
-            </label>
-            <input
-              type="date"
-              value={incidentDate}
-              onChange={(e) => setIncidentDate(e.target.value)}
-              min={activePolicy?.startDate}
-              max={activePolicy?.endDate}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-white focus:bg-white transition-all shadow-2xs"
-              required
-            />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-emerald-700" /> Incident Date (Calendar Date)
+              </label>
+              {activePolicy && (
+                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                  Must be between {activePolicy.startDate} and {activePolicy.endDate}
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                type="date"
+                value={incidentDate}
+                onChange={(e) => setIncidentDate(e.target.value)}
+                min={activePolicy?.startDate}
+                max={activePolicy?.endDate}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-900 bg-white transition-all shadow-2xs"
+                required
+              />
+            </div>
             {activePolicy && (
               <p className="text-[11px] text-slate-500 mt-1">
                 Must fall within coverage: <strong>{formatDate(activePolicy.startDate)}</strong> to <strong>{formatDate(activePolicy.endDate)}</strong> (inclusive).
@@ -235,7 +260,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
                 className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 font-bold text-slate-900 bg-white text-sm shadow-2xs transition-all ${
                   isAmountExceeded
                     ? 'border-rose-400 focus:ring-rose-500 text-rose-700'
-                    : 'border-slate-200 focus:ring-emerald-600'
+                    : 'border-slate-200 focus:ring-emerald-600 focus:border-emerald-600'
                 }`}
                 required
               />
@@ -265,18 +290,34 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             )}
           </div>
 
-          {/* Optional Custom Claim ID */}
+          {/* Auto-generated Custom Claim ID with Regenerate Button */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              Custom Claim ID <span className="text-slate-400 font-normal lowercase">(optional)</span>
-            </label>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="e.g. CLM-CUSTOM-01 (Auto-generated if blank)"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-mono text-slate-800 bg-white shadow-2xs"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                Claim ID <span className="text-emerald-700 font-normal lowercase">(auto-generated)</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setCustomId(generateAutoClaimId())}
+                className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 hover:underline"
+                title="Generate new ID"
+              >
+                <RefreshCw className="w-3 h-3" />
+                Regenerate ID
+              </button>
+            </div>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={customId}
+                onChange={(e) => setCustomId(e.target.value)}
+                placeholder="e.g. CLM-1005"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-mono font-bold text-slate-900 bg-slate-50/50 shadow-2xs"
+              />
+              <span className="absolute right-3 text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Auto
+              </span>
+            </div>
           </div>
 
           {/* Modal Actions */}

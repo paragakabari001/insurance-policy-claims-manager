@@ -62,21 +62,8 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-10 shadow-2xs backdrop-blur-md bg-white/95">
-      {/* Left: Breadcrumbs & Collapse Toggle */}
+      {/* Left: Clean Breadcrumbs */}
       <div className="flex items-center gap-3">
-        {onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200/60 shadow-2xs"
-            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-            aria-label={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          >
-            <PanelLeft className="w-4 h-4" />
-          </button>
-        )}
-
-        <div className="hidden sm:block h-5 w-px bg-slate-200" />
-
         {/* Breadcrumb Trail */}
         <div className="flex items-center gap-2 text-xs">
           <span className="text-slate-400 font-medium hidden md:inline">TailVaR</span>

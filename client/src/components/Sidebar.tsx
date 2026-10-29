@@ -87,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               title="Expand Sidebar"
               aria-label="Expand Sidebar"
             >
-              <Shield className="w-5 h-5 group-hover:scale-105 transition-transform" />
+              <PanelLeft className="w-5 h-5 group-hover:scale-105 transition-transform" />
             </button>
           </div>
         )}

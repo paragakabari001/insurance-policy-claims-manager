@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CustomerUser } from '../types';
 import { Button } from './ui/button';
 import {
@@ -9,6 +9,9 @@ import {
   User,
   ArrowRight,
   AlertTriangle,
+  RefreshCw,
+  Sparkles,
+  ChevronDown,
 } from 'lucide-react';
 
 interface CreatePolicyModalProps {
@@ -38,7 +41,18 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  React.useEffect(() => {
+  const generateAutoPolicyId = () => {
+    return `POL-${Math.floor(1000 + Math.random() * 9000)}`;
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      setCustomId(generateAutoPolicyId());
+      setError(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!customerId && customers.length > 0) {
       setCustomerId(customers[0].id);
     }
@@ -95,7 +109,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150">
-        {/* Clean Pure White Header (shadcn style) */}
+        {/* Header */}
         <div className="px-6 py-5 bg-white border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700 shadow-2xs">
@@ -132,26 +146,31 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
             </div>
           )}
 
-          {/* Customer Selection */}
+          {/* Customer Selection (shadcn styled) */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-emerald-700" /> Target Customer
             </label>
-            <select
-              value={customerId}
-              onChange={(e) => setCustomerId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-bold text-slate-800 bg-slate-50/70 focus:bg-white transition-all shadow-2xs"
-              required
-            >
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} (@{c.username})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={customerId}
+                onChange={(e) => setCustomerId(e.target.value)}
+                className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50/50 appearance-none transition-all shadow-2xs"
+                required
+              >
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} (@{c.username})
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                <ChevronDown className="w-4 h-4" />
+              </div>
+            </div>
           </div>
 
-          {/* Dates Grid */}
+          {/* Dates Grid (shadcn styled) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
@@ -161,7 +180,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-white shadow-2xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-900 bg-white shadow-2xs transition-all"
                 required
               />
             </div>
@@ -174,7 +193,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 min={startDate}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-white shadow-2xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-900 bg-white shadow-2xs transition-all"
                 required
               />
             </div>
@@ -221,28 +240,41 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 step="any"
                 value={sumInsured}
                 onChange={(e) => setSumInsured(e.target.value)}
-                placeholder="e.g. 1000000 (10 Lakhs)"
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-bold text-slate-900 bg-white text-sm shadow-2xs"
+                placeholder="e.g. 1000000"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 font-bold text-slate-900 bg-white text-sm shadow-2xs"
                 required
               />
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
-              Spec example: ₹10,00,000 allows filing claims up to ₹10 Lakhs.
-            </p>
           </div>
 
-          {/* Optional Custom Policy ID */}
+          {/* Auto-generated Custom Policy ID */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              Custom Policy ID <span className="text-slate-400 font-normal lowercase">(optional)</span>
-            </label>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="e.g. POL-SPEC-TEST (Auto-generated if blank)"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-mono text-slate-800 bg-white shadow-2xs"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                Policy ID <span className="text-emerald-700 font-normal lowercase">(auto-generated)</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setCustomId(generateAutoPolicyId())}
+                className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 hover:underline"
+                title="Generate new ID"
+              >
+                <RefreshCw className="w-3 h-3" />
+                Regenerate ID
+              </button>
+            </div>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={customId}
+                onChange={(e) => setCustomId(e.target.value)}
+                placeholder="e.g. POL-1004"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-mono font-bold text-slate-900 bg-slate-50/50 shadow-2xs"
+              />
+              <span className="absolute right-3 text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Auto
+              </span>
+            </div>
           </div>
 
           {/* Modal Actions */}

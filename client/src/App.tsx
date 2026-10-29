@@ -233,7 +233,7 @@ export function App() {
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         />
 
-        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        <main className="flex-1 px-5 py-6 sm:px-8 w-full">
           {user.role === 'Administrator' ? (
             <AdminDashboard
               policies={policies}
