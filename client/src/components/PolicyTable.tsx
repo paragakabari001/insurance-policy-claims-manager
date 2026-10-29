@@ -61,7 +61,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                 <tr key={policy.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="px-6 py-4 font-mono font-bold text-slate-900 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
+                      <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                         <ShieldCheck className="w-4 h-4" />
                       </span>
                       {policy.id}
@@ -143,13 +143,13 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                       <button
                         onClick={() => onSelectForClaim(policy)}
                         disabled={!isAvailable}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
                           isAvailable
-                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                            ? 'bg-[#06241b] hover:bg-[#083528] text-white shadow-2xs'
                             : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                         }`}
                       >
-                        <Clock className="w-3.5 h-3.5" />
+                        <Clock className="w-3.5 h-3.5 text-emerald-400" />
                         File Claim
                       </button>
                     </td>
