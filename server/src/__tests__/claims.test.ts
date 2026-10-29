@@ -9,6 +9,9 @@ describe('Insurance Policy & Claims Management System Tests', () => {
   let adminToken: string;
 
   beforeAll(async () => {
+    await prisma.claim.deleteMany({ where: { policyId: { in: ['POL-TEST-001', 'POL-SPEC-TEST'] } } });
+    await prisma.policy.deleteMany({ where: { id: { in: ['POL-TEST-001', 'POL-SPEC-TEST'] } } });
+
     await seed();
 
     // Login customer 1
