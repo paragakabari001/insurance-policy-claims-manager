@@ -28,6 +28,7 @@ export function App() {
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
   const [preselectedPolicyId, setPreselectedPolicyId] = useState<string | undefined>(undefined);
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const addToast = (type: 'success' | 'error', text: string) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -215,6 +216,8 @@ export function App() {
         onQuickSwitch={handleQuickSwitch}
         pendingClaimsCount={pendingClaimsCount}
         policiesCount={policies.length}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
       />
 
       {/* Main Content Area */}
@@ -226,6 +229,8 @@ export function App() {
           onOpenSubmitClaim={() => handleOpenClaimModalForPolicy()}
           onRefresh={loadData}
           isLoading={isDataLoading}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         />
 
         <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
