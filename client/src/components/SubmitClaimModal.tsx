@@ -129,10 +129,15 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 animate-in fade-in duration-150">
+      <div className="bg-white rounded-t-[28px] sm:rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col transform transition-all animate-in slide-in-from-bottom sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+        {/* Mobile Grab Handle Bar */}
+        <div className="sm:hidden pt-3 pb-1 flex justify-center shrink-0">
+          <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+        </div>
+
         {/* Header */}
-        <div className="px-6 py-5 bg-white border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 sm:py-5 bg-white border-b border-slate-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700 shadow-2xs">
               <FilePlus className="w-5 h-5 text-emerald-700" />
@@ -159,8 +164,9 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {/* Scrollable Form Body */}
+        <div className="overflow-y-auto p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-start gap-2.5 shadow-2xs">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
@@ -343,6 +349,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             </Button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

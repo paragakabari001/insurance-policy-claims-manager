@@ -337,10 +337,15 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
         </>
       )}
 
-      {/* Admin Decision Confirmation Dialog */}
+      {/* Admin Decision Confirmation Dialog (Bottom Drawer on Mobile) */}
       {pendingDecision && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-t-[28px] sm:rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+            {/* Mobile Grab Handle Bar */}
+            <div className="sm:hidden pt-3 pb-1 flex justify-center shrink-0">
+              <div className="w-12 h-1.5 rounded-full bg-slate-300" />
+            </div>
+
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span
