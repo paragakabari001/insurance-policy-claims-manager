@@ -9,7 +9,7 @@ import {
   CheckCircle,
   PanelLeftClose,
   PanelLeft,
-  UserCheck,
+  X,
 } from 'lucide-react';
 
 export type ActiveView = 'dashboard' | 'policies' | 'claims';
@@ -24,6 +24,8 @@ interface SidebarProps {
   policiesCount?: number;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -36,6 +38,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   policiesCount = 0,
   isCollapsed = false,
   onToggleCollapse,
+  isMobileOpen = false,
+  onCloseMobile,
 }) => {
   const isAdmin = user.role === 'Administrator';
 
@@ -45,59 +49,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { username: 'admin', label: 'Administrator', short: 'AD', role: 'Admin' },
   ];
 
-  return (
-    <aside
-      className={`${
-        isCollapsed ? 'w-20' : 'w-64'
-      } bg-[#06241b] text-white border-r border-[#0d3b2e] flex flex-col shrink-0 h-screen sticky top-0 select-none z-20 transition-all duration-300 ease-in-out`}
-    >
-      {/* Brand Header */}
-      <div className="h-16 px-4 flex items-center justify-between border-b border-[#0d3b2e] bg-[#051e17]">
-        {!isCollapsed ? (
-          <>
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-950 font-black shadow-md shadow-emerald-950/40 shrink-0">
-                <Shield className="w-5 h-5 text-slate-950" />
-              </div>
-              <div className="min-w-0">
-                <span className="font-extrabold text-sm tracking-tight text-white block truncate">
-                  TailVaR
-                </span>
-                <span className="text-[11px] text-emerald-300/80 font-medium block truncate">
-                  Claims & Policy Manager
-                </span>
-              </div>
-            </div>
-            {onToggleCollapse && (
-              <button
-                onClick={onToggleCollapse}
-                className="p-1.5 rounded-lg text-emerald-300/70 hover:text-white hover:bg-[#093327] transition-colors shrink-0"
-                title="Collapse Sidebar"
-                aria-label="Collapse Sidebar"
-              >
-                <PanelLeftClose className="w-4 h-4" />
-              </button>
-            )}
-          </>
-        ) : (
-          <div className="w-full flex flex-col items-center gap-1">
-            <button
-              onClick={onToggleCollapse}
-              className="w-10 h-10 rounded-xl bg-[#093327] hover:bg-[#0d4233] border border-emerald-500/20 flex items-center justify-center text-emerald-300 hover:text-white transition-all shadow-xs group"
-              title="Expand Sidebar"
-              aria-label="Expand Sidebar"
-            >
-              <PanelLeft className="w-5 h-5 group-hover:scale-105 transition-transform" />
-            </button>
-          </div>
-        )}
-      </div>
+  const handleNavClick = (view: ActiveView) => {
+    setActiveView(view);
+    if (onCloseMobile) onCloseMobile();
+  };
 
-      {/* Navigation Body */}
+  const handleDemoSwitch = (username: string) => {
+    onQuickSwitch(username);
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  // Shared content for navigation & profiles
+  const renderSidebarContent = (isMobileMode = false) => {
+    const collapsed = isMobileMode ? false : isCollapsed;
+
+    return (
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin scrollbar-thumb-emerald-900/50">
         {/* Navigation Section */}
         <div>
-          {!isCollapsed && (
+          {!collapsed && (
             <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/60 mb-2">
               Navigation
             </p>
@@ -105,10 +75,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <nav className="space-y-1.5">
             {/* Dashboard */}
             <button
-              onClick={() => setActiveView('dashboard')}
-              title={isCollapsed ? 'Dashboard' : undefined}
+              onClick={() => handleNavClick('dashboard')}
+              title={collapsed ? 'Dashboard' : undefined}
               className={`w-full flex items-center ${
-                isCollapsed ? 'justify-center px-0 py-2.5' : 'justify-between px-3 py-2.5'
+                collapsed ? 'justify-center px-0 py-2.5' : 'justify-between px-3 py-2.5'
               } rounded-xl text-xs font-semibold transition-all ${
                 activeView === 'dashboard'
                   ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-950/20'
@@ -117,16 +87,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2.5">
                 <LayoutDashboard className="w-4 h-4 shrink-0" />
-                {!isCollapsed && <span>Dashboard</span>}
+                {!collapsed && <span>Dashboard</span>}
               </div>
             </button>
 
             {/* Policies */}
             <button
-              onClick={() => setActiveView('policies')}
-              title={isCollapsed ? `Policies (${policiesCount})` : undefined}
+              onClick={() => handleNavClick('policies')}
+              title={collapsed ? `Policies (${policiesCount})` : undefined}
               className={`w-full flex items-center relative ${
-                isCollapsed ? 'justify-center px-0 py-2.5' : 'justify-between px-3 py-2.5'
+                collapsed ? 'justify-center px-0 py-2.5' : 'justify-between px-3 py-2.5'
               } rounded-xl text-xs font-semibold transition-all ${
                 activeView === 'policies'
                   ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-950/20'
@@ -135,9 +105,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2.5">
                 <FileText className="w-4 h-4 shrink-0" />
-                {!isCollapsed && <span>Policies</span>}
+                {!collapsed && <span>Policies</span>}
               </div>
-              {!isCollapsed ? (
+              {!collapsed ? (
                 policiesCount > 0 && (
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -158,10 +128,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Claims */}
             <button
-              onClick={() => setActiveView('claims')}
-              title={isCollapsed ? `Claims (${pendingClaimsCount} pending)` : undefined}
+              onClick={() => handleNavClick('claims')}
+              title={collapsed ? `Claims (${pendingClaimsCount} pending)` : undefined}
               className={`w-full flex items-center relative ${
-                isCollapsed ? 'justify-center px-0 py-2.5' : 'justify-between px-3 py-2.5'
+                collapsed ? 'justify-center px-0 py-2.5' : 'justify-between px-3 py-2.5'
               } rounded-xl text-xs font-semibold transition-all ${
                 activeView === 'claims'
                   ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-950/20'
@@ -170,9 +140,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2.5">
                 <FileCheck2 className="w-4 h-4 shrink-0" />
-                {!isCollapsed && <span>Claims</span>}
+                {!collapsed && <span>Claims</span>}
               </div>
-              {!isCollapsed ? (
+              {!collapsed ? (
                 pendingClaimsCount > 0 && (
                   <span
                     title={`${pendingClaimsCount} pending claims requiring review`}
@@ -192,7 +162,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Demo Switcher Section */}
         <div>
-          {!isCollapsed ? (
+          {!collapsed ? (
             <>
               <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/60 mb-2">
                 Switch Demo User
@@ -203,8 +173,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   return (
                     <button
                       key={account.username}
-                      onClick={() => onQuickSwitch(account.username)}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-all ${
+                      onClick={() => handleDemoSwitch(account.username)}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-medium flex items-center justify-between transition-all ${
                         isActive
                           ? 'bg-emerald-400/20 text-emerald-300 font-bold border border-emerald-400/40 shadow-xs'
                           : 'text-emerald-200/70 hover:bg-[#093327] hover:text-white border border-transparent'
@@ -235,7 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 return (
                   <button
                     key={account.username}
-                    onClick={() => onQuickSwitch(account.username)}
+                    onClick={() => handleDemoSwitch(account.username)}
                     title={`Switch to ${account.label} (${account.role})`}
                     className={`w-full h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all relative ${
                       isActive
@@ -254,13 +224,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
       </div>
+    );
+  };
 
-      {/* User Card at Bottom */}
+  const renderFooter = (isMobileMode = false) => {
+    const collapsed = isMobileMode ? false : isCollapsed;
+
+    return (
       <div className="p-3 border-t border-[#0d3b2e] bg-[#051e17]">
-        {!isCollapsed ? (
+        {!collapsed ? (
           <div className="p-2.5 rounded-xl bg-[#093327] border border-[#0f4435] flex items-center justify-between gap-2 shadow-xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center text-[11px] font-bold shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center text-xs font-bold shrink-0">
                 {user.name.slice(0, 2).toUpperCase()}
               </div>
               <div className="truncate">
@@ -296,6 +271,109 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         )}
       </div>
-    </aside>
+    );
+  };
+
+  return (
+    <>
+      {/* Desktop Sidebar (hidden on mobile) */}
+      <aside
+        className={`hidden md:flex ${
+          isCollapsed ? 'w-20' : 'w-64'
+        } bg-[#06241b] text-white border-r border-[#0d3b2e] flex-col shrink-0 h-screen sticky top-0 select-none z-20 transition-all duration-300 ease-in-out`}
+      >
+        {/* Brand Header */}
+        <div className="h-16 px-4 flex items-center justify-between border-b border-[#0d3b2e] bg-[#051e17]">
+          {!isCollapsed ? (
+            <>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-950 font-black shadow-md shadow-emerald-950/40 shrink-0">
+                  <Shield className="w-5 h-5 text-slate-950" />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-extrabold text-sm tracking-tight text-white block truncate">
+                    TailVaR
+                  </span>
+                  <span className="text-[11px] text-emerald-300/80 font-medium block truncate">
+                    Claims & Policy Manager
+                  </span>
+                </div>
+              </div>
+              {onToggleCollapse && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="p-1.5 rounded-lg text-emerald-300/70 hover:text-white hover:bg-[#093327] transition-colors shrink-0"
+                  title="Collapse Sidebar"
+                  aria-label="Collapse Sidebar"
+                >
+                  <PanelLeftClose className="w-4 h-4" />
+                </button>
+              )}
+            </>
+          ) : (
+            <div className="w-full flex flex-col items-center gap-1">
+              <button
+                onClick={onToggleCollapse}
+                className="w-10 h-10 rounded-xl bg-[#093327] hover:bg-[#0d4233] border border-emerald-500/20 flex items-center justify-center text-emerald-300 hover:text-white transition-all shadow-xs group"
+                title="Expand Sidebar"
+                aria-label="Expand Sidebar"
+              >
+                <PanelLeft className="w-5 h-5 group-hover:scale-105 transition-transform" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation Body */}
+        {renderSidebarContent(false)}
+
+        {/* User Card at Bottom */}
+        {renderFooter(false)}
+      </aside>
+
+      {/* Mobile Slide-out Drawer (shown when isMobileOpen is true) */}
+      {isMobileOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={onCloseMobile}
+          />
+
+          {/* Drawer content */}
+          <div className="relative w-72 max-w-[85vw] bg-[#06241b] text-white flex flex-col h-full shadow-2xl z-50 animate-in slide-in-from-left duration-200">
+            {/* Header */}
+            <div className="h-16 px-4 flex items-center justify-between border-b border-[#0d3b2e] bg-[#051e17]">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-950 font-black shadow-md shadow-emerald-950/40 shrink-0">
+                  <Shield className="w-5 h-5 text-slate-950" />
+                </div>
+                <div>
+                  <span className="font-extrabold text-sm tracking-tight text-white block">
+                    TailVaR
+                  </span>
+                  <span className="text-[11px] text-emerald-300/80 font-medium block">
+                    Insurance App
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={onCloseMobile}
+                className="p-1.5 rounded-lg text-emerald-300/70 hover:text-white hover:bg-[#093327] transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            {renderSidebarContent(true)}
+
+            {/* Footer */}
+            {renderFooter(true)}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

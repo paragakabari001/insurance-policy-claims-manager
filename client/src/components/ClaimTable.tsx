@@ -13,6 +13,7 @@ import {
   Calendar,
   Filter,
   AlertTriangle,
+  ArrowRight,
 } from 'lucide-react';
 
 interface ClaimTableProps {
@@ -85,14 +86,12 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      {/* Accounting Explanation Banner */}
-      <div className="px-5 py-2.5 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
-        <span className="flex items-center gap-2">
-          <span className="font-semibold text-slate-800">Claim Accounting Rules:</span>
-          <span>Submitted claims <strong className="text-amber-700">reserve</strong> coverage.</span>
-          <span>Approved claims <strong className="text-emerald-700">use</strong> coverage.</span>
-          <span>Rejected claims <strong className="text-slate-700">restore</strong> coverage.</span>
-        </span>
+      {/* Accounting Rules Banner */}
+      <div className="px-4 sm:px-5 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-slate-600">
+        <span className="font-semibold text-slate-800">Rules:</span>
+        <span>Submitted <strong className="text-amber-700">reserves</strong> coverage.</span>
+        <span>Approved <strong className="text-emerald-700">uses</strong> coverage.</span>
+        <span>Rejected <strong className="text-slate-700">restores</strong> coverage.</span>
       </div>
 
       {/* Header filter toolbar */}
@@ -108,15 +107,15 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
         </div>
 
         {/* Filter buttons */}
-        <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 text-xs shadow-2xs">
-          <span className="text-slate-400 px-2 flex items-center gap-1 font-semibold">
+        <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 text-xs shadow-2xs overflow-x-auto">
+          <span className="text-slate-400 px-1 sm:px-2 flex items-center gap-1 font-semibold shrink-0">
             <Filter className="w-3 h-3" /> Filter:
           </span>
           {(['ALL', 'Submitted', 'Approved', 'Rejected'] as const).map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded-lg font-semibold transition-all shrink-0 ${
                 statusFilter === status
                   ? 'bg-[#06241b] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -129,7 +128,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
       </div>
 
       {filteredClaims.length === 0 ? (
-        <div className="p-12 text-center">
+        <div className="p-8 sm:p-12 text-center">
           <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center mx-auto mb-3">
             <AlertCircle className="w-6 h-6" />
           </div>
@@ -141,109 +140,201 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
-              <tr>
-                <th scope="col" className="px-6 py-4">Claim ID</th>
-                {isAdmin && <th scope="col" className="px-6 py-4">Customer</th>}
-                <th scope="col" className="px-6 py-4">Policy ID</th>
-                <th scope="col" className="px-6 py-4">Incident Date</th>
-                <th scope="col" className="px-6 py-4">Claim Amount</th>
-                <th scope="col" className="px-6 py-4">Status</th>
-                {isAdmin && onDecideClaim && (
-                  <th scope="col" className="px-6 py-4 text-right">Review Action</th>
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {filteredClaims.map((claim) => {
-                const isDeciding = isLoadingDecision === claim.id;
-                const canDecide = isAdmin && claim.status === 'Submitted';
+        <>
+          {/* Mobile Feed View (Native App Feel on Screens < 768px) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredClaims.map((claim) => {
+              const isDeciding = isLoadingDecision === claim.id;
+              const canDecide = isAdmin && claim.status === 'Submitted';
 
-                return (
-                  <tr key={claim.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-6 py-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+              return (
+                <div key={claim.id} className="p-4 space-y-3 hover:bg-slate-50/60 transition-colors">
+                  {/* Top: ID + Status */}
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-slate-900 text-sm">
                       {claim.id}
-                    </td>
+                    </span>
+                    {getStatusBadge(claim.status)}
+                  </div>
 
-                    {isAdmin && (
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <User className="w-3.5 h-3.5 text-slate-400" />
-                          <div>
-                            <span className="font-semibold text-slate-800">
-                              {claim.customer?.name || claim.customer?.username || 'Customer'}
-                            </span>
-                            <span className="text-xs text-slate-500 block">
-                              @{claim.customer?.username}
-                            </span>
+                  {/* Customer Info (Admin) */}
+                  {isAdmin && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs">
+                      <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="font-semibold text-slate-800">
+                        {claim.customer?.name || claim.customer?.username || 'Customer'}
+                      </span>
+                      <span className="text-slate-400">@{claim.customer?.username}</span>
+                    </div>
+                  )}
+
+                  {/* Amount & Policy Details */}
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100">
+                    <div>
+                      <span className="text-slate-400 block font-medium">Claim Amount</span>
+                      <span className="text-base font-extrabold text-slate-900">
+                        {formatCurrency(claim.amount)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block font-medium">Linked Policy</span>
+                      <span className="font-mono font-bold text-slate-800 text-xs">
+                        {claim.policyId}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Incident Date */}
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Incident Date: {formatDate(claim.incidentDate)}</span>
+                  </div>
+
+                  {/* Review Actions for Admin on Mobile */}
+                  {isAdmin && onDecideClaim && (
+                    <div className="pt-2 border-t border-slate-100">
+                      {canDecide ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => {
+                              setDecisionError(null);
+                              setPendingDecision({ claim, decision: 'Approved' });
+                            }}
+                            disabled={isDeciding}
+                            className="py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          >
+                            <Check className="w-4 h-4" />
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDecisionError(null);
+                              setPendingDecision({ claim, decision: 'Rejected' });
+                            }}
+                            disabled={isDeciding}
+                            className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          >
+                            <X className="w-4 h-4" />
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="text-center py-1 text-xs text-slate-400 italic font-medium">
+                          Decided ({claim.status})
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop Table View (Screens >= 768px) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
+                <tr>
+                  <th scope="col" className="px-6 py-4">Claim ID</th>
+                  {isAdmin && <th scope="col" className="px-6 py-4">Customer</th>}
+                  <th scope="col" className="px-6 py-4">Policy ID</th>
+                  <th scope="col" className="px-6 py-4">Incident Date</th>
+                  <th scope="col" className="px-6 py-4">Claim Amount</th>
+                  <th scope="col" className="px-6 py-4">Status</th>
+                  {isAdmin && onDecideClaim && (
+                    <th scope="col" className="px-6 py-4 text-right">Review Action</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg-white">
+                {filteredClaims.map((claim) => {
+                  const isDeciding = isLoadingDecision === claim.id;
+                  const canDecide = isAdmin && claim.status === 'Submitted';
+
+                  return (
+                    <tr key={claim.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-6 py-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                        {claim.id}
+                      </td>
+
+                      {isAdmin && (
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <User className="w-3.5 h-3.5 text-slate-400" />
+                            <div>
+                              <span className="font-semibold text-slate-800">
+                                {claim.customer?.name || claim.customer?.username || 'Customer'}
+                              </span>
+                              <span className="text-xs text-slate-500 block">
+                                @{claim.customer?.username}
+                              </span>
+                            </div>
                           </div>
+                        </td>
+                      )}
+
+                      <td className="px-6 py-4 whitespace-nowrap font-mono text-slate-600 font-medium">
+                        {claim.policyId}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap text-slate-600">
+                        <div className="flex items-center gap-1.5 text-xs font-medium">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          {formatDate(claim.incidentDate)}
                         </div>
                       </td>
-                    )}
 
-                    <td className="px-6 py-4 whitespace-nowrap font-mono text-slate-600 font-medium">
-                      {claim.policyId}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-600">
-                      <div className="flex items-center gap-1.5 text-xs font-medium">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                        {formatDate(claim.incidentDate)}
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap font-extrabold text-slate-900">
-                      {formatCurrency(claim.amount)}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(claim.status)}
-                    </td>
-
-                    {isAdmin && onDecideClaim && (
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        {canDecide ? (
-                          <div className="inline-flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setDecisionError(null);
-                                setPendingDecision({ claim, decision: 'Approved' });
-                              }}
-                              disabled={isDeciding}
-                              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors inline-flex items-center gap-1 disabled:opacity-50"
-                              title="Review and approve claim"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => {
-                                setDecisionError(null);
-                                setPendingDecision({ claim, decision: 'Rejected' });
-                              }}
-                              disabled={isDeciding}
-                              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors inline-flex items-center gap-1 disabled:opacity-50"
-                              title="Review and reject claim"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                              Reject
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400 font-medium">
-                            Decided ({claim.status})
-                          </span>
-                        )}
+                      <td className="px-6 py-4 whitespace-nowrap font-extrabold text-slate-900">
+                        {formatCurrency(claim.amount)}
                       </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(claim.status)}
+                      </td>
+
+                      {isAdmin && onDecideClaim && (
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          {canDecide ? (
+                            <div className="inline-flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setDecisionError(null);
+                                  setPendingDecision({ claim, decision: 'Approved' });
+                                }}
+                                disabled={isDeciding}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors inline-flex items-center gap-1 disabled:opacity-50"
+                                title="Review and approve claim"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDecisionError(null);
+                                  setPendingDecision({ claim, decision: 'Rejected' });
+                                }}
+                                disabled={isDeciding}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors inline-flex items-center gap-1 disabled:opacity-50"
+                                title="Review and reject claim"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-slate-400 font-medium">
+                              Decided ({claim.status})
+                            </span>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* Admin Decision Confirmation Dialog */}

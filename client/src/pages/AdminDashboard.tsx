@@ -43,57 +43,61 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* View: DASHBOARD (Overview) */}
       {activeView === 'dashboard' && (
         <div className="space-y-6">
-          {/* Compact Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <Card className="p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
+          {/* Compact Metric Cards (2x2 on Mobile, 4-col on Desktop) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
                   Total Policies
                 </span>
-                <Layers className="w-4 h-4 text-slate-400" />
+                <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" />
               </div>
-              <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-slate-900">{totalPolicies}</span>
-                <span className="text-xs text-slate-500">
-                  ({activePolicies} Active, {expiredPolicies} Expired)
+              <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
+                <span className="text-xl sm:text-2xl font-bold text-slate-900">{totalPolicies}</span>
+                <span className="text-[10px] sm:text-xs text-slate-500">
+                  ({activePolicies} Active)
                 </span>
               </div>
             </Card>
 
-            <Card className="p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
+            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
                   Total Sum Insured
                 </span>
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0" />
               </div>
               <div className="mt-1.5">
-                <span className="text-2xl font-bold text-slate-900">{formatCurrency(totalSI)}</span>
+                <span className="text-lg sm:text-2xl font-bold text-slate-900 truncate block">
+                  {formatCurrency(totalSI)}
+                </span>
               </div>
             </Card>
 
-            <Card className="p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
+            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
                   Remaining Coverage
                 </span>
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0" />
               </div>
               <div className="mt-1.5">
-                <span className="text-2xl font-bold text-emerald-700">{formatCurrency(remainingSI)}</span>
+                <span className="text-lg sm:text-2xl font-bold text-emerald-700 truncate block">
+                  {formatCurrency(remainingSI)}
+                </span>
               </div>
             </Card>
 
-            <Card className="p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
+            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
                   Pending Claims
                 </span>
-                <Clock className="w-4 h-4 text-amber-500" />
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0" />
               </div>
-              <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-amber-600">{pendingClaims}</span>
-                <span className="text-xs text-slate-400">({approvedClaims} approved)</span>
+              <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
+                <span className="text-xl sm:text-2xl font-bold text-amber-600">{pendingClaims}</span>
+                <span className="text-[10px] sm:text-xs text-slate-400">({approvedClaims} apprv)</span>
               </div>
             </Card>
           </div>

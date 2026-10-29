@@ -3,6 +3,7 @@ import { api, getStoredToken, clearStoredToken, setStoredToken } from './api';
 import { User, Policy, Claim, CustomerUser } from './types';
 import { Sidebar, ActiveView } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { LoginPage } from './pages/LoginPage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { CustomerDashboard } from './pages/CustomerDashboard';
@@ -29,6 +30,7 @@ export function App() {
   const [preselectedPolicyId, setPreselectedPolicyId] = useState<string | undefined>(undefined);
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const addToast = (type: 'success' | 'error', text: string) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -207,7 +209,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* Single Clean Sidebar Navigation */}
+      {/* Responsive Sidebar (Desktop & Mobile Drawer) */}
       <Sidebar
         user={user}
         activeView={activeView}
@@ -218,6 +220,8 @@ export function App() {
         policiesCount={policies.length}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        isMobileOpen={isMobileDrawerOpen}
+        onCloseMobile={() => setIsMobileDrawerOpen(false)}
       />
 
       {/* Main Content Area */}
@@ -229,11 +233,10 @@ export function App() {
           onOpenSubmitClaim={() => handleOpenClaimModalForPolicy()}
           onRefresh={loadData}
           isLoading={isDataLoading}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+          onOpenMobileMenu={() => setIsMobileDrawerOpen(true)}
         />
 
-        <main className="flex-1 px-5 py-6 sm:px-8 w-full">
+        <main className="flex-1 px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-24 md:pb-6">
           {user.role === 'Administrator' ? (
             <AdminDashboard
               policies={policies}
@@ -254,6 +257,16 @@ export function App() {
           )}
         </main>
       </div>
+
+      {/* Native-feeling Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        user={user}
+        activeView={activeView}
+        setActiveView={setActiveView}
+        pendingClaimsCount={pendingClaimsCount}
+        policiesCount={policies.length}
+        onOpenProfileDrawer={() => setIsMobileDrawerOpen(true)}
+      />
 
       {/* Create Policy Modal (Admin) */}
       <CreatePolicyModal
