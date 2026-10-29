@@ -9,7 +9,6 @@ import {
   User,
   ArrowRight,
   AlertTriangle,
-  Sparkles,
 } from 'lucide-react';
 
 interface CreatePolicyModalProps {
@@ -39,7 +38,6 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync default customer if empty
   React.useEffect(() => {
     if (!customerId && customers.length > 0) {
       setCustomerId(customers[0].id);
@@ -95,29 +93,31 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150">
-        {/* Header - Luxury Forest Green Theme */}
-        <div className="px-6 py-5 bg-gradient-to-r from-[#041a13] via-[#06241b] to-[#083528] text-white flex items-center justify-between border-b border-[#0d3b2e] relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shadow-xs">
-              <ShieldPlus className="w-5 h-5 text-emerald-400" />
+        {/* Clean Pure White Header (shadcn style) */}
+        <div className="px-6 py-5 bg-white border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700 shadow-2xs">
+              <ShieldPlus className="w-5 h-5 text-emerald-700" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base text-white tracking-tight">Issue Insurance Policy</h3>
-                <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                <h3 className="font-extrabold text-base text-slate-900 tracking-tight">
+                  Issue Insurance Policy
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                   Underwriter Action
                 </span>
               </div>
-              <p className="text-xs text-emerald-200/70 font-medium">Create coverage policy for Customer 1 or Customer 2</p>
+              <p className="text-xs text-slate-500 font-medium">
+                Create coverage policy for Customer 1 or Customer 2
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-emerald-300/70 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition-colors relative z-10"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -161,7 +161,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white shadow-2xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-white shadow-2xs"
                 required
               />
             </div>
@@ -174,7 +174,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 min={startDate}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white shadow-2xs"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-white shadow-2xs"
                 required
               />
             </div>
@@ -186,7 +186,6 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
               <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                 <DollarSign className="w-3.5 h-3.5 text-emerald-700" /> Sum Insured (SI) in INR (₹)
               </label>
-              {/* Quick preset chips */}
               <div className="flex gap-1">
                 <button
                   type="button"
@@ -223,7 +222,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 value={sumInsured}
                 onChange={(e) => setSumInsured(e.target.value)}
                 placeholder="e.g. 1000000 (10 Lakhs)"
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-bold text-slate-900 bg-slate-50/50 focus:bg-white text-sm shadow-2xs"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-bold text-slate-900 bg-white text-sm shadow-2xs"
                 required
               />
             </div>
@@ -242,7 +241,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
               value={customId}
               onChange={(e) => setCustomId(e.target.value)}
               placeholder="e.g. POL-SPEC-TEST (Auto-generated if blank)"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-mono text-slate-800 bg-slate-50/50 focus:bg-white shadow-2xs"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-mono text-slate-800 bg-white shadow-2xs"
             />
           </div>
 

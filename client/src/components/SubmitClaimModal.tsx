@@ -10,10 +10,9 @@ import {
   DollarSign,
   ShieldAlert,
   AlertTriangle,
-  CheckCircle2,
-  Clock,
   ArrowRight,
-  Sparkles,
+  ShieldCheck,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface SubmitClaimModalProps {
@@ -45,7 +44,6 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync selected policy
   useEffect(() => {
     if (preselectedPolicyId) {
       setSelectedPolicyId(preselectedPolicyId);
@@ -56,7 +54,6 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
 
   const activePolicy = policies.find((p) => p.id === selectedPolicyId) || policies[0];
 
-  // Set default incident date to policy start date if empty or outside
   useEffect(() => {
     if (activePolicy) {
       if (!incidentDate || incidentDate < activePolicy.startDate || incidentDate > activePolicy.endDate) {
@@ -121,29 +118,31 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150">
-        {/* Header - Luxury Forest Green Theme */}
-        <div className="px-6 py-5 bg-gradient-to-r from-[#041a13] via-[#06241b] to-[#083528] text-white flex items-center justify-between border-b border-[#0d3b2e] relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shadow-xs">
-              <FilePlus className="w-5 h-5 text-emerald-400" />
+        {/* Clean Pure White Header (shadcn style) */}
+        <div className="px-6 py-5 bg-white border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700 shadow-2xs">
+              <FilePlus className="w-5 h-5 text-emerald-700" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base text-white tracking-tight">File an Insurance Claim</h3>
-                <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                <h3 className="font-extrabold text-base text-slate-900 tracking-tight">
+                  File an Insurance Claim
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                   Customer Action
                 </span>
               </div>
-              <p className="text-xs text-emerald-200/70 font-medium">Instant real-time Sum Insured verification</p>
+              <p className="text-xs text-slate-500 font-medium">
+                Instant real-time Sum Insured verification
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-emerald-300/70 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition-colors relative z-10"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -179,15 +178,15 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
 
           {/* Policy Information Card */}
           {activePolicy && (
-            <div className="p-4 rounded-2xl bg-[#06241b]/5 border border-emerald-900/10 text-xs space-y-2">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs space-y-2">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-slate-600">Coverage Duration:</span>
+                <span className="font-semibold text-slate-500">Coverage Duration:</span>
                 <span className="font-bold text-slate-900">
                   {formatDate(activePolicy.startDate)} &rarr; {formatDate(activePolicy.endDate)}
                 </span>
               </div>
-              <div className="flex justify-between items-center pt-2 border-t border-emerald-900/10">
-                <span className="font-semibold text-slate-600">Remaining Claimable SI:</span>
+              <div className="flex justify-between items-center pt-2 border-t border-slate-200/80">
+                <span className="font-semibold text-slate-500">Remaining Claimable SI:</span>
                 <span className="font-black text-emerald-800 text-sm">
                   {formatCurrency(activePolicy.remainingClaimableSI)}
                 </span>
@@ -206,7 +205,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
               onChange={(e) => setIncidentDate(e.target.value)}
               min={activePolicy?.startDate}
               max={activePolicy?.endDate}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white transition-all shadow-2xs"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-medium text-slate-800 bg-white focus:bg-white transition-all shadow-2xs"
               required
             />
             {activePolicy && (
@@ -233,7 +232,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="e.g. 600000"
-                className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 font-bold text-slate-900 bg-slate-50/50 focus:bg-white text-sm shadow-2xs transition-all ${
+                className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 font-bold text-slate-900 bg-white text-sm shadow-2xs transition-all ${
                   isAmountExceeded
                     ? 'border-rose-400 focus:ring-rose-500 text-rose-700'
                     : 'border-slate-200 focus:ring-emerald-600'
@@ -276,7 +275,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
               value={customId}
               onChange={(e) => setCustomId(e.target.value)}
               placeholder="e.g. CLM-CUSTOM-01 (Auto-generated if blank)"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-mono text-slate-800 bg-slate-50/50 focus:bg-white shadow-2xs"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-xs font-mono text-slate-800 bg-white shadow-2xs"
             />
           </div>
 
