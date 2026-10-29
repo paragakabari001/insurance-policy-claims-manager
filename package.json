@@ -1,0 +1,30 @@
+{
+  "name": "insurance-policy-claims-manager",
+  "version": "1.0.0",
+  "description": "Insurance Policy & Claims Management Web Application for TailVaR Assessment",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd server && npm install && npx prisma generate && cd ../client && npm install",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:client && npm run build:server",
+    "start": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "npm run build:client && npm run dev:server",
+    "test": "cd server && npm test",
+    "seed": "cd server && npm run seed"
+  },
+  "keywords": [
+    "insurance",
+    "claims",
+    "tailvar",
+    "fullstack",
+    "react",
+    "express",
+    "typescript",
+    "prisma"
+  ],
+  "author": "Parag",
+  "license": "ISC"
+}

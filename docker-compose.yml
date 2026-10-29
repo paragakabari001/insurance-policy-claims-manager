@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - DATABASE_URL=file:/app/data/insurance.db
+      - JWT_SECRET=tailvar_takehome_secret_key_2026_secure
+    volumes:
+      - insurance_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  insurance_data:

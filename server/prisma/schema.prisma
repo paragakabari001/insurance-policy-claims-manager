@@ -1,0 +1,40 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      String   // "Customer" | "Administrator"
+  name      String
+  createdAt DateTime @default(now())
+  policies  Policy[]
+}
+
+model Policy {
+  id          String   @id // e.g. POL-1001 or custom identifier
+  customerId  String
+  customer    User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  startDate   String   // Calendar date format YYYY-MM-DD
+  endDate     String   // Calendar date format YYYY-MM-DD
+  sumInsured  Float    // Monetary amount
+  createdAt   DateTime @default(now())
+  claims      Claim[]
+}
+
+model Claim {
+  id           String   @id // e.g. CLM-1001 or custom identifier
+  policyId     String
+  policy       Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  incidentDate String   // Calendar date format YYYY-MM-DD
+  amount       Float    // Monetary amount
+  status       String   @default("Submitted") // "Submitted" | "Approved" | "Rejected"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
