@@ -39,9 +39,10 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
               <th scope="col" className="px-6 py-4">Policy ID</th>
               {isAdmin && <th scope="col" className="px-6 py-4">Customer</th>}
               <th scope="col" className="px-6 py-4">Coverage Period</th>
+              <th scope="col" className="px-6 py-4">Coverage Status</th>
               <th scope="col" className="px-6 py-4">Original Sum Insured (SI)</th>
-              <th scope="col" className="px-6 py-4">Remaining Claimable SI</th>
-              <th scope="col" className="px-6 py-4">Utilization</th>
+              <th scope="col" className="px-6 py-4">Remaining Coverage</th>
+              <th scope="col" className="px-6 py-4">Reserved + Used</th>
               {!isAdmin && onSelectForClaim && (
                 <th scope="col" className="px-6 py-4 text-right">Action</th>
               )}
@@ -93,6 +94,29 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                     </div>
                   </td>
 
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {policy.coverageStatus === 'Active' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Active
+                      </span>
+                    )}
+                    {policy.coverageStatus === 'Upcoming' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                        Upcoming
+                      </span>
+                    )}
+                    {policy.coverageStatus === 'Expired' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-300">
+                        Expired
+                      </span>
+                    )}
+                    {!policy.coverageStatus && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-300">
+                        Active
+                      </span>
+                    )}
+                  </td>
+
                   <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-800">
                     {formatCurrency(policy.sumInsured)}
                   </td>
@@ -121,7 +145,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap w-44">
                     <div className="w-full">
                       <div className="flex justify-between text-xs text-slate-500 mb-1 font-medium">
-                        <span>{consumedPercentage}% blocked/consumed</span>
+                        <span>{consumedPercentage}% Reserved + Used</span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
                         <div
@@ -150,7 +174,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                         }`}
                       >
                         <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                        File Claim
+                        Submit Claim
                       </button>
                     </td>
                   )}

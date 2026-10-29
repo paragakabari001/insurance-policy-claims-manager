@@ -129,14 +129,14 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-base text-slate-900 tracking-tight">
-                  File an Insurance Claim
+                  Submit Claim
                 </h3>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  Customer Action
+                  Customer
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Instant real-time Sum Insured verification
+                Coverage and balance verification
               </p>
             </div>
           </div>
@@ -186,7 +186,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
                 </span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-slate-200/80">
-                <span className="font-semibold text-slate-500">Remaining Claimable SI:</span>
+                <span className="font-semibold text-slate-500">Remaining Coverage:</span>
                 <span className="font-black text-emerald-800 text-sm">
                   {formatCurrency(activePolicy.remainingClaimableSI)}
                 </span>
@@ -245,7 +245,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             {parsedAmount > 0 && (
               <div className="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500 font-medium">Projected Remaining SI:</span>
+                  <span className="text-slate-500 font-medium">Projected Remaining Coverage:</span>
                   <span
                     className={`font-black ${
                       isAmountExceeded ? 'text-rose-600' : 'text-emerald-700'
@@ -258,7 +258,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
                 </div>
                 {!isAmountExceeded && (
                   <p className="text-[10px] text-slate-500">
-                    &bull; This amount will be blocked immediately upon submission.
+                    &bull; This amount will be reserved immediately upon submission.
                   </p>
                 )}
               </div>

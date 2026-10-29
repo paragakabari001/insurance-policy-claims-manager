@@ -16,7 +16,9 @@ export interface Policy {
   endDate: string;
   sumInsured: number;
   remainingClaimableSI: number;
-  totalBlockedOrConsumed: number;
+  totalReservedAndUsed?: number;
+  totalBlockedOrConsumed?: number;
+  coverageStatus?: 'Upcoming' | 'Active' | 'Expired';
   submittedTotal?: number;
   approvedTotal?: number;
   rejectedTotal?: number;

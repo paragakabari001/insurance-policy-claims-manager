@@ -5,6 +5,8 @@ import { AuthenticatedRequest } from '../types';
 import {
   isValidDateFormat,
   calculatePolicyBalances,
+  getCoverageStatus,
+  getTodayCalendarDate,
 } from '../services/policyService';
 
 const router = Router();
@@ -32,6 +34,8 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
 
     const enrichedPolicies = policies.map((policy) => {
       const balances = calculatePolicyBalances(policy);
+      const coverageStatus = getCoverageStatus(policy.startDate, policy.endDate);
+
       return {
         id: policy.id,
         customerId: policy.customerId,
@@ -39,9 +43,10 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
         customerName: policy.customer?.name,
         startDate: policy.startDate,
         endDate: policy.endDate,
+        coverageStatus,
         sumInsured: policy.sumInsured,
         remainingClaimableSI: balances.remainingClaimableSI,
-        totalBlockedOrConsumed: balances.totalBlockedOrConsumed,
+        totalReservedAndUsed: balances.totalReservedAndUsed,
         submittedTotal: balances.submittedTotal,
         approvedTotal: balances.approvedTotal,
         rejectedTotal: balances.rejectedTotal,
@@ -50,7 +55,23 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
       };
     });
 
-    res.json({ policies: enrichedPolicies });
+    // Summary metrics
+    const today = getTodayCalendarDate();
+    const totalPolicies = enrichedPolicies.length;
+    const activePoliciesCount = enrichedPolicies.filter((p) => p.coverageStatus === 'Active').length;
+    const expiredPoliciesCount = enrichedPolicies.filter((p) => p.coverageStatus === 'Expired').length;
+    const upcomingPoliciesCount = enrichedPolicies.filter((p) => p.coverageStatus === 'Upcoming').length;
+
+    res.json({
+      policies: enrichedPolicies,
+      meta: {
+        today,
+        totalPolicies,
+        activePoliciesCount,
+        expiredPoliciesCount,
+        upcomingPoliciesCount,
+      },
+    });
   } catch (err: any) {
     console.error('Error fetching policies:', err);
     res.status(500).json({ error: 'Failed to retrieve policies.' });
@@ -88,6 +109,7 @@ router.get('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
     }
 
     const balances = calculatePolicyBalances(policy);
+    const coverageStatus = getCoverageStatus(policy.startDate, policy.endDate);
 
     res.json({
       policy: {
@@ -97,9 +119,10 @@ router.get('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
         customerName: policy.customer?.name,
         startDate: policy.startDate,
         endDate: policy.endDate,
+        coverageStatus,
         sumInsured: policy.sumInsured,
         remainingClaimableSI: balances.remainingClaimableSI,
-        totalBlockedOrConsumed: balances.totalBlockedOrConsumed,
+        totalReservedAndUsed: balances.totalReservedAndUsed,
         submittedTotal: balances.submittedTotal,
         approvedTotal: balances.approvedTotal,
         rejectedTotal: balances.rejectedTotal,
@@ -155,7 +178,7 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
     // Reject invalid policy dates (end before start)
     if (endDate < startDate) {
       res.status(400).json({
-        error: 'Invalid policy dates: Coverage end date cannot be earlier than start date.',
+        error: 'Invalid policy dates: Coverage end date cannot precede start date (cannot be earlier than start date).',
       });
       return;
     }
@@ -164,7 +187,7 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
     const parsedSI = Number(sumInsured);
     if (isNaN(parsedSI) || parsedSI <= 0) {
       res.status(400).json({
-        error: 'Sum Insured (SI) must be a positive number greater than 0.',
+        error: 'Sum Insured must be a positive number greater than 0.',
       });
       return;
     }
@@ -183,13 +206,15 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
       policyId = `POL-${1000 + count + 1}-${randomSuffix}`;
     }
 
+    const roundedSI = Math.round(parsedSI * 100) / 100;
+
     const newPolicy = await prisma.policy.create({
       data: {
         id: policyId,
         customerId: targetCustomer.id,
         startDate,
         endDate,
-        sumInsured: Math.round(parsedSI * 100) / 100,
+        sumInsured: roundedSI,
       },
       include: {
         customer: {
@@ -197,6 +222,8 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
         },
       },
     });
+
+    const coverageStatus = getCoverageStatus(newPolicy.startDate, newPolicy.endDate);
 
     res.status(201).json({
       message: 'Policy created successfully.',
@@ -207,9 +234,10 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
         customerName: newPolicy.customer?.name,
         startDate: newPolicy.startDate,
         endDate: newPolicy.endDate,
+        coverageStatus,
         sumInsured: newPolicy.sumInsured,
         remainingClaimableSI: newPolicy.sumInsured,
-        totalBlockedOrConsumed: 0,
+        totalReservedAndUsed: 0,
         claimsCount: 0,
         createdAt: newPolicy.createdAt,
       },

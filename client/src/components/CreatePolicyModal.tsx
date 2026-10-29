@@ -104,14 +104,14 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-base text-slate-900 tracking-tight">
-                  Issue Insurance Policy
+                  Create Policy
                 </h3>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  Underwriter Action
+                  Administrator
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Create coverage policy for Customer 1 or Customer 2
+                Issue coverage policy for Customer 1 or Customer 2
               </p>
             </div>
           </div>
@@ -263,7 +263,7 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
               size="sm"
               className="bg-[#06241b] hover:bg-[#083528] text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-950/20 px-5 gap-1.5"
             >
-              {isSubmitting ? 'Issuing Policy...' : 'Issue Policy'}
+              {isSubmitting ? 'Creating Policy...' : 'Create Policy'}
               <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </div>

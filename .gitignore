@@ -34,3 +34,5 @@ lerna-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+*.zip
+submission-insurance-policy-claims-manager.zip
