@@ -10,6 +10,9 @@ import {
   Clock,
   Layers,
   Sparkles,
+  FileText,
+  TrendingUp,
+  TrendingDown,
 } from 'lucide-react';
 
 interface CustomerDashboardProps {
@@ -40,65 +43,169 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
       {/* View: DASHBOARD (Overview) */}
       {activeView === 'dashboard' && (
         <div className="space-y-6">
-          {/* Compact Metric Cards (2x2 on Mobile, 4-col on Desktop) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
-            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
-                  Total Policies
-                </span>
-                <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 shrink-0" />
-              </div>
-              <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-bold text-slate-900">{totalPolicies}</span>
-                <span className="text-[10px] sm:text-xs text-slate-500">
-                  ({activePolicies} active)
-                </span>
-              </div>
-            </Card>
+          {/* Compact Metric Cards with Wave Graphs (Figma Match) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Total Policies */}
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-[#00ba63]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Total Policies</p>
+                    <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{totalPolicies}</p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{activePolicies} Active</p>
+                  </div>
+                </div>
 
-            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
-                  Total Sum Insured
-                </span>
-                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 shrink-0" />
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="w-6 h-6 rounded-lg bg-orange-50 border border-orange-100/80 flex items-center justify-center text-orange-400">
+                    <FileText className="w-3.5 h-3.5 text-orange-400" />
+                  </div>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
+                      <TrendingUp className="w-3 h-3 text-[#00ba63]" /> +12%
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-1.5">
-                <span className="text-lg sm:text-2xl font-bold text-slate-900 truncate block">
-                  {formatCurrency(totalCoveredSI)}
-                </span>
-              </div>
-            </Card>
 
-            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
-                  Remaining Coverage
-                </span>
-                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 shrink-0" />
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="cust-wave-green-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 14, 300 8 L 300 50 L 0 50 Z" fill="url(#cust-wave-green-1)" />
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 14, 300 8" fill="none" stroke="#00ba63" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
               </div>
-              <div className="mt-1.5">
-                <span className="text-lg sm:text-2xl font-bold text-emerald-700 truncate block">
-                  {formatCurrency(remainingSI)}
-                </span>
-              </div>
-            </Card>
+            </div>
 
-            <Card className="p-3.5 sm:p-4 rounded-xl bg-white border-slate-200 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate">
-                  Claims Filed
-                </span>
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0" />
+            {/* Card 2: Total Sum Insured */}
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5 text-[#2563eb]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Total Sum Insured</p>
+                    <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">
+                      {formatCurrency(totalCoveredSI)}
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">Across your policies</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-500">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eff6ff] text-[#2563eb] text-xs font-bold">
+                      <TrendingUp className="w-3 h-3 text-[#2563eb]" /> +8%
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
-                <span className="text-xl sm:text-2xl font-bold text-slate-900">{claims.length}</span>
-                <span className="text-[10px] sm:text-xs text-amber-700 font-medium">
-                  ({submittedClaims} pending)
-                </span>
+
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="cust-wave-blue-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 42 C 60 44, 110 32, 170 34 C 220 36, 250 16, 300 10 L 300 50 L 0 50 Z" fill="url(#cust-wave-blue-1)" />
+                  <path d="M0 42 C 60 44, 110 32, 170 34 C 220 36, 250 16, 300 10" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
               </div>
-            </Card>
+            </div>
+
+            {/* Card 3: Remaining Coverage */}
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-[#00ba63]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Remaining Coverage</p>
+                    <p className="text-xl sm:text-2xl font-black text-[#008f4c] tracking-tight mt-1 leading-tight">
+                      {formatCurrency(remainingSI)}
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">Available to use</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="h-6" />
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
+                      <TrendingUp className="w-3 h-3 text-[#00ba63]" /> +18%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="cust-wave-green-rem-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 12, 300 8 L 300 50 L 0 50 Z" fill="url(#cust-wave-green-rem-1)" />
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 12, 300 8" fill="none" stroke="#00ba63" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Card 4: Claims Filed */}
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-[#ea580c]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Claims Filed</p>
+                    <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{claims.length}</p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">
+                      {submittedClaims} pending &bull; {approvedClaims} approved
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="h-6" />
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] text-xs font-bold">
+                      <TrendingDown className="w-3 h-3 text-[#ea580c]" /> -100%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="cust-wave-orange-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ea580c" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#ea580c" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 44 C 60 46, 120 38, 180 36 C 230 34, 260 20, 300 12 L 300 50 L 0 50 Z" fill="url(#cust-wave-orange-1)" />
+                  <path d="M0 44 C 60 46, 120 38, 180 36 C 230 34, 260 20, 300 12" fill="none" stroke="#ea580c" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* My Policies Section */}

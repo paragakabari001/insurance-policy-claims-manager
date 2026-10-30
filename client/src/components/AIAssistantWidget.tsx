@@ -196,7 +196,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[410px] h-full flex flex-col bg-[#f8fafc] border-l border-slate-200/90 shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 shrink-0"
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[410px] h-screen shrink-0 flex flex-col bg-[#f8fafc] border-l border-slate-200/90 shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
         >
           {/* Header (Figma Match: Dark Green Header with Badge and Window Controls) */}
           <div className="shrink-0 h-16 px-4 bg-[#031d16] text-white flex items-center justify-between border-b border-[#093529]">

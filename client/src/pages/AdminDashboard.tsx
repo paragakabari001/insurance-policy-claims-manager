@@ -105,127 +105,170 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeView === 'dashboard' && (
         <div className="space-y-6">
           {/* Top 4 KPI Cards with mini wave graphs & trend tags (Figma Match) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: Total Policies */}
-            <Card className="p-4 rounded-2xl bg-white border-slate-200 shadow-2xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                    <FileText className="w-4 h-4" />
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-[#00ba63]" />
                   </div>
-                  <span className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
-                    <FileText className="w-3.5 h-3.5 text-amber-500" />
-                  </span>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Total Policies</p>
+                    <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{totalPolicies}</p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{activePolicies} Active</p>
+                  </div>
                 </div>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-2.5">
-                  Total Policies
-                </p>
-                <div className="flex items-baseline justify-between mt-1">
-                  <span className="text-2xl font-black text-slate-900">{totalPolicies}</span>
-                </div>
-                <div className="flex items-center justify-between mt-1 text-[11px]">
-                  <span className="text-slate-400 font-medium">{activePolicies} Active</span>
-                  <span className="inline-flex items-center gap-0.5 text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded-md">
-                    <TrendingUp className="w-3 h-3" /> +12%
-                  </span>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="w-6 h-6 rounded-lg bg-orange-50 border border-orange-100/80 flex items-center justify-center text-orange-400">
+                    <FileText className="w-3.5 h-3.5 text-orange-400" />
+                  </div>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
+                      <TrendingUp className="w-3 h-3 text-[#00ba63]" /> +12%
+                    </span>
+                  </div>
                 </div>
               </div>
-              {/* Wave SVG */}
-              <div className="mt-3 pt-2 border-t border-slate-100">
-                <svg className="w-full h-6 text-emerald-500" viewBox="0 0 100 20" fill="none">
-                  <path d="M0 15 Q25 5 50 12 T100 8" stroke="currentColor" strokeWidth="2.5" fill="none" />
+
+              {/* Glowing Wave SVG */}
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="wave-green-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 14, 300 8 L 300 50 L 0 50 Z" fill="url(#wave-green-1)" />
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 14, 300 8" fill="none" stroke="#00ba63" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-            </Card>
+            </div>
 
             {/* Card 2: Total Sum Insured */}
-            <Card className="p-4 rounded-2xl bg-white border-slate-200 shadow-2xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Layers className="w-4 h-4" />
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5 text-[#2563eb]" />
                   </div>
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Total Sum Insured</p>
+                    <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">
+                      {formatCurrency(totalSI)}
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">Across all policies</p>
+                  </div>
                 </div>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-2.5">
-                  Total Sum Insured
-                </p>
-                <div className="mt-1">
-                  <span className="text-xl sm:text-2xl font-black text-slate-900">
-                    {formatCurrency(totalSI)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between mt-1 text-[11px]">
-                  <span className="text-slate-400 font-medium">Across all policies</span>
-                  <span className="inline-flex items-center gap-0.5 text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded-md">
-                    <TrendingUp className="w-3 h-3" /> +8%
-                  </span>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-500">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eff6ff] text-[#2563eb] text-xs font-bold">
+                      <TrendingUp className="w-3 h-3 text-[#2563eb]" /> +8%
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100">
-                <svg className="w-full h-6 text-blue-500" viewBox="0 0 100 20" fill="none">
-                  <path d="M0 16 Q30 18 55 10 T100 6" stroke="currentColor" strokeWidth="2.5" fill="none" />
+
+              {/* Glowing Wave SVG */}
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="wave-blue-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 42 C 60 44, 110 32, 170 34 C 220 36, 250 16, 300 10 L 300 50 L 0 50 Z" fill="url(#wave-blue-1)" />
+                  <path d="M0 42 C 60 44, 110 32, 170 34 C 220 36, 250 16, 300 10" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-            </Card>
+            </div>
 
             {/* Card 3: Remaining Coverage */}
-            <Card className="p-4 rounded-2xl bg-white border-slate-200 shadow-2xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-xl bg-[#00c569]/10 text-[#00c569] flex items-center justify-center">
-                    <ShieldCheck className="w-4 h-4" />
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-[#00ba63]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Remaining Coverage</p>
+                    <p className="text-xl sm:text-2xl font-black text-[#008f4c] tracking-tight mt-1 leading-tight">
+                      {formatCurrency(remainingSI)}
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">Available to use</p>
                   </div>
                 </div>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-2.5">
-                  Remaining Coverage
-                </p>
-                <div className="mt-1">
-                  <span className="text-xl sm:text-2xl font-black text-[#00c569]">
-                    {formatCurrency(remainingSI)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between mt-1 text-[11px]">
-                  <span className="text-slate-400 font-medium">Available to use</span>
-                  <span className="inline-flex items-center gap-0.5 text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded-md">
-                    <TrendingUp className="w-3 h-3" /> +18%
-                  </span>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="h-6" />
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
+                      <TrendingUp className="w-3 h-3 text-[#00ba63]" /> +18%
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100">
-                <svg className="w-full h-6 text-[#00c569]" viewBox="0 0 100 20" fill="none">
-                  <path d="M0 14 Q20 6 50 10 T100 4" stroke="currentColor" strokeWidth="2.5" fill="none" />
+
+              {/* Glowing Wave SVG */}
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="wave-green-rem-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 12, 300 8 L 300 50 L 0 50 Z" fill="url(#wave-green-rem-1)" />
+                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 12, 300 8" fill="none" stroke="#00ba63" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-            </Card>
+            </div>
 
             {/* Card 4: Pending Claims */}
-            <Card className="p-4 rounded-2xl bg-white border-slate-200 shadow-2xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <Clock className="w-4 h-4" />
+            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
+              <div className="flex items-start justify-between gap-2 z-10">
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-[#ea580c]" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500 leading-tight">Pending Claims</p>
+                    <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{pendingClaims}</p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{approvedClaims} approved</p>
                   </div>
                 </div>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-2.5">
-                  Pending Claims
-                </p>
-                <div className="mt-1">
-                  <span className="text-2xl font-black text-amber-600">{pendingClaims}</span>
-                </div>
-                <div className="flex items-center justify-between mt-1 text-[11px]">
-                  <span className="text-slate-400 font-medium">{approvedClaims} approved</span>
-                  <span className="inline-flex items-center gap-0.5 text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded-md">
-                    <TrendingDown className="w-3 h-3" /> -100%
-                  </span>
+
+                <div className="flex flex-col items-end justify-between h-full">
+                  <div className="h-6" />
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] text-xs font-bold">
+                      <TrendingDown className="w-3 h-3 text-[#ea580c]" /> -100%
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100">
-                <svg className="w-full h-6 text-amber-500" viewBox="0 0 100 20" fill="none">
-                  <path d="M0 16 Q35 12 65 17 T100 11" stroke="currentColor" strokeWidth="2.5" fill="none" />
+
+              {/* Glowing Wave SVG */}
+              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="wave-orange-1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ea580c" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#ea580c" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 44 C 60 46, 120 38, 180 36 C 230 34, 260 20, 300 12 L 300 50 L 0 50 Z" fill="url(#wave-orange-1)" />
+                  <path d="M0 44 C 60 46, 120 38, 180 36 C 230 34, 260 20, 300 12" fill="none" stroke="#ea580c" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-            </Card>
+            </div>
           </div>
 
           {/* Section: Policies Overview */}

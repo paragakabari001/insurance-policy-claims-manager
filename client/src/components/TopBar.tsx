@@ -9,6 +9,7 @@ import {
   Bell,
   Sparkles,
   Menu,
+  ChevronDown,
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -37,7 +38,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const isAdmin = user.role === 'Administrator';
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-10 shadow-2xs">
+    <header className="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-10 shadow-2xs shrink-0">
       {/* Left: Mobile Menu & Search Bar (Figma Match) */}
       <div className="flex items-center gap-3 flex-1 max-w-md min-w-0">
         {onOpenMobileMenu && (
@@ -86,14 +87,15 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
 
         {/* User Pill (Figma Match) */}
-        <div className="flex items-center gap-2 px-2 py-1 rounded-xl bg-slate-50 border border-slate-200/80">
-          <div className="w-7 h-7 rounded-full bg-[#031d16] text-[#00c569] font-bold text-xs flex items-center justify-center">
-            {user.name.slice(0, 2).toUpperCase()}
+        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 cursor-default">
+          <div className="w-8 h-8 rounded-full bg-[#011f17] text-[#00ba63] font-bold text-xs flex items-center justify-center shrink-0">
+            {user.role === 'Administrator' ? 'AD' : user.username === 'customer1' ? 'C1' : 'C2'}
           </div>
           <div className="hidden sm:block text-left leading-tight pr-1">
             <p className="text-xs font-bold text-slate-900">{user.name}</p>
-            <p className="text-[10px] text-slate-500 font-medium">{user.role}</p>
+            <p className="text-[10px] text-slate-400 font-medium">{user.role}</p>
           </div>
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         </div>
 
         {/* Refresh Button */}

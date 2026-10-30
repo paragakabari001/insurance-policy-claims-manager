@@ -213,7 +213,7 @@ export function App() {
   const pendingClaimsCount = claims.filter((c) => c.status === 'Submitted').length;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="h-screen w-screen overflow-hidden bg-slate-50 flex">
       {/* Responsive Sidebar (Desktop & Mobile Drawer) */}
       <Sidebar
         user={user}
@@ -230,7 +230,7 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         <TopBar
           user={user}
           activeView={activeView}
@@ -243,7 +243,7 @@ export function App() {
           onToggleAI={() => setIsAIOpen((prev) => !prev)}
         />
 
-        <main className="flex-1 px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-24 md:pb-6">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-24 md:pb-6">
           {user.role === 'Administrator' ? (
             <AdminDashboard
               policies={policies}
