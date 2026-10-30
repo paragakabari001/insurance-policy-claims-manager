@@ -79,6 +79,23 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
     ]);
   }, [user?.id]);
 
+  // Keep the drawer mounted during its exit animation
+  const [rendered, setRendered] = useState(isOpen);
+  const [closing, setClosing] = useState(false);
+  useEffect(() => {
+    if (isOpen) {
+      setRendered(true);
+      setClosing(false);
+    } else if (rendered) {
+      setClosing(true);
+      const t = setTimeout(() => {
+        setRendered(false);
+        setClosing(false);
+      }, 260);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen]);
+
   // Auto-scroll to latest message
   useEffect(() => {
     if (isOpen) {
@@ -213,11 +230,11 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
       )}
 
       {/* Right-Side AI Assistant Panel: Clean, integrated Copilot Rail aligned with TopBar */}
-      {isOpen && (
+      {rendered && (
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[410px] xl:w-[440px] h-screen shrink-0 flex flex-col bg-slate-50 border-l border-slate-200/90 shadow-2xl md:shadow-none overflow-hidden relative"
+          className={`anim-drawer ${closing ? 'anim-drawer-out' : 'anim-drawer-in'} fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[410px] xl:w-[440px] h-screen shrink-0 flex flex-col bg-slate-50 border-l border-slate-200/90 shadow-2xl md:shadow-none overflow-hidden relative`}
         >
           {/* Unified 64px Header - Matches TopBar height & styling for a seamless top navigation band */}
           <div className="relative z-10 shrink-0 h-16 px-4 bg-white border-b border-slate-200/80 flex items-center justify-between shadow-2xs">
@@ -309,7 +326,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
               return (
                 <div
                   key={msg.id}
-                  className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+                  className={`anim-msg flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   {!isUser && (
                     <div className="w-7 h-7 rounded-full bg-[#011f17] text-[#00c569] flex items-center justify-center shrink-0 mb-4 shadow-sm">
@@ -360,7 +377,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
 
             {/* In-flight typing indicator */}
             {isLoading && (
-              <div className="flex items-end gap-2">
+              <div className="anim-msg flex items-end gap-2">
                 <div className="w-7 h-7 rounded-full bg-[#011f17] text-[#00c569] flex items-center justify-center shrink-0 shadow-sm">
                   <Sparkles className="w-3.5 h-3.5" />
                 </div>

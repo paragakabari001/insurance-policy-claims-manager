@@ -108,13 +108,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+            <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-2.5 flex-nowrap">
               {/* Date Range Filter Button (Interactive Dropdown) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="h-8 sm:h-9 px-3 sm:px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] sm:text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
+                    className="h-8 sm:h-9 px-3 sm:px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] sm:text-xs font-semibold text-slate-700 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
                   >
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>{dateRange}</span>
@@ -137,14 +137,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Desktop-only Action Buttons */}
-              <div className="hidden sm:flex items-center gap-2">
+              {/* Action Buttons (single line on mobile, right aligned) */}
+              <div className="flex items-center gap-2 shrink-0">
                 {onOpenCreatePolicy && (
                   <button
                     onClick={onOpenCreatePolicy}
-                    className="h-9 px-4 rounded-xl bg-[#031d16] hover:bg-[#072d22] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#031d16]/20 transition-all cursor-pointer"
+                    className="h-8 sm:h-9 px-3 sm:px-4 rounded-xl bg-[#031d16] hover:bg-[#072d22] text-white text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#031d16]/20 transition-all cursor-pointer whitespace-nowrap"
                   >
-                    <Plus className="w-4 h-4 text-[#00c569]" />
+                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00c569]" />
                     <span>Create Policy</span>
                   </button>
                 )}
@@ -152,7 +152,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {onToggleAI && (
                   <button
                     onClick={onToggleAI}
-                    className={`h-9 px-3.5 rounded-xl border text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer ${
+                    className={`hidden sm:flex h-9 px-3.5 rounded-xl border text-xs font-bold items-center gap-2 shadow-2xs transition-all cursor-pointer ${
                       isAIOpen
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
                         : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
@@ -166,23 +166,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
-          {/* Mobile Action Buttons: 2 Equal Columns Matching Mobile Design Reference */}
-          <div className="flex items-center gap-2 sm:hidden">
-            {onOpenCreatePolicy && (
-              <button
-                onClick={onOpenCreatePolicy}
-                className="h-8 px-3 rounded-xl bg-[#031d16] active:bg-[#072d22] text-white text-[11px] font-bold flex items-center justify-center gap-1 shadow-sm shadow-[#031d16]/20 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4 text-[#00c569]" />
-                <span>Create Policy</span>
-              </button>
-            )}
-          </div>
-
           {/* Top 4 KPI Cards: 2x2 Grid on Mobile, 4-Cols on Desktop (Clean Flat Executive Style without bottom wave) */}
           <div className={`grid grid-cols-2 gap-2.5 sm:gap-3.5 ${isAIOpen ? 'lg:grid-cols-2 2xl:grid-cols-4' : 'lg:grid-cols-4'}`}>
             {/* Card 1: Total Policies */}
-            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+            <div className="kpi-card relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
               <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
                   <FileText className="w-4 h-4 text-[#00ba63]" />
@@ -206,7 +193,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 2: Total Sum Insured */}
-            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-blue-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+            <div className="kpi-card relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-blue-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
               <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
                   <Layers className="w-4 h-4 text-[#2563eb]" />
@@ -233,7 +220,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 3: Remaining Coverage */}
-            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+            <div className="kpi-card relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
               <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
@@ -260,7 +247,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 4: Pending Claims */}
-            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-amber-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+            <div className="kpi-card relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-amber-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
               <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
                   <Clock className="w-4 h-4 text-[#ea580c]" />
@@ -331,6 +318,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       strokeWidth="3.5"
                       strokeDasharray={`${remainingPercent * 0.88} 100`}
                       strokeLinecap="round"
+                      className="anim-donut"
+                      style={{ ['--dash' as any]: `${remainingPercent * 0.88} 100`, ['--circ' as any]: 100 }}
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">

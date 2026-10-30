@@ -332,6 +332,7 @@ export function App() {
         />
 
         <main className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-28 md:pb-6 bg-[#f8fafc]">
+          <div key={activeView} className="anim-page">
           {user.role === 'Administrator' ? (
             <AdminDashboard
               user={user}
@@ -357,6 +358,7 @@ export function App() {
               onToggleAI={() => setIsAIOpen((prev) => !prev)}
             />
           )}
+          </div>
         </main>
       </div>
 

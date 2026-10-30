@@ -113,7 +113,8 @@ const SvgDonutChart: React.FC<{
                 strokeDasharray={seg.strokeDasharray}
                 strokeDashoffset={seg.strokeDashoffset}
                 strokeLinecap="round"
-                className="transition-all duration-700 ease-out"
+                className="anim-donut"
+                style={{ ['--dash' as any]: seg.strokeDasharray, ['--circ' as any]: circumference, animationDelay: `${0.1 + idx * 0.12}s` }}
               />
             ))}
         </svg>
@@ -640,7 +641,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
       {/* 3. KPI Metrics: stacked responsive cards (2x2 on mobile, 4 cols on wide) */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3.5">
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-emerald-300 transition-all min-w-0">
+        <div className="kpi-card bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-emerald-300 transition-all min-w-0">
           <div className="flex items-center justify-between gap-1">
             <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4 text-[#00ba63]" />
@@ -653,7 +654,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">Across all policies</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-blue-300 transition-all min-w-0">
+        <div className="kpi-card bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-blue-300 transition-all min-w-0">
           <div className="flex items-center justify-between gap-1">
             <div className="w-8 h-8 rounded-xl bg-[#eef4ff] flex items-center justify-center shrink-0">
               <Layers className="w-4 h-4 text-[#2563eb]" />
@@ -666,7 +667,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">Total insured value</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-emerald-300 transition-all min-w-0">
+        <div className="kpi-card bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-emerald-300 transition-all min-w-0">
           <div className="flex items-center justify-between gap-1">
             <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
@@ -679,7 +680,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">Remaining to claim</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-orange-300 transition-all min-w-0">
+        <div className="kpi-card bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-orange-300 transition-all min-w-0">
           <div className="flex items-center justify-between gap-1">
             <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
               <Target className="w-4 h-4 text-orange-500" />
@@ -709,12 +710,12 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           <div className="space-y-2">
             <div className="w-full h-4 rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
               <div
-                className="bg-[#00c569] h-full transition-all duration-700 ease-out"
+                className="bg-[#00c569] h-full anim-bar-x"
                 style={{ width: `${usedPct}%` }}
                 title={`Reserved + Used: ${formatCurrency(analyticsData.totalUsed)} (${usedPct}%)`}
               />
               <div
-                className="bg-[#00ba63] h-full transition-all duration-700 ease-out"
+                className="bg-[#00ba63] h-full anim-bar-x" 
                 style={{ width: `${remainingPct}%` }}
                 title={`Remaining: ${formatCurrency(analyticsData.totalRemaining)} (${remainingPct}%)`}
               />
@@ -853,7 +854,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                     </span>
                     <div className="w-7 bg-slate-100/60 rounded-t-md h-16 flex items-end">
                       <div
-                        className={`w-full ${barColor} rounded-t-md transition-all duration-700 ease-out group-hover:opacity-90`}
+                        className={`w-full ${barColor} rounded-t-md anim-bar-y group-hover:opacity-90`}
                         style={{ height: `${heightPct}%` }}
                       />
                     </div>
@@ -907,6 +908,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                   stroke="#00ba63"
                   strokeWidth="2.2"
                   strokeLinecap="round"
+                  pathLength={1}
+                  className="anim-line"
                 />
 
                 {/* Data Points */}
@@ -918,7 +921,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                   { cx: 215, cy: 38, val: 2 },
                   { cx: 265, cy: 50, val: 1 },
                 ].map((pt, i) => (
-                  <g key={i} className="group cursor-pointer">
+                  <g key={i} className="group cursor-pointer anim-pop" style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDelay: `${0.4 + i * 0.15}s` }}>
                     {pt.isPeak && (
                       <circle
                         cx={pt.cx}
