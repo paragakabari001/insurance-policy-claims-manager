@@ -3,250 +3,272 @@
 > **Founding Engineer Hiring 2026: Take-Home Assignment**  
 > Candidate: Parag  
 > Repository: `https://github.com/paragakabari001/insurance-policy-claims-manager`  
+> Branches: `main` (Strict Specification) & `feature/ai-and-extended-features` (AI & Extended UI)  
 > Submission Deadline: 7 November 2026, 11:59 PM IST  
 > Operational Guarantee: 30 November 2026, 11:59 PM IST  
 
 ---
 
+## Live Application URLs
+
+| Branch | Description | Live Deployment URL |
+| :--- | :--- | :--- |
+| **`main`** | **Official Submission (Strict PDF Spec)** | `https://insurance-policy-claims-manager.onrender.com` *(or your Vercel/Render URL)* |
+| **`feature/ai-and-extended-features`** | **Extended Version (AI Copilot + Customers)** | `https://insurance-policy-claims-manager-ai.onrender.com` *(or your Vercel/Render URL)* |
+
+---
+
 ## 1. Project Overview and Implemented Features
 
-This project is an end-to-end insurance policy and claims management web application designed for TailVaR Consulting. It provides a secure, role-based platform where administrators can create customer policies and adjudicate claims, while customers can view their active policies and file claims against remaining coverage limits.
+This project is a fullstack insurance policy and claims management web application developed for the TailVaR Consulting Founding Engineer assessment. It provides an isolated, role-based platform where administrators can issue policies and adjudicate claims, while customers can view only their own policies and submit claims against available coverage limits.
 
-### Recent Enhancements & Fixes
-- **Accurate Policy Counting:** Replaced blanket "active" labeling with data-driven counts (`2 policies · 1 active`) calculated dynamically using `Asia/Kolkata` (IST) date boundaries.
-- **UI Clean-up & Subtitles:** Removed "ACID Ledger Active" from the header, expanded abbreviated counts (`5 approved`), added customer-facing subtitles ("Your policies and claims"), and fixed missing spaces in claims rules text.
-- **Enhanced Claim Form:** Displays coverage dates and remaining balance, dynamic placeholders based on policy limits, "Maximum claim amount: ₹...", clear field-level validation messages, disabled submission during in-flight requests, and immediate balance refresh.
-- **Robust Server-Side ID Generation:** Final policy and claim IDs are generated on the server with database uniqueness enforcement, eliminating frontend random ID collisions and removing "Regenerate ID" controls.
-- **Official shadcn/ui Popover Calendar:** Integrated Radix-powered popover datepicker with collision detection and top-oriented placement in modals, preventing clipping and z-index overlap.
+### Core Implemented Workflows
 
-### Pre-Configured Demo Accounts
-The system is automatically seeded with the three required evaluation accounts:
+#### 1. Authentication & Role-Based Access Control
+- Pre-configured with the three required evaluation demo accounts:
+  | Role | Username | Password | Access Boundary |
+  | :--- | :--- | :--- | :--- |
+  | **Customer 1** | `customer1` | `Customer1@Demo26` | Isolated to Customer 1 policies and claims |
+  | **Customer 2** | `customer2` | `Customer2@Demo26` | Isolated to Customer 2 policies and claims |
+  | **Administrator** | `admin` | `Admin@Demo26` | Global access: policy creation, claim adjudication |
+- **Session Security:** Cryptographic JSON Web Tokens (JWT) signed with `JWT_SECRET`. Tokens are validated per-request via bearer authorization headers.
+- **Role Isolation:** Customers cannot view or claim against another customer's policy (enforced server-side with HTTP 403). Customers cannot access administrative endpoints.
+- **Logout:** Explicit logout endpoint and frontend button clearing session storage and redirecting to login.
 
-| Role | Username | Password | Access Boundary |
-| :--- | :--- | :--- | :--- |
-| **Customer 1** | `customer1` | `Customer1@Demo26` | Isolated to Customer 1 policies and claims |
-| **Customer 2** | `customer2` | `Customer2@Demo26` | Isolated to Customer 2 policies and claims |
-| **Administrator** | `admin` | `Admin@Demo26` | Global access, policy issuance, claim adjudication |
+#### 2. Policy Management (Administrator)
+- **Policy Creation:** Admin creates policies for either `customer1` or `customer2` with coverage start date, end date, and Sum Insured (SI).
+- **Validation Rules:**
+  - Rejects inverted dates (`endDate < startDate`) with descriptive error messages.
+  - Rejects non-positive SI amounts (`sumInsured <= 0`).
+  - Dates standardized on calendar format (`YYYY-MM-DD`).
+- **Policy Overview:** Complete table and cards view displaying original SI, remaining claimable SI, coverage dates, and active status calculated dynamically using `Asia/Kolkata` (IST).
 
-*Note: Demo quick-login buttons on the sign-in page execute the real `POST /api/auth/login` authentication flow, issuing cryptographically signed JWT tokens.*
+#### 3. Claims Submission & Adjudication
+- **Customer Claim Submission:**
+  - Customers submit claims against their active policies.
+  - **Date Boundary Validation:** Incident date must fall within coverage dates, inclusive (`startDate <= incidentDate <= endDate`), accepted even for expired policies.
+  - **Balance Boundary Validation:** Amount must be positive (`> 0`) and cannot exceed current remaining claimable SI.
+- **SI Claim Accounting Rules:**
+  $$\text{Remaining Claimable SI} = \text{Original SI} - \sum \text{Submitted Claims} - \sum \text{Approved Claims}$$
+  - **Submitted Claims:** Reserve/block SI immediately upon submission.
+  - **Approved Claims:** Permanently consume the blocked SI.
+  - **Rejected Claims:** Immediately release the blocked SI so that it can be claimed again.
+  - **Decision Immutability:** Only claims in `Submitted` status can be approved or rejected. Decided claims cannot be re-decided.
+- **Concurrency & Race Condition Safety:** Claim submissions and decisions are executed inside serialized database transactions (`prisma.$transaction`) to prevent double-spending under concurrent requests.
 
-### Implemented Workflows & Features
-
-#### Administrator
-- **Policy Creation:** Issue insurance policies for either customer, specifying coverage start date, end date, and Sum Insured (SI). Rejects inverted dates (`endDate < startDate`) and non-positive SI amounts (`<= 0`).
-- **Policy Overview:** Inspect all customer policies with customer identity, coverage dates, coverage status (`Active`, `Upcoming`, `Expired`), original SI, remaining coverage, and utilization progress (`Reserved + Used`).
-- **Claims Review:** Inspect claims across all customers with live status (`Submitted`, `Approved`, `Rejected`), linked policy, incident date, and amount.
-- **Decision Workflow & Confirmation:** Review submitted claims with an explicit confirmation dialog displaying Claim ID and Claim Amount. Approving keeps the amount consumed; rejecting releases the reserved balance immediately. Re-deciding a decided claim is rejected server-side.
-
-#### Customer
-- **Data Isolation:** Customers strictly access only their own policies and submitted claims. Attempts to view or submit claims against other customers' policies are blocked server-side (HTTP 403).
-- **Claim Submission:** Submit claims against policies via top-level or row-level actions with preselected policy context. Incident dates are validated against the policy's coverage duration (`startDate <= incidentDate <= endDate`), inclusive, even for expired policies.
-- **Decision Tracking:** Real-time visibility into claim statuses (`Submitted`, `Approved`, `Rejected`) with live badges and submission timestamps.
-
-#### Claim Accounting Rules & Timezone Specification
-$$\text{Remaining Coverage} = \text{Original Policy SI} - \sum \text{Submitted Claims} - \sum \text{Approved Claims}$$
-1. **Application Timezone:** The server calculates today's calendar date and active policy status using the documented timezone: `Asia/Kolkata` (IST).
-2. **Policy Counts:** Displays "Total Policies" with a clear breakdown of `Active`, `Upcoming`, and `Expired` policies. Coverage status (`Active` if `startDate <= today <= endDate`) is strictly decoupled from claimable balance.
-3. **Immediate Reservation:** Submitted claims reserve coverage immediately.
-4. **Approved Claims:** Permanently use coverage.
-5. **Rejected Claims:** Immediately restore reserved coverage so it can be claimed again.
-6. **Coverage Bounds:** Incident date must fall between policy start date and end date, inclusive (`startDate <= incidentDate <= endDate`), regardless of whether the policy is currently expired.
-7. **Concurrency Safety:** Claims are processed within serialized database transactions (`prisma.$transaction`) to eliminate double-spending race conditions.
+#### 4. Frontend Usability Enhancements
+- **View Toggle:** Seamless toggle between **Table View** and **Card Grid View** on policies and claims.
+- **No Line-Wrapping on IDs:** Applied `whitespace-nowrap font-bold` to Policy IDs (`POL-1005-6554`) and Claim IDs (`CLM-1001`) preventing split-character line wraps.
+- **Radix Popover Datepicker:** Clean top-oriented popover calendar avoiding clipping inside modal windows.
+- **Currency Formatting:** Full monetary precision formatted in Indian Rupee notation (`₹ 10,00,000.00`).
 
 ---
 
 ## 2. Technology Stack and Rationale
 
-| Component | Technology | Rationale |
+| Layer | Technology | Rationale |
 | :--- | :--- | :--- |
-| **Frontend** | React 18, TypeScript, Vite | Fast builds, strong type safety, and predictable component rendering. |
-| **UI Components** | Tailwind CSS, shadcn/ui primitives, Lucide Icons | Clean, compact, professional interface with accessible contrast and restrained emerald accents. |
-| **Backend API** | Node.js, Express, TypeScript | Modular routing, robust middleware ecosystem, and shared TypeScript domain interfaces. |
-| **Database & ORM** | SQLite / PostgreSQL via Prisma ORM | Durable persistence, type-safe queries, migration integrity, and zero-configuration local evaluation. |
-| **Authentication** | JWT (jsonwebtoken) & bcryptjs | Stateless, tamper-proof session tokens with salted bcrypt password hashing. |
-| **Testing** | Jest, Supertest, ts-jest | Full integration and unit test suite verifying business logic, access control, and concurrency. |
-| **Packaging** | Docker multi-stage build | Single deployable container serving both the static React build and Express API. |
+| **Frontend** | React 18, TypeScript, Tailwind CSS, Lucide Icons | Responsive UI with strict typing and modern aesthetic without heavy external component libraries. |
+| **Backend** | Node.js, Express, TypeScript | High performance, lightweight RESTful service with modular controllers and middleware. |
+| **ORM & Database** | Prisma ORM, SQLite (`dev.db`) | Type-safe queries, zero-setup local evaluation, ACID transactional isolation. Swappable to PostgreSQL via `DATABASE_URL`. |
+| **Security** | bcryptjs, jsonwebtoken, zod | Industry-standard password hashing, stateless JWT authorization, and runtime schema validation. |
+| **Testing** | Jest, Supertest | Automated integration test suite verifying 28 comprehensive test cases covering authentication, boundaries, accounting, and concurrency. |
+| **Containerization** | Docker, Docker Compose | Multi-stage production build providing reproducible zero-dependency deployments. |
 
 ---
 
-## 3. System Architecture & Data Flow
+## 3. System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Client Frontend                        │
-│   (React 18 + Vite + Tailwind CSS + shadcn/ui)              │
-│   • Single Navigation: Dashboard, Policies, Claims          │
-│   • Real API authentication for all accounts                │
-│   • Real-time remaining coverage balance preview            │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ HTTPS / JSON REST API
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Express.js Backend                       │
-│   • Auth Middleware (JWT Bearer token verification)         │
-│   • Tenant Isolation & Ownership Guard                      │
-│   • Transactional Accounting Engine                         │
-│   • Concurrency serialized checks (prisma.$transaction)     │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ Prisma Client
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Durable Database (SQLite)                   │
-│   • Persists across container boots and application restarts│
-│   • Auto-seeded with demo accounts and sample policies      │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Client["React 18 SPA (Vite / Tailwind)"]
+    API["Express 4 REST API (TypeScript)"]
+    Auth["JWT Authentication Middleware"]
+    Validation["Zod Schema & Date Validator"]
+    Tx["Prisma Transaction Engine ($transaction)"]
+    DB[("SQLite Durable Database (dev.db)")]
+
+    Client -->|"HTTP / REST (Bearer JWT)"| API
+    API --> Auth
+    Auth --> Validation
+    Validation --> Tx
+    Tx --> DB
 ```
 
----
-
-## 4. Live Application URL
-
-- **Primary Cloud Deployment URL:** `https://insurance-policy-claims-manager.onrender.com` *(or configured cloud provider URL)*
-- **Local Application URL:** `http://localhost:5001`
-
-### Cloud Deployment Instructions (Render / Railway / Fly.io / Docker)
-1. Fork or clone repository: `https://github.com/paragakabari001/insurance-policy-claims-manager.git`
-2. Connect to hosting platform (e.g., Render Web Service or Railway).
-3. Build Command: `npm run build`
-4. Start Command: `npm start`
-5. Configure Environment Variables:
-   - `PORT=5001`
-   - `NODE_ENV=production`
-   - `DATABASE_URL=file:./dev.db` (or a managed PostgreSQL database URL)
-   - `JWT_SECRET=your_production_secret_key`
+### Component Breakdown
+1. **Frontend Client (`/client`):** Single-page application built with Vite. Compiles to static assets (`/client/dist`) and served by the Express backend or static CDN.
+2. **Backend Server (`/server`):** Express application with modular routes (`/api/auth`, `/api/policies`, `/api/claims`). Handles business logic and date arithmetic.
+3. **Database Layer (`/server/prisma`):** SQLite database stored durably in `server/prisma/dev.db`. Automatically seeded on startup with the 3 mandatory evaluation accounts.
+4. **Cloud / Hosting Provider:** Deployed as a web service on **Render.com** (or **Railway** / **Vercel**), persisting records across restarts.
 
 ---
 
-## 5. Local Setup, Migrations & Demo Account Setup
+## 4. Environment Variables Configuration
 
-### Prerequisites
-- Node.js >= 18
-- npm >= 9
+Create a `.env` file in the root directory or configure in your cloud dashboard:
 
-### Step-by-Step Local Setup
+### For `main` Branch (Core Application):
+```env
+# Server Port
+PORT=5001
+
+# Runtime Environment
+NODE_ENV=production
+
+# Database Connection
+DATABASE_URL="file:./dev.db"
+
+# JWT Secret Key (Use a strong random secret in production)
+JWT_SECRET="tailvar_secure_production_jwt_secret_2026_eval"
+```
+
+### For `feature/ai-and-extended-features` Branch:
+```env
+PORT=5001
+NODE_ENV=production
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="tailvar_secure_production_jwt_secret_2026_eval"
+
+# AI Copilot Provider (Optional: OpenRouter / OpenAI)
+AI_API_KEY="your_openrouter_or_openai_api_key_here"
+AI_BASE_URL="https://openrouter.ai/api/v1"
+AI_MODEL="openai/gpt-4o-mini"
+```
+
+---
+
+## 5. Deployment Guide
+
+### Option 1: Deploy on Render.com (Recommended for Node + SQLite)
+1. Sign in to [Render.com](https://render.com) and click **New +** $\rightarrow$ **Web Service**.
+2. Connect your GitHub repository: `paragakabari001/insurance-policy-claims-manager`.
+3. Configure **Service 1 (`main` branch)**:
+   - **Name:** `insurance-policy-claims-manager`
+   - **Branch:** `main`
+   - **Build Command:** `npm run build`
+   - **Start Command:** `npm start`
+   - **Environment Variables:** Add `NODE_ENV=production`, `JWT_SECRET=your_jwt_secret`, `DATABASE_URL=file:./dev.db`.
+4. Configure **Service 2 (`feature/ai-and-extended-features` branch)**:
+   - Click **New Web Service**, connect the same repo.
+   - **Name:** `insurance-policy-ai-extended`
+   - **Branch:** `feature/ai-and-extended-features`
+   - **Build Command:** `npm run build`
+   - **Start Command:** `npm start`
+   - **Environment Variables:** Add the variables above plus `AI_API_KEY`.
+5. Both services will be live with public HTTPS URLs!
+
+### Option 2: Deploy on Vercel
+1. Import repository on [Vercel](https://vercel.com).
+2. Set Framework Preset to **Vite** or **Other**.
+3. For deployment of both branches:
+   - Deploy `main` as Production.
+   - Deploy `feature/ai-and-extended-features` as a separate project or preview branch.
+4. Set Environment Variables: `JWT_SECRET`, `NODE_ENV=production`.
+*(Note: If deploying serverless on Vercel, SQLite database files reset on cold lambda restarts; for permanent persistence, Render/Railway or a hosted PostgreSQL URL is recommended).*
+
+---
+
+## 6. Local Setup and Execution
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/paragakabari001/insurance-policy-claims-manager.git
 cd insurance-policy-claims-manager
 
-# 2. Install dependencies for root, server, and client
+# 2. Install all dependencies (root, server, and client)
 npm run postinstall
 
-# 3. Seed demo accounts (customer1, customer2, admin) safely without data loss
+# 3. Setup and seed database
 npm run seed
 
-# 4. Build both frontend and backend
+# 4. Build client and server
 npm run build
 
-# 5. Start unified application (API + Frontend on port 5001)
+# 5. Start unified application (Server + UI on port 5001)
 npm start
 ```
-Access the application at `http://localhost:5001`.
+Access the application at: `http://localhost:5001`
 
 ---
 
-## 6. Tests Performed & Verification Report
+## 7. Automated Tests Performed
 
-The test suite runs with Jest and Supertest (`server/src/__tests__/claims.test.ts`).
+The project includes a comprehensive integration test suite (`server/src/__tests__/claims.test.ts`) covering all 28 requirements of the take-home assignment:
 
-To execute tests:
 ```bash
 npm test
 ```
 
-### Verification Results (25/25 Passing Tests)
-| Test Category | Test Case | Status |
+### Verification Matrix (28 / 28 Tests Passed)
+
+| Category | Test Case | Status |
 | :--- | :--- | :--- |
-| **Authentication** | Valid login for `customer1`, `customer2`, and `admin` | ✅ PASSED |
-| **Authentication** | Reject invalid credentials (HTTP 401) | ✅ PASSED |
-| **Authentication** | Working logout endpoint (`POST /api/auth/logout`) | ✅ PASSED |
-| **Authentication** | Reject unauthenticated access to protected endpoints | ✅ PASSED |
-| **Access Control** | Reject customer attempting admin policy creation (HTTP 403) | ✅ PASSED |
-| **Access Control** | Reject customer attempting admin claim decision (HTTP 403) | ✅ PASSED |
-| **Data Isolation** | Customer 1 views only Customer 1 policies | ✅ PASSED |
-| **Data Isolation** | Customer 1 blocked from accessing Customer 2 policy ID | ✅ PASSED |
-| **Data Isolation** | Customer 1 blocked from filing claim on Customer 2 policy | ✅ PASSED |
-| **Data Isolation** | Administrator can view all customer policies | ✅ PASSED |
-| **Validation** | Reject policy creation with end date earlier than start date | ✅ PASSED |
-| **Validation** | Reject non-positive Sum Insured (`SI <= 0`) | ✅ PASSED |
-| **Validation** | Reject zero or negative claim amount (`amount <= 0`) | ✅ PASSED |
-| **Validation** | Reject invalid calendar date format (e.g., `2026-02-31`) | ✅ PASSED |
-| **Boundaries** | Accept incident date exactly on `startDate` boundary | ✅ PASSED |
-| **Boundaries** | Accept incident date exactly on `endDate` boundary | ✅ PASSED |
-| **Boundaries** | Reject incident date 1 day before coverage start | ✅ PASSED |
-| **Boundaries** | Reject incident date 1 day after coverage end | ✅ PASSED |
-| **Accounting** | Step 1: Submit ₹6,00,000 on ₹10,00,000 SI $\rightarrow$ Remaining ₹4,00,000 | ✅ PASSED |
-| **Accounting** | Step 2: Attempt ₹5,00,000 $\rightarrow$ Rejected (exceeds remaining SI) | ✅ PASSED |
-| **Accounting** | Claim equal to exact remaining SI (₹4,00,000) $\rightarrow$ Accepted | ✅ PASSED |
-| **Accounting** | Step 3: Admin rejects ₹6,00,000 claim $\rightarrow$ Balance restores to ₹10,00,000 | ✅ PASSED |
-| **Accounting** | Step 4: Submit ₹5,00,000 claim $\rightarrow$ Accepted (remaining ₹5,00,000) | ✅ PASSED |
-| **Accounting** | Step 5: Admin approves ₹5,00,000 claim $\rightarrow$ Balance stays ₹5,00,000 | ✅ PASSED |
-| **Accounting** | Decided claims cannot be decided again (immutability) | ✅ PASSED |
-| **Concurrency** | Concurrent claims exceeding SI serialized via transactions | ✅ PASSED |
-| **Persistence** | Records persist durably in SQLite database file | ✅ PASSED |
+| **Authentication** | Rejects invalid credentials with HTTP 401 | ✅ PASSED |
+| **Authentication** | Successfully executes logout | ✅ PASSED |
+| **Authorization** | Rejects unauthenticated requests to protected endpoints (401) | ✅ PASSED |
+| **Authorization** | Rejects customer attempting to create policy (403) | ✅ PASSED |
+| **Authorization** | Rejects customer attempting to adjudicate claim (403) | ✅ PASSED |
+| **Data Isolation** | Customer 1 views only their own policies and claims | ✅ PASSED |
+| **Data Isolation** | Customer 1 cannot view Customer 2 policy by ID (403) | ✅ PASSED |
+| **Data Isolation** | Customer 1 cannot submit claim against Customer 2 policy (403) | ✅ PASSED |
+| **Data Isolation** | Administrator can view all policies across all customers | ✅ PASSED |
+| **Validation** | Rejects policy creation if `endDate < startDate` (400) | ✅ PASSED |
+| **Validation** | Rejects non-positive Sum Insured (`sumInsured <= 0`) | ✅ PASSED |
+| **Validation** | Rejects zero or negative claim amount (`amount <= 0`) | ✅ PASSED |
+| **Validation** | Rejects invalid calendar date format (e.g., `2026-02-31`) | ✅ PASSED |
+| **Boundaries** | Accepts incident date exactly on coverage `startDate` | ✅ PASSED |
+| **Boundaries** | Accepts incident date exactly on coverage `endDate` | ✅ PASSED |
+| **Boundaries** | Rejects incident date 1 day before coverage start | ✅ PASSED |
+| **Boundaries** | Rejects incident date 1 day after coverage end | ✅ PASSED |
+| **Spec Accounting** | Step 1: Submit ₹6,00,000 on ₹10,00,000 SI $\rightarrow$ Remaining ₹4,00,000 | ✅ PASSED |
+| **Spec Accounting** | Step 2: Attempt ₹5,00,000 $\rightarrow$ Rejected (exceeds ₹4,00,000) | ✅ PASSED |
+| **Spec Accounting** | Submit claim equal to exact remaining SI (₹4,00,000) $\rightarrow$ Accepted | ✅ PASSED |
+| **Spec Accounting** | Step 3: Admin rejects ₹6,00,000 claim $\rightarrow$ Balance restores to ₹10,00,000 | ✅ PASSED |
+| **Spec Accounting** | Step 4: Now ₹5,00,000 claim can be submitted $\rightarrow$ Accepted | ✅ PASSED |
+| **Spec Accounting** | Step 5: Decided claims cannot be decided again (immutability) | ✅ PASSED |
+| **Concurrency** | Concurrent claims that together exceed SI cannot breach policy limit | ✅ PASSED |
+| **Persistence** | Persists policy and claim records durably across application restarts | ✅ PASSED |
+| **Assistant Security** | Rejects unauthenticated requests to AI endpoints (401) | ✅ PASSED |
+| **Assistant Security** | Rejects empty or invalid messages (400) | ✅ PASSED |
+| **Assistant Security** | Processes authenticated customer chat with safe grounded data | ✅ PASSED |
 
 ---
 
-## 7. Edge Cases Identified, Handling & Fixes
+## 8. Edge Cases Identified, Handling & Fixes
 
-1. **Concurrent Simultaneous Claim Submissions:**
-   - *Risk:* Two concurrent requests both read remaining SI as available, and both get inserted, exceeding policy limit.
-   - *Fix:* Executed all balance checks and insertions within atomic database transactions (`prisma.$transaction`) with serialized locking.
-2. **Calendar Date vs Floating Timestamps:**
-   - *Risk:* Timezone offsets shift dates across midnight, causing valid incident dates to be wrongly rejected or vice versa.
-   - *Fix:* Standardized strictly on calendar date strings (`YYYY-MM-DD`). Validated format and day-of-month ranges rigorously without UTC timezone drift.
+1. **Race Conditions / Double-Spending:**
+   - *Risk:* Two simultaneous claim requests both read available balance and proceed, exceeding total Sum Insured.
+   - *Fix:* Executed all balance checks and insertions within atomic database transactions (`prisma.$transaction`) with database-level isolation.
+2. **Timezone Offset Drifts:**
+   - *Risk:* Floating UTC timestamps could shift a calendar date across midnight, invalidating legitimate boundary incidents.
+   - *Fix:* Standardized strictly on ISO calendar date strings (`YYYY-MM-DD`). Validated format and day-of-month ranges rigorously without UTC offset drift.
 3. **Exact Coverage Boundaries:**
-   - *Handling:* Inclusive string comparisons (`targetDate >= startDate && targetDate <= endDate`) ensure incidents occurring on the exact first and last day of coverage are accepted.
-4. **Claim Balance Immutability:**
-   - *Handling:* Only claims in `Submitted` status can receive an `Approved` or `Rejected` decision. Re-deciding a claim returns HTTP 400.
+   - *Handling:* Inclusive comparisons (`startDate <= incidentDate <= endDate`) ensure incidents occurring on the exact start or end dates are accepted.
+4. **Decision Immutability:**
+   - *Handling:* Only claims in `Submitted` status can receive an `Approved` or `Rejected` decision. Attempting to decide a settled claim returns HTTP 400.
 5. **Monetary Precision:**
-   - *Handling:* Stored amounts as positive monetary values with strict decimal rounding (`Math.round(val * 100) / 100`) preventing floating point inaccuracies.
-
----
-
-## 8. AI Policy & Claims Assistant (Optional Feature)
-
-### Architecture & Security Boundaries
-- **Floating Chat Widget:** Fixed launcher located at `fixed right-4 top-1/2 -translate-y-1/2 z-50` with label "Open AI Assistant", opening a compact $380\text{px} \times 520\text{px}$ panel (responsive down to mobile viewports).
-- **Zero-Trust Access Control:** Chat requests hit an authenticated server-side endpoint (`POST /api/ai/chat`). Identity and role are derived strictly from the verified JWT bearer session.
-- **Data Isolation:** Customers receive answers grounded exclusively in their own policies and claims. The backend queries the database for authorized records, prepares a factual context block, and never passes passwords, session tokens, or other users' data.
-- **Read-Only Assistant:** The assistant cannot modify balances, create policies, or decide claims; balances are calculated strictly using backend logic ($SI - \text{Submitted} - \text{Approved}$).
-- **Polite Scope Redirection:** For questions outside the scope of insurance policies or claims in this app, the assistant politely declines:
-  > *"I can help with your insurance policies and claims in this app. Please ask about coverage, remaining balance, claim status, or submitting a claim."*
-- **Multilingual Support:** Tested and verified to respond fluently in English, Gujarati, and Hindi.
-- **Provider Configuration via Server Environment Variables:**
-  - `AI_API_KEY`: Read securely from local `server/.env`.
-  - `AI_BASE_URL`: Defaults to `https://openrouter.ai/api/v1`.
-  - `AI_MODEL`: Defaults to `openai/gpt-4o-mini`.
-  - Keys are never bundled into client JavaScript assets or exposed in git.
+   - *Handling:* Amounts are stored as positive floats with explicit rounding (`Math.round(val * 100) / 100`) preventing floating-point drift.
 
 ---
 
 ## 9. Assumptions, Trade-offs & Limitations
 
-- **Assumptions:** Demo accounts are pre-seeded for evaluator convenience. Indian numbering format (`₹ 10,00,000`) is used in the UI to match the illustrative example in the specification.
-- **Trade-offs:** SQLite was selected as the default durable store for frictionless local evaluation and zero external dependencies, while Prisma allows swapping to PostgreSQL simply by changing `DATABASE_URL`.
-- **Known Limitations:** Push notifications and WebSockets are out of scope as per section 1.5; updated decisions are reflected upon data refresh or subsequent retrieval.
+- **Pre-Seeded Accounts:** Fictional demo accounts (`customer1`, `customer2`, `admin`) are pre-seeded automatically on server launch for evaluator convenience.
+- **Database Selection:** SQLite was selected for zero-dependency local evaluation and lightweight deployment, with Prisma allowing instant migration to PostgreSQL.
+- **Push Notifications:** As specified in Section 1.5, push notifications/WebSockets are not required; updated decisions reflect on refresh or data retrieval.
 
 ---
 
-## 9. AI Tools Used & Conversation Logs
+## 10. AI Tools Used & Conversation Logs
 
 ### AI Tools Utilized
-- **Claude & Gemini (Advanced Agentic Assistant):** Used for scaffolding, refactoring to shadcn/ui components, formulating transactional race condition tests, and drafting documentation.
-- **Assistance Scope:**
-  - TypeScript interfaces and Prisma database schema definitions.
-  - Concurrency test implementation using `Promise.all` and transaction locks.
-  - UI modernization with clean white modal dialogs and restrained emerald palette.
-
-### Location of Submitted AI Conversation Logs
-In accordance with Section 2.2 of the submission guidelines, development logs are preserved in:
-- `docs/ai-logs/ai-development-log.md`
-- `logs/ai-conversation-log.md`
-- Included in the final submission ZIP archive.
+- **Gemini & Claude (Advanced Agentic Assistant):** Used for scaffolding, UI refinement, formulating concurrency race-condition tests, and documentation.
+- **Location of Submitted AI Conversation Logs:**
+  - `docs/ai-logs/ai-development-log.md`
+  - `logs/ai-conversation-log.md`
+  - Included in root submission archive: `submission-insurance-policy-claims-manager.zip`.
 
 ---
 
 ## License & Confidentiality
-This submission was developed confidentially for TailVaR Consulting.
+This submission was developed confidentially for TailVaR Consulting Founding Engineer Hiring 2026.
