@@ -369,7 +369,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
             <div key={claim.id} className="rounded-2xl border border-slate-200/90 bg-white p-4 flex flex-col justify-between gap-3 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <span className="font-bold text-slate-900 text-sm block truncate">{claim.id}</span>
+                  <span className="font-bold text-slate-900 text-sm block truncate whitespace-nowrap">{claim.id}</span>
                   <span className="text-[11px] text-slate-500 font-medium">
                     Policy {claim.policyId}
                     {isAdmin && claim.customer?.name ? ` · ${claim.customer.name}` : ''}
@@ -435,7 +435,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
                       className="rounded border-slate-300 accent-[#00ba63] cursor-pointer"
                     />
                   </td>
-                  <td className="px-3 py-3.5 font-bold text-slate-900 break-all">{claim.id}</td>
+                  <td className="px-3 py-3.5 font-bold text-slate-900 whitespace-nowrap">{claim.id}</td>
                   {showCustomerColumn && (
                     <td className="px-3 py-3.5">
                       <div className="flex items-center gap-2">
