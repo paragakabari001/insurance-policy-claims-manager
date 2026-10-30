@@ -252,6 +252,9 @@ export function App() {
               activeView={activeView}
               onDecideClaim={handleDecideClaim}
               isLoadingDecision={isLoadingDecision}
+              onOpenCreatePolicy={() => setIsPolicyModalOpen(true)}
+              isAIOpen={isAIOpen}
+              onToggleAI={() => setIsAIOpen((prev) => !prev)}
             />
           ) : (
             <CustomerDashboard
