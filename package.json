@@ -7,7 +7,7 @@
     "postinstall": "cd server && npm install && npx prisma generate && cd ../client && npm install",
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
-    "build": "npm run build:client && npm run build:server",
+    "build": "npm run build:client && npm run build:server && cp -r client/dist ./dist",
     "start": "cd server && npm start",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
