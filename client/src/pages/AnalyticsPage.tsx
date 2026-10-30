@@ -535,6 +535,39 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
     ? ['Overview', 'Customer Wise', 'Trends', 'Coverage', 'Claims Analysis']
     : ['Overview', 'Trends', 'Coverage', 'Claims Analysis'];
 
+  const show = (...t: TabType[]) => t.includes(activeTab);
+
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const trendYear = useMemo(() => {
+    const years = claims.map((c) => new Date(c.createdAt).getFullYear()).filter((y) => !isNaN(y));
+    return years.length ? Math.max(...years) : 2026;
+  }, [claims]);
+  const monthCounts = useMemo(() => {
+    const arr = Array(12).fill(0) as number[];
+    claims.forEach((c) => {
+      const d = new Date(c.createdAt);
+      if (!isNaN(d.getTime()) && d.getFullYear() === trendYear) arr[d.getMonth()] += 1;
+    });
+    return arr;
+  }, [claims, trendYear]);
+  const trendPts = useMemo(() => {
+    const max = Math.max(1, ...monthCounts);
+    return monthCounts.map((v, i) => ({ x: 8 + i * (264 / 11), y: 60 - (v / max) * 48, v }));
+  }, [monthCounts]);
+  const trendPath = trendPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ');
+
+  const coveragePolicies = useMemo(
+    () => policies.filter((p) => statusFilter === 'All' || (p.coverageStatus || 'Active') === statusFilter),
+    [policies, statusFilter]
+  );
+  const claimAmounts = useMemo(() => {
+    const t = { Approved: 0, Submitted: 0, Rejected: 0 };
+    claims.forEach((c) => {
+      t[c.status] += c.amount;
+    });
+    return t;
+  }, [claims]);
+
   return (
     <div className="space-y-5 w-full pb-10">
       {/* 1. Page Header with Title, Date Range Dropdown, Export Button & Filter Button */}
@@ -696,6 +729,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
       </div>
 
       {/* 4. Row 2: Coverage Summary (Left) & Policies by Status Donut (Right) - High-Density */}
+      {show('Overview', 'Coverage') && (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4">
         {/* Coverage Summary Card */}
         <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
@@ -784,11 +818,12 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           />
         </div>
       </div>
+)}
 
       {/* 5. Row 3: Three Visualizations (Claims by Outcome, Customer Wise Distribution, Monthly Claim Trend) - Space-Efficient */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className={`grid grid-cols-1 gap-3.5 sm:gap-4 ${activeTab === 'Overview' ? 'md:grid-cols-3' : activeTab === 'Trends' ? 'md:grid-cols-2' : ''}`}>
         {/* Chart 1: Claims by Outcome Donut */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
+        <div className={`${show('Overview', 'Trends', 'Claims Analysis') ? '' : 'hidden'} bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between`}>
           <h3 className="text-xs font-bold text-slate-900 mb-2">Claims by Outcome</h3>
           <SvgDonutChart
             total={analyticsData.totalClaims}
@@ -817,7 +852,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
 
         {/* Chart 2: Customer Wise Distribution Bar Chart */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
+        <div className={`${show('Overview', 'Customer Wise') ? '' : 'hidden'} bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between`}>
           <div className="flex items-center gap-1.5 mb-2">
             <div className="w-5 h-5 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
               <Users className="w-3 h-3 text-[#00ba63]" />
@@ -868,94 +903,38 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           </div>
         </div>
 
-        {/* Chart 3: Monthly Claim Trend Area/Line Chart */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
-          <h3 className="text-xs font-bold text-slate-900 mb-2">Monthly Claim Trend</h3>
-
-          <div className="relative pt-2 pb-1 flex-1 flex flex-col justify-end">
-            {/* Y-axis Ticks & Gridlines */}
-            <div className="absolute inset-x-0 inset-y-2 flex flex-col justify-between pointer-events-none">
-              {[4, 3, 2, 1, 0].map((val) => (
-                <div key={val} className="flex items-center gap-2">
-                  <span className="text-[9px] text-slate-400 font-medium w-3 text-right">
-                    {val}
-                  </span>
-                  <div className="flex-1 border-b border-dashed border-slate-100" />
-                </div>
+        {/* Chart 3: Monthly Claim Trend (computed from real claims) */}
+        <div className={`${show('Overview', 'Trends') ? '' : 'hidden'} bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between`}>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold text-slate-900">Monthly Claim Trend</h3>
+            <span className="text-[10px] font-semibold text-slate-400">{trendYear}</span>
+          </div>
+          <div className="relative flex-1 flex flex-col justify-end">
+            <svg className="w-full h-24 overflow-visible" viewBox="0 0 280 70" preserveAspectRatio="none">
+              {[0, 1, 2, 3].map((g) => (
+                <line key={g} x1="0" x2="280" y1={10 + g * 16.6} y2={10 + g * 16.6} stroke="#f1f5f9" strokeWidth="1" />
               ))}
-            </div>
-
-            {/* SVG Spline Curve with Gradient Area Fill */}
-            <div className="relative z-10 pl-5 pr-2 h-22 flex flex-col justify-between">
-              <svg className="w-full h-18 overflow-visible" viewBox="0 0 280 70">
-                <defs>
-                  <linearGradient id="claimTrendGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-
-                {/* Area Fill */}
-                <path
-                  d="M 15,50 C 35,42 45,38 65,38 C 90,38 95,50 115,50 C 140,50 145,16 165,16 C 190,16 195,38 215,38 C 240,38 245,50 265,50 L 265,70 L 15,70 Z"
-                  fill="url(#claimTrendGradient)"
-                />
-
-                {/* Line Path */}
-                <path
-                  d="M 15,50 C 35,42 45,38 65,38 C 90,38 95,50 115,50 C 140,50 145,16 165,16 C 190,16 195,38 215,38 C 240,42 245,50 265,50"
-                  fill="none"
-                  stroke="#00ba63"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  pathLength={1}
-                  className="anim-line"
-                />
-
-                {/* Data Points */}
-                {[
-                  { cx: 15, cy: 50, val: 1 },
-                  { cx: 65, cy: 38, val: 2 },
-                  { cx: 115, cy: 50, val: 1 },
-                  { cx: 165, cy: 16, val: 3, isPeak: true },
-                  { cx: 215, cy: 38, val: 2 },
-                  { cx: 265, cy: 50, val: 1 },
-                ].map((pt, i) => (
-                  <g key={i} className="group cursor-pointer anim-pop" style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDelay: `${0.4 + i * 0.15}s` }}>
-                    {pt.isPeak && (
-                      <circle
-                        cx={pt.cx}
-                        cy={pt.cy}
-                        r="6"
-                        fill="#00ba63"
-                        opacity="0.25"
-                        className="animate-ping"
-                      />
-                    )}
-                    <circle
-                      cx={pt.cx}
-                      cy={pt.cy}
-                      r="3.5"
-                      fill="#00ba63"
-                      stroke="#ffffff"
-                      strokeWidth="1.5"
-                    />
-                  </g>
-                ))}
-              </svg>
-
-              {/* Month Labels below chart */}
-              <div className="flex justify-between text-[9px] font-semibold text-slate-500 pt-0.5 px-1">
-                {['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
-                  <span key={m}>{m}</span>
-                ))}
-              </div>
+              <path d={`${trendPath} L ${trendPts[11].x},60 L ${trendPts[0].x},60 Z`} fill="#00ba63" opacity="0.1" />
+              <path d={trendPath} fill="none" stroke="#00ba63" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" pathLength={1} className="anim-line" />
+              {trendPts.map((pt, i) => (
+                <g key={i} className="group anim-pop" style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDelay: `${0.4 + i * 0.06}s` }}>
+                  <circle cx={pt.x} cy={pt.y} r="3" fill="#00ba63" stroke="#fff" strokeWidth="1.5">
+                    <title>{`${MONTHS[i]}: ${pt.v} claim(s)`}</title>
+                  </circle>
+                </g>
+              ))}
+            </svg>
+            <div className="flex justify-between text-[9px] font-semibold text-slate-500 pt-1">
+              {MONTHS.map((m) => (
+                <span key={m}>{m[0]}</span>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       {/* 6. Row 4: Customer Wise Summary Table (Compact Space-Efficient View) */}
+      {show('Overview', 'Customer Wise') && (
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
         {/* Table Top Header: Title & Search + Columns Dropdown */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1199,6 +1178,96 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           </table>
         </div>
       </div>
+)}
+      {/* Coverage tab: coverage by policy */}
+      {show('Coverage') && (
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
+          <h3 className="text-xs font-bold text-slate-900">Coverage by Policy</h3>
+          <div className="space-y-3">
+            {coveragePolicies.map((p) => {
+              const used = p.sumInsured - p.remainingClaimableSI;
+              const pct = p.sumInsured > 0 ? Math.round((used / p.sumInsured) * 100) : 0;
+              return (
+                <div key={p.id} className="rounded-xl border border-slate-100 p-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="min-w-0">
+                      <p className="text-xs font-black text-slate-900">{p.id}</p>
+                      {isAdmin && <p className="text-[10px] text-slate-400 font-medium">{p.customerName}</p>}
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{p.coverageStatus || 'Active'}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden mt-2.5 flex">
+                    <div className="bg-[#00c569] h-full anim-bar-x" style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] mt-1.5 font-semibold text-slate-500 gap-2 flex-wrap">
+                    <span>Used/Reserved {formatCurrency(used)} ({pct}%)</span>
+                    <span className="text-[#008f4c]">Remaining {formatCurrency(p.remainingClaimableSI)}</span>
+                    <span className="text-slate-700">SI {formatCurrency(p.sumInsured)}</span>
+                  </div>
+                </div>
+              );
+            })}
+            {coveragePolicies.length === 0 && <p className="text-xs text-slate-400 py-6 text-center">No policies for this filter.</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Claims Analysis tab: claims breakdown */}
+      {show('Claims Analysis') && (
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h3 className="text-xs font-bold text-slate-900">Claims Breakdown</h3>
+            <div className="flex gap-3 text-[11px] font-semibold text-slate-500">
+              <span>Approved {formatCurrency(claimAmounts.Approved)}</span>
+              <span>Pending {formatCurrency(claimAmounts.Submitted)}</span>
+              <span>Rejected {formatCurrency(claimAmounts.Rejected)}</span>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                  <th className="py-2 pr-3">Claim</th>
+                  <th className="py-2 pr-3">Policy</th>
+                  {isAdmin && <th className="py-2 pr-3">Customer</th>}
+                  <th className="py-2 pr-3">Incident</th>
+                  <th className="py-2 pr-3 text-right">Amount</th>
+                  <th className="py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {claims.map((c) => (
+                  <tr key={c.id} className="border-b border-slate-50 last:border-0">
+                    <td className="py-2.5 pr-3 font-bold text-slate-900">{c.id}</td>
+                    <td className="py-2.5 pr-3 text-slate-600">{c.policyId}</td>
+                    {isAdmin && <td className="py-2.5 pr-3 text-slate-600">{c.customer?.name || '-'}</td>}
+                    <td className="py-2.5 pr-3 text-slate-600 whitespace-nowrap">{c.incidentDate}</td>
+                    <td className="py-2.5 pr-3 text-right font-bold text-slate-900 whitespace-nowrap">{formatCurrency(c.amount)}</td>
+                    <td className="py-2.5">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          c.status === 'Approved'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : c.status === 'Rejected'
+                            ? 'bg-rose-50 text-rose-600'
+                            : 'bg-amber-50 text-amber-600'
+                        }`}
+                      >
+                        {c.status === 'Submitted' ? 'Pending' : c.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {claims.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-400">No claims yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
