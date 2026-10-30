@@ -30,76 +30,7 @@ interface BaseProps {
 
 /* ------------------------------ Customers ------------------------------ */
 
-export const CustomersView: React.FC<BaseProps & { customers: CustomerUser[]; onOpenPolicies: (q: string) => void }> = ({
-  policies,
-  claims,
-  customers,
-  onOpenPolicies,
-}) => (
-  <div className="space-y-4">
-    <div>
-      <h1 className="text-2xl font-black text-slate-900 tracking-tight">Customers</h1>
-      <p className="text-xs text-slate-500 font-medium mt-0.5">
-        {customers.length} customers &bull; coverage and claims per customer
-      </p>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-      {customers.map((c) => {
-        const own = policies.filter((p) => p.customerId === c.id);
-        const ownClaims = claims.filter((cl) => cl.customer?.id === c.id);
-        const totalSI = own.reduce((a, p) => a + p.sumInsured, 0);
-        const remaining = own.reduce((a, p) => a + p.remainingClaimableSI, 0);
-        const pending = ownClaims.filter((cl) => cl.status === 'Submitted').length;
-        return (
-          <div key={c.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center">
-                {c.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
-              </span>
-              <div className="min-w-0">
-                <p className="font-bold text-slate-900 truncate">{c.name}</p>
-                <p className="text-xs text-slate-400">@{c.username}</p>
-              </div>
-            </div>
-            <dl className="grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-xl bg-slate-50 p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Policies</dt>
-                <dd className="mt-1 font-extrabold text-slate-900">{own.length}</dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Claims</dt>
-                <dd className="mt-1 font-extrabold text-slate-900">
-                  {ownClaims.length}
-                  {pending > 0 && <span className="ml-1 text-amber-600">({pending} pending)</span>}
-                </dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sum insured</dt>
-                <dd className="mt-1 font-extrabold text-slate-900">{formatCurrency(totalSI)}</dd>
-              </div>
-              <div className="rounded-xl bg-emerald-50 p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Remaining</dt>
-                <dd className="mt-1 font-extrabold text-[#008f4c]">{formatCurrency(remaining)}</dd>
-              </div>
-            </dl>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => onOpenPolicies(c.username)}
-              className="w-full"
-            >
-              View policies
-            </Button>
-          </div>
-        );
-      })}
-      {customers.length === 0 && (
-        <p className="text-xs text-slate-400 font-medium py-10 col-span-full text-center">No customers found.</p>
-      )}
-    </div>
-  </div>
-);
+export { CustomersPage as CustomersView } from './CustomersPage';
 
 /* ------------------------------ Analytics ------------------------------ */
 
