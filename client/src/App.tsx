@@ -32,6 +32,7 @@ export function App() {
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
 
   const addToast = (type: 'success' | 'error', text: string) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -238,6 +239,8 @@ export function App() {
           onRefresh={loadData}
           isLoading={isDataLoading}
           onOpenMobileMenu={() => setIsMobileDrawerOpen(true)}
+          isAIOpen={isAIOpen}
+          onToggleAI={() => setIsAIOpen((prev) => !prev)}
         />
 
         <main className="flex-1 px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-24 md:pb-6">
@@ -289,8 +292,13 @@ export function App() {
         onSubmit={handleSubmitClaim}
       />
 
-      {/* AI Policy & Claims Assistant Widget */}
-      <AIAssistantWidget user={user} />
+      {/* AI Policy & Claims Assistant Layout Panel */}
+      <AIAssistantWidget
+        user={user}
+        isOpen={isAIOpen}
+        onToggle={() => setIsAIOpen((prev) => !prev)}
+        onClose={() => setIsAIOpen(false)}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>

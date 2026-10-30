@@ -10,6 +10,7 @@ import {
   FileCheck2,
   ChevronRight,
   Menu,
+  Sparkles,
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -20,6 +21,8 @@ interface TopBarProps {
   onRefresh: () => void;
   isLoading?: boolean;
   onOpenMobileMenu?: () => void;
+  isAIOpen?: boolean;
+  onToggleAI?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -30,6 +33,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   onRefresh,
   isLoading = false,
   onOpenMobileMenu,
+  isAIOpen = false,
+  onToggleAI,
 }) => {
   const isAdmin = user.role === 'Administrator';
 
@@ -131,7 +136,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Button
             onClick={onOpenCreatePolicy}
             size="sm"
-            className="bg-[#06241b] hover:bg-[#083528] text-white rounded-xl h-9 px-3 sm:px-4 text-xs font-bold shadow-md shadow-emerald-950/20 gap-1.5 transition-all shrink-0"
+            className="bg-[#06241b] hover:bg-[#083528] text-white rounded-xl h-9 px-3 sm:px-4 text-xs font-bold shadow-md shadow-emerald-950/20 gap-1.5 transition-all shrink-0 cursor-pointer"
           >
             <Plus className="w-4 h-4 text-emerald-400" />
             <span className="hidden sm:inline">Create Policy</span>
@@ -143,12 +148,30 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Button
             onClick={onOpenSubmitClaim}
             size="sm"
-            className="bg-[#06241b] hover:bg-[#083528] text-white rounded-xl h-9 px-3 sm:px-4 text-xs font-bold shadow-md shadow-emerald-950/20 gap-1.5 transition-all shrink-0"
+            className="bg-[#06241b] hover:bg-[#083528] text-white rounded-xl h-9 px-3 sm:px-4 text-xs font-bold shadow-md shadow-emerald-950/20 gap-1.5 transition-all shrink-0 cursor-pointer"
           >
             <Plus className="w-4 h-4 text-emerald-400" />
             <span className="hidden sm:inline">Submit Claim</span>
             <span className="sm:hidden">Claim</span>
           </Button>
+        )}
+
+        {/* AI Assistant Toggle Button in Header */}
+        {onToggleAI && (
+          <button
+            type="button"
+            onClick={onToggleAI}
+            aria-label="Toggle AI Assistant"
+            title={isAIOpen ? 'Close AI Assistant' : 'Open AI Assistant'}
+            className={`h-9 px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs shrink-0 cursor-pointer ${
+              isAIOpen
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
+                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200/80 hover:bg-slate-50'
+            }`}
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${isAIOpen ? 'text-emerald-700' : 'text-emerald-600'}`} />
+            <span className="hidden xl:inline">AI Assistant</span>
+          </button>
         )}
       </div>
     </header>

@@ -7,10 +7,15 @@ import {
   Send,
   Loader2,
   RefreshCw,
+  PanelRightClose,
+  PanelRightOpen,
 } from 'lucide-react';
 
 interface AIAssistantWidgetProps {
   user: User | null;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
 }
 
 interface MessageItem {
@@ -20,8 +25,12 @@ interface MessageItem {
   isError?: boolean;
 }
 
-export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
+  user,
+  isOpen,
+  onToggle,
+  onClose,
+}) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
@@ -33,7 +42,6 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
   ]);
 
   const launcherRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +49,6 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
   useEffect(() => {
     if (!user) {
       setMessages([]);
-      setIsOpen(false);
       return;
     }
 
@@ -77,13 +84,13 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
+        onClose();
         launcherRef.current?.focus();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!user) return null;
 
@@ -157,35 +164,32 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
 
   return (
     <>
-      {/* Floating Launcher Button - Flushed to the right screen edge with rounded left corners */}
-      <button
-        ref={launcherRef}
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-label="Open AI Assistant"
-        title="Open AI Assistant"
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-50 h-14 pl-3.5 pr-2 rounded-l-2xl rounded-r-none bg-[#06241b] hover:bg-[#0a382b] text-white border-y border-l border-r-0 border-emerald-500/40 shadow-2xl shadow-emerald-950/40 flex items-center justify-center transition-all hover:pl-4 active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-      >
-        <span className="relative flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-emerald-300 transition-transform group-hover:rotate-12" />
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse border-2 border-[#06241b]" />
-        </span>
-      </button>
+      {/* Floating Toggle Tab Button (Shown on edge when panel is closed) */}
+      {!isOpen && (
+        <button
+          ref={launcherRef}
+          type="button"
+          onClick={onToggle}
+          aria-label="Open AI Assistant"
+          title="Open AI Assistant"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 h-14 pl-3 pr-1.5 rounded-l-2xl bg-[#06241b] hover:bg-[#0a382b] text-white border-y border-l border-emerald-500/40 shadow-2xl flex items-center justify-center transition-all hover:pl-4 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+        >
+          <span className="relative flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-emerald-300 transition-transform group-hover:rotate-12" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse border-2 border-[#06241b]" />
+          </span>
+        </button>
+      )}
 
-      {/* Floating Chat Panel - Flushed to right edge, with left-side rounded corners */}
+      {/* Dedicated Layout Panel: Full Height, Flex Column, Border-Left, Responsive */}
       {isOpen && (
-        <div
-          ref={panelRef}
-          role="dialog"
+        <aside
+          role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col overflow-hidden bg-white border-y border-l border-r-0 border-slate-200/90 rounded-l-3xl rounded-r-none shadow-2xl animate-in slide-in-from-right duration-200"
-          style={{
-            width: 'min(380px, calc(100vw - 16px))',
-            height: 'min(540px, calc(100dvh - 32px))',
-          }}
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[400px] h-full flex flex-col bg-white border-l border-slate-200 shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 shrink-0"
         >
           {/* Panel Header */}
-          <div className="shrink-0 px-4 py-3.5 bg-[#06241b] text-white flex items-center justify-between border-b border-emerald-950">
+          <div className="shrink-0 h-16 px-4 bg-[#06241b] text-white flex items-center justify-between border-b border-emerald-950">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-xl bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-emerald-300 shrink-0">
                 <Sparkles className="w-4 h-4" />
@@ -202,21 +206,20 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
                 </p>
               </div>
             </div>
+
             <button
               type="button"
-              onClick={() => {
-                setIsOpen(false);
-                launcherRef.current?.focus();
-              }}
-              aria-label="Close AI Assistant"
-              className="p-1.5 rounded-xl text-emerald-200/70 hover:text-white hover:bg-emerald-900/50 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400"
+              onClick={onClose}
+              aria-label="Close AI Assistant Panel"
+              title="Close panel"
+              className="p-1.5 rounded-xl text-emerald-200/70 hover:text-white hover:bg-emerald-900/50 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Messages Container */}
-          <div className="flex flex-1 min-h-0 flex-col overflow-y-auto p-4 space-y-3 bg-slate-50/50">
+          {/* Messages Container (flex-1 overflow-y-auto) */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-slate-50/60 scrollbar-thin scrollbar-thumb-slate-200">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -240,7 +243,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
                   <button
                     type="button"
                     onClick={handleRetry}
-                    className="mt-1 text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1 hover:underline"
+                    className="mt-1 text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <RefreshCw className="w-3 h-3" /> Retry question
                   </button>
@@ -263,7 +266,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
 
           {/* Suggested Questions Chips (Shown when not loading) */}
           {!isLoading && suggestedQuestions.length > 0 && (
-            <div className="px-3 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+            <div className="px-3 py-2.5 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
                 Suggested:
               </span>
@@ -272,7 +275,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
                   key={q}
                   type="button"
                   onClick={() => handleSend(q)}
-                  className="shrink-0 text-[11px] font-semibold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 px-2.5 py-1 rounded-full border border-slate-200/70 transition-colors whitespace-nowrap"
+                  className="shrink-0 text-[11px] font-semibold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 px-2.5 py-1 rounded-full border border-slate-200/70 transition-colors whitespace-nowrap cursor-pointer"
                 >
                   {q}
                 </button>
@@ -301,13 +304,13 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
                 onKeyDown={handleKeyDown}
                 placeholder="Ask about coverage, claims..."
                 disabled={isLoading}
-                className="flex-1 resize-none px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-medium text-slate-900 bg-slate-50/50 placeholder:text-slate-400 leading-normal max-h-24 shadow-2xs"
+                className="flex-1 resize-none px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-medium text-slate-900 bg-slate-50/50 placeholder:text-slate-400 leading-normal max-h-24 shadow-2xs"
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
                 aria-label="Send message"
-                className="w-9 h-9 rounded-xl bg-[#06241b] hover:bg-[#0a382b] text-white flex items-center justify-center shrink-0 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                className="w-10 h-10 rounded-xl bg-[#06241b] hover:bg-[#0a382b] text-white flex items-center justify-center shrink-0 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin text-emerald-300" />
@@ -317,10 +320,10 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
               </button>
             </form>
             <p className="text-[10px] text-slate-400 mt-1 text-center font-medium">
-              Press Enter to send &bull; Shift+Enter for new line
+              Press Enter to send &bull; Shift+Enter for newline
             </p>
           </div>
-        </div>
+        </aside>
       )}
     </>
   );
