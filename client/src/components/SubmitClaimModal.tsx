@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Policy } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { Button } from './ui/button';
+import { DatePicker } from './ui/date-picker';
 import {
   FilePlus,
   X,
@@ -216,7 +217,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
             </div>
           )}
 
-          {/* Incident Date Picker (shadcn styled) */}
+          {/* Incident Date Picker (Custom shadcn Popover Calendar) */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -228,17 +229,13 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
                 </span>
               )}
             </div>
-            <div className="relative">
-              <input
-                type="date"
-                value={incidentDate}
-                onChange={(e) => setIncidentDate(e.target.value)}
-                min={activePolicy?.startDate}
-                max={activePolicy?.endDate}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-900 bg-white transition-all shadow-2xs"
-                required
-              />
-            </div>
+            <DatePicker
+              value={incidentDate}
+              onChange={setIncidentDate}
+              minDate={activePolicy?.startDate}
+              maxDate={activePolicy?.endDate}
+              placeholder="Select incident calendar date"
+            />
             {activePolicy && (
               <p className="text-[11px] text-slate-500 mt-1">
                 Must fall within coverage: <strong>{formatDate(activePolicy.startDate)}</strong> to <strong>{formatDate(activePolicy.endDate)}</strong> (inclusive).

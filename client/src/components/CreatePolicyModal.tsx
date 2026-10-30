@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CustomerUser } from '../types';
 import { Button } from './ui/button';
+import { DatePicker } from './ui/date-picker';
 import {
   ShieldPlus,
   X,
@@ -176,31 +177,27 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
             </div>
           </div>
 
-          {/* Dates Grid (shadcn styled) */}
+          {/* Dates Grid (shadcn Popover DatePicker) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-emerald-700" /> Start Date
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-900 bg-white shadow-2xs transition-all"
-                required
+                onChange={setStartDate}
+                placeholder="Select start date"
               />
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-emerald-700" /> End Date
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-bold text-slate-900 bg-white shadow-2xs transition-all"
-                required
+                onChange={setEndDate}
+                minDate={startDate}
+                placeholder="Select end date"
               />
             </div>
           </div>
