@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Policy, Claim, CustomerUser, User } from '../types';
+import { filterByPeriod } from '../utils/period';
 import { formatCurrency, formatCompactCurrency, formatDate } from '../utils/formatters';
 import { Card } from '../components/ui/card';
 import { PolicyTable } from '../components/PolicyTable';
@@ -46,8 +47,8 @@ interface AdminDashboardProps {
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   user,
-  policies,
-  claims,
+  policies: allPolicies,
+  claims: allClaims,
   customers,
   activeView,
   setActiveView,
@@ -58,6 +59,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onToggleAI,
 }) => {
   const [dateRange, setDateRange] = useState('Jan 1, 2026 – Dec 31, 2026');
+  // The period selector scopes the dashboard overview; other pages always use the full dataset
+  const { policies, claims } = React.useMemo(
+    () => filterByPeriod(allPolicies, allClaims, dateRange),
+    [allPolicies, allClaims, dateRange]
+  );
   const totalPolicies = policies.length;
   const activePolicies = policies.filter((p) => p.coverageStatus === 'Active').length;
   const expiredPolicies = policies.filter((p) => p.coverageStatus === 'Expired').length;
@@ -74,7 +80,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     'Jan 1, 2026 – Dec 31, 2026',
     'Q1 2026 (Jan – Mar)',
     'Q2 2026 (Apr – Jun)',
+    'Q3 2026 (Jul – Sep)',
+    'Q4 2026 (Oct – Dec)',
     'H2 2026 (Jul – Dec)',
+    'All Time',
   ];
 
   const getGreeting = () => {
@@ -410,10 +419,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900">All Customer Policies</h2>
             <span className="text-xs text-slate-500 font-medium">
-              {policies.length} policies &middot; {activePolicies} active
+              {allPolicies.length} policies &middot; {allPolicies.filter((p) => p.coverageStatus === 'Active').length} active
             </span>
           </div>
-          <PolicyTable policies={policies} isAdmin={true} />
+          <PolicyTable policies={allPolicies} isAdmin={true} />
         </div>
       )}
 
@@ -423,11 +432,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900">All Submitted Claims</h2>
             <span className="text-xs text-slate-500 font-medium">
-              Total {claims.length} filed ({pendingClaims} pending review)
+              Total {allClaims.length} claims ({allClaims.filter((c) => c.status === 'Submitted').length} pending review, {allClaims.filter((c) => c.status === 'Approved').length} approved)
             </span>
           </div>
           <ClaimTable
-            claims={claims}
+            claims={allClaims}
             isAdmin={true}
             onDecideClaim={onDecideClaim}
             isLoadingDecision={isLoadingDecision}
@@ -439,8 +448,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeView === 'customers' && (
         <CustomersView
           user={adminUser}
-          policies={policies}
-          claims={claims}
+          policies={allPolicies}
+          claims={allClaims}
           customers={customers}
           onOpenPolicies={() => {
             if (setActiveView) setActiveView('policies');
@@ -452,8 +461,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeView === 'analytics' && (
         <AnalyticsView
           user={adminUser}
-          policies={policies}
-          claims={claims}
+          policies={allPolicies}
+          claims={allClaims}
           customers={customers}
           onOpenPolicies={(q) => {
             if (setActiveView) setActiveView('policies');
@@ -468,8 +477,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeView === 'reports' && (
         <ReportsView
           user={adminUser}
-          policies={policies}
-          claims={claims}
+          policies={allPolicies}
+          claims={allClaims}
         />
       )}
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Policy, Claim, CustomerUser, User } from '../types';
+import { filterByPeriod } from '../utils/period';
 import { formatCurrency } from '../utils/formatters';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -154,8 +155,8 @@ const SvgDonutChart: React.FC<{
 
 export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   user,
-  policies = [],
-  claims = [],
+  policies: allPolicies = [],
+  claims: allClaims = [],
   customers = [],
   onOpenPolicies,
   onOpenClaims,
@@ -163,7 +164,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   const isAdmin = user?.role === 'Administrator';
 
   // Preset selector: matches the user's reference screenshot default 'H2 2026 (Jul - Dec)'
-  const [datePreset, setDatePreset] = useState<string>('H2 2026 (Jul - Dec)');
+  const [datePreset, setDatePreset] = useState<string>('FY 2026 (Full Year)');
   const [activeTab, setActiveTab] = useState<TabType>('Overview');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -184,6 +185,15 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
   // Filter state for modal/dropdown
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Upcoming' | 'Expired'>('All');
+
+  // Apply the selected period and policy-status filter to everything on this page
+  const { policies, claims } = useMemo(() => {
+    const scoped = filterByPeriod(allPolicies, allClaims, datePreset);
+    if (statusFilter === 'All') return scoped;
+    const ps = scoped.policies.filter((p) => (p.coverageStatus || 'Active') === statusFilter);
+    const ids = new Set(ps.map((p) => p.id));
+    return { policies: ps, claims: scoped.claims.filter((c) => ids.has(c.policyId)) };
+  }, [allPolicies, allClaims, datePreset, statusFilter]);
 
   // Compute live data with strict isolation:
   // Customers ONLY see their own data; Administrator sees full portfolio
@@ -557,8 +567,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   const trendPath = trendPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ');
 
   const coveragePolicies = useMemo(
-    () => policies.filter((p) => statusFilter === 'All' || (p.coverageStatus || 'Active') === statusFilter),
-    [policies, statusFilter]
+    () => policies,
+    [policies]
   );
   const claimAmounts = useMemo(() => {
     const t = { Approved: 0, Submitted: 0, Rejected: 0 };
@@ -597,7 +607,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <DropdownMenuContent align="end" className="w-56 p-1.5">
               <DropdownMenuLabel>Timeframe Preset</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {['H2 2026 (Jul - Dec)', 'H1 2026 (Jan - Jun)', 'FY 2026 (Full Year)', 'Live Database Data'].map(
+              {['FY 2026 (Full Year)', 'H1 2026 (Jan - Jun)', 'H2 2026 (Jul - Dec)', 'Q3 2026 (Jul - Sep)', 'Q4 2026 (Oct - Dec)', 'All Time'].map(
                 (preset) => (
                   <DropdownMenuItem
                     key={preset}

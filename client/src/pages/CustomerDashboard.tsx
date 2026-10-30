@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Policy, Claim, User } from '../types';
+import { filterByPeriod } from '../utils/period';
 import { formatCurrency, formatCompactCurrency } from '../utils/formatters';
 import { Card } from '../components/ui/card';
 import { PolicyTable } from '../components/PolicyTable';
@@ -41,14 +42,19 @@ interface CustomerDashboardProps {
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   user,
-  policies,
-  claims,
+  policies: allPolicies,
+  claims: allClaims,
   activeView,
   onOpenSubmitClaim,
   isAIOpen = false,
   onToggleAI,
 }) => {
   const [dateRange, setDateRange] = useState('Jan 1, 2026 – Dec 31, 2026');
+  // The period selector scopes the dashboard overview; other pages always use the full dataset
+  const { policies, claims } = React.useMemo(
+    () => filterByPeriod(allPolicies, allClaims, dateRange),
+    [allPolicies, allClaims, dateRange]
+  );
   const totalPolicies = policies.length;
   const activePolicies = policies.filter((p) => p.coverageStatus === 'Active').length;
   const expiredPolicies = policies.filter((p) => p.coverageStatus === 'Expired').length;
@@ -61,7 +67,10 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
     'Jan 1, 2026 – Dec 31, 2026',
     'Q1 2026 (Jan – Mar)',
     'Q2 2026 (Apr – Jun)',
+    'Q3 2026 (Jul – Sep)',
+    'Q4 2026 (Oct – Dec)',
     'H2 2026 (Jul – Dec)',
+    'All Time',
   ];
 
   const getGreeting = () => {
@@ -277,11 +286,11 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900">My Insurance Policies</h2>
             <span className="text-xs text-slate-500 font-medium">
-              {totalPolicies} policies &middot; {activePolicies} active
+              {allPolicies.length} policies &middot; {allPolicies.filter((p) => p.coverageStatus === 'Active').length} active
             </span>
           </div>
           <PolicyTable
-            policies={policies}
+            policies={allPolicies}
             isAdmin={false}
             onSelectForClaim={(p) => onOpenSubmitClaim(p.id)}
           />
@@ -294,21 +303,21 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900">My Claims & Status History</h2>
             <span className="text-xs text-slate-500 font-medium">
-              Total {claims.length} claims ({submittedClaims} pending review, {approvedClaims} approved)
+              Total {allClaims.length} claims ({allClaims.filter((c) => c.status === 'Submitted').length} pending review, {allClaims.filter((c) => c.status === 'Approved').length} approved)
             </span>
           </div>
-          <ClaimTable claims={claims} isAdmin={false} />
+          <ClaimTable claims={allClaims} isAdmin={false} />
         </div>
       )}
 
       {/* View: ANALYTICS */}
       {activeView === 'analytics' && (
-        <AnalyticsView user={user} policies={policies} claims={claims} />
+        <AnalyticsView user={user} policies={allPolicies} claims={allClaims} />
       )}
 
       {/* View: REPORTS */}
       {activeView === 'reports' && (
-        <ReportsView user={user} policies={policies} claims={claims} />
+        <ReportsView user={user} policies={allPolicies} claims={allClaims} />
       )}
     </div>
   );
