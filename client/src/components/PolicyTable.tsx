@@ -209,7 +209,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                   </div>
                 </div>
 
-                {/* Footer Action for Customers (Small & Right-Aligned) */}
+                {/* Footer Action for Customers (Proper Button, Right-Aligned) */}
                 {!isAdmin && onSelectForClaim && (
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                     <span className="text-[11px] text-slate-400 font-medium">
@@ -218,15 +218,15 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                     <button
                       onClick={() => onSelectForClaim(policy)}
                       disabled={!isAvailable}
-                      className={`py-1.5 px-3.5 rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-2xs ${
+                      className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2 shadow-xs hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] ${
                         isAvailable
-                          ? 'bg-[#06241b] hover:bg-[#083528] active:scale-[0.98] text-white'
-                          : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                          ? 'bg-[#06241b] hover:bg-[#0a382b] text-white border border-emerald-950/40'
+                          : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                       }`}
                     >
                       <Clock className="w-3.5 h-3.5 text-emerald-400" />
                       <span>Submit Claim</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5 text-emerald-400/80" />
                     </button>
                   </div>
                 )}
@@ -353,10 +353,10 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                           <button
                             onClick={() => onSelectForClaim(policy)}
                             disabled={!isAvailable}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
+                            className={`h-8 px-3.5 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1.5 shadow-2xs hover:shadow-xs hover:scale-[1.02] active:scale-[0.98] ${
                               isAvailable
-                                ? 'bg-[#06241b] hover:bg-[#083528] text-white shadow-2xs'
-                                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                ? 'bg-[#06241b] hover:bg-[#0a382b] text-white border border-emerald-950/40'
+                                : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                             }`}
                           >
                             <Clock className="w-3.5 h-3.5 text-emerald-400" />
