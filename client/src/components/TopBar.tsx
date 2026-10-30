@@ -75,7 +75,6 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenMobileMenu,
   isAIOpen = false,
   onToggleAI,
-  onQuickSwitch,
   onLogout,
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -288,48 +287,6 @@ export const TopBar: React.FC<TopBarProps> = ({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              {/* Quick Switch Accounts */}
-              {onQuickSwitch && (
-                <>
-                  <DropdownMenuLabel className="text-[9px] uppercase tracking-wider text-slate-400">
-                    Switch Demo Account
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onSelect={() => onQuickSwitch('customer1')}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-bold text-[9px] flex items-center justify-center">C1</span>
-                      Customer 1
-                    </span>
-                    {user.username === 'customer1' && <Check className="w-3.5 h-3.5 text-[#00ba63]" />}
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    onSelect={() => onQuickSwitch('customer2')}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-bold text-[9px] flex items-center justify-center">C2</span>
-                      Customer 2
-                    </span>
-                    {user.username === 'customer2' && <Check className="w-3.5 h-3.5 text-[#00ba63]" />}
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    onSelect={() => onQuickSwitch('admin')}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-[#011f17] text-[#00ba63] font-bold text-[9px] flex items-center justify-center">AD</span>
-                      Administrator
-                    </span>
-                    {user.username === 'admin' && <Check className="w-3.5 h-3.5 text-[#00ba63]" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-
               {onLogout && (
                 <DropdownMenuItem
                   onSelect={onLogout}
@@ -354,6 +311,20 @@ export const TopBar: React.FC<TopBarProps> = ({
               className={`w-4 h-4 ${isLoading ? 'animate-spin text-emerald-600' : ''}`}
             />
           </button>
+
+          {/* Logout Button (top right) */}
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              title="Logout"
+              aria-label="Logout"
+              className="h-9 px-2.5 sm:px-3 rounded-xl text-rose-600 hover:text-white hover:bg-rose-500 border border-rose-200 bg-rose-50/60 transition-colors shadow-2xs shrink-0 flex items-center gap-1.5 text-xs font-bold cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          )}
         </div>
       </header>
 

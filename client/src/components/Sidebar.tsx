@@ -22,7 +22,7 @@ interface SidebarProps {
   activeView: ActiveView;
   setActiveView: (view: ActiveView) => void;
   onLogout: () => void;
-  onQuickSwitch: (username: string) => void;
+  onQuickSwitch?: (username: string) => void;
   pendingClaimsCount?: number;
   policiesCount?: number;
   isCollapsed?: boolean;
@@ -46,7 +46,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   user,
   activeView,
   setActiveView,
-  onQuickSwitch,
   pendingClaimsCount = 0,
   policiesCount = 0,
   isCollapsed = false,
@@ -54,12 +53,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
   onOpenAI,
 }) => {
-  const demoAccounts = [
-    { username: 'customer1', label: 'Customer 1', short: 'C1', role: 'Customer' },
-    { username: 'customer2', label: 'Customer 2', short: 'C2', role: 'Customer' },
-    { username: 'admin', label: 'Administrator', short: 'AD', role: 'Admin' },
-  ];
-
   const navItems: NavItem[] = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutGrid, view: 'dashboard', highlightable: true },
     { key: 'policies', label: 'Policies', icon: FileText, view: 'policies', highlightable: true, badge: policiesCount, badgeTone: 'green' },
@@ -73,11 +66,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleNavClick = (view: ActiveView) => {
     setActiveView(view);
-    if (onCloseMobile) onCloseMobile();
-  };
-
-  const handleDemoSwitch = (username: string) => {
-    onQuickSwitch(username);
     if (onCloseMobile) onCloseMobile();
   };
 
@@ -136,49 +124,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
         })}
       </nav>
-
-      {/* Demo Switcher */}
-      <div className="pt-1">
-        {!collapsed && (
-          <p className="px-1 text-[10px] font-bold uppercase tracking-wider text-[#00ba63] mb-2.5">
-            Switch Demo User
-          </p>
-        )}
-        <div className={`space-y-2 ${collapsed ? 'pt-3 border-t border-[#053225]' : ''}`}>
-          {demoAccounts.map((account) => {
-            const isActive = user.username === account.username;
-            return (
-              <button
-                key={account.username}
-                type="button"
-                onClick={() => handleDemoSwitch(account.username)}
-                title={`Switch to ${account.label} (${account.role})`}
-                className={`w-full ${
-                  collapsed ? 'justify-center px-0' : 'justify-between px-3 text-left'
-                } py-2.5 rounded-2xl text-xs font-medium flex items-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
-                  isActive
-                    ? 'bg-[#003b29] text-white font-bold border border-[#00ba63]/30 shadow-sm'
-                    : 'bg-[#02271d]/50 text-slate-300 hover:bg-[#033225] hover:text-white border border-[#053225]'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 truncate">
-                  <span
-                    className={`w-6 h-6 rounded-full text-[10px] font-black flex items-center justify-center shrink-0 ${
-                      isActive ? 'bg-[#00ba63] text-[#011f17]' : 'bg-[#053225] text-slate-300'
-                    }`}
-                  >
-                    {account.short}
-                  </span>
-                  {!collapsed && <span className="truncate">{account.label}</span>}
-                </div>
-                {!collapsed && isActive && (
-                  <CheckCircle2 className="w-4 h-4 text-[#00ba63] shrink-0" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 
