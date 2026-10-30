@@ -7,10 +7,6 @@ import {
   Send,
   Loader2,
   RefreshCw,
-  HelpCircle,
-  MessageSquare,
-  Shield,
-  ArrowRight,
 } from 'lucide-react';
 
 interface AIAssistantWidgetProps {
@@ -49,7 +45,6 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
       return;
     }
 
-    // Set introductory greeting tailored to user role
     setMessages([
       {
         id: 'welcome',
@@ -107,7 +102,6 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
     setIsLoading(true);
 
     try {
-      // Build history excluding welcome and errors
       const historyPayload = messages
         .filter((m) => !m.isError && m.id !== 'welcome')
         .slice(-6)
@@ -163,14 +157,14 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
 
   return (
     <>
-      {/* Floating Launcher Button */}
+      {/* Floating Launcher Button - Flushed to the right screen edge with rounded left corners */}
       <button
         ref={launcherRef}
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label="Open AI Assistant"
         title="Open AI Assistant"
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-2xl bg-[#06241b] hover:bg-[#0a382b] text-white border border-emerald-500/40 shadow-xl shadow-emerald-950/30 flex items-center justify-center transition-all hover:scale-105 active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-50 h-14 pl-3.5 pr-2 rounded-l-2xl rounded-r-none bg-[#06241b] hover:bg-[#0a382b] text-white border-y border-l border-r-0 border-emerald-500/40 shadow-2xl shadow-emerald-950/40 flex items-center justify-center transition-all hover:pl-4 active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
       >
         <span className="relative flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-emerald-300 transition-transform group-hover:rotate-12" />
@@ -178,16 +172,16 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({ user }) =>
         </span>
       </button>
 
-      {/* Floating Chat Panel */}
+      {/* Floating Chat Panel - Flushed to right edge, with left-side rounded corners */}
       {isOpen && (
         <div
           ref={panelRef}
           role="dialog"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed right-4 md:right-20 top-1/2 -translate-y-1/2 z-50 flex flex-col overflow-hidden bg-white border border-slate-200/90 rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col overflow-hidden bg-white border-y border-l border-r-0 border-slate-200/90 rounded-l-3xl rounded-r-none shadow-2xl animate-in slide-in-from-right duration-200"
           style={{
-            width: 'min(380px, calc(100vw - 24px))',
-            height: 'min(520px, calc(100dvh - 24px))',
+            width: 'min(380px, calc(100vw - 16px))',
+            height: 'min(540px, calc(100dvh - 32px))',
           }}
         >
           {/* Panel Header */}
