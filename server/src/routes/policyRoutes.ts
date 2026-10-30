@@ -192,7 +192,7 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
       return;
     }
 
-    // 4. Generate unique Policy ID
+    // 4. Generate unique Policy ID on server
     let policyId = customId ? String(customId).trim() : null;
     if (policyId) {
       const existing = await prisma.policy.findUnique({ where: { id: policyId } });
@@ -201,9 +201,22 @@ router.post('/', ...requireAdmin, async (req: AuthenticatedRequest, res: Respons
         return;
       }
     } else {
-      const count = await prisma.policy.count();
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      policyId = `POL-${1000 + count + 1}-${randomSuffix}`;
+      let unique = false;
+      let attempt = 0;
+      while (!unique && attempt < 20) {
+        attempt++;
+        const count = await prisma.policy.count();
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+        const candidate = `POL-${1000 + count + attempt}-${randomSuffix}`;
+        const existing = await prisma.policy.findUnique({ where: { id: candidate } });
+        if (!existing) {
+          policyId = candidate;
+          unique = true;
+        }
+      }
+      if (!policyId) {
+        policyId = `POL-${Date.now()}`;
+      }
     }
 
     const roundedSI = Math.round(parsedSI * 100) / 100;

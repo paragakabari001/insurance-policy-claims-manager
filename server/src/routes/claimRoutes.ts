@@ -139,7 +139,7 @@ router.post('/', ...requireCustomer, async (req: AuthenticatedRequest, res: Resp
         };
       }
 
-      // 4. Generate unique claim ID
+      // 4. Generate unique claim ID on server
       let claimId = customId ? String(customId).trim() : null;
       if (claimId) {
         const existingClaim = await tx.claim.findUnique({ where: { id: claimId } });
@@ -147,9 +147,22 @@ router.post('/', ...requireCustomer, async (req: AuthenticatedRequest, res: Resp
           throw { statusCode: 409, message: `Claim ID "${claimId}" already exists.` };
         }
       } else {
-        const claimCount = await tx.claim.count();
-        const randSuffix = Math.floor(1000 + Math.random() * 9000);
-        claimId = `CLM-${1000 + claimCount + 1}-${randSuffix}`;
+        let unique = false;
+        let attempt = 0;
+        while (!unique && attempt < 20) {
+          attempt++;
+          const claimCount = await tx.claim.count();
+          const randSuffix = Math.floor(1000 + Math.random() * 9000);
+          const candidate = `CLM-${1000 + claimCount + attempt}-${randSuffix}`;
+          const existing = await tx.claim.findUnique({ where: { id: candidate } });
+          if (!existing) {
+            claimId = candidate;
+            unique = true;
+          }
+        }
+        if (!claimId) {
+          claimId = `CLM-${Date.now()}`;
+        }
       }
 
       // 5. Create claim in Submitted status (immediately blocks SI)

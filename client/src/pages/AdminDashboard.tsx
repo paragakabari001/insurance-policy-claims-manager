@@ -97,7 +97,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
                 <span className="text-xl sm:text-2xl font-bold text-amber-600">{pendingClaims}</span>
-                <span className="text-[10px] sm:text-xs text-slate-400">({approvedClaims} apprv)</span>
+                <span className="text-[10px] sm:text-xs text-slate-400">({approvedClaims} approved)</span>
               </div>
             </Card>
           </div>
@@ -131,7 +131,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900">All Customer Policies</h2>
             <span className="text-xs text-slate-500 font-medium">
-              Total {policies.length} registered
+              {policies.length} policies &middot; {activePolicies} active
             </span>
           </div>
           <PolicyTable policies={policies} isAdmin={true} />

@@ -118,6 +118,9 @@ export function App() {
     };
 
     try {
+      // Clear previous cached account data when switching demo user
+      setPolicies([]);
+      setClaims([]);
       const res = await api.login({
         username,
         password: passwords[username],

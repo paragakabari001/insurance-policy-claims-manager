@@ -52,7 +52,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
                 <span className="text-xl sm:text-2xl font-bold text-slate-900">{totalPolicies}</span>
                 <span className="text-[10px] sm:text-xs text-slate-500">
-                  ({activePolicies} Active)
+                  ({activePolicies} active)
                 </span>
               </div>
             </Card>
@@ -129,7 +129,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900">My Insurance Policies</h2>
             <span className="text-xs text-slate-500 font-medium">
-              Total {policies.length} active policies
+              {totalPolicies} policies &middot; {activePolicies} active
             </span>
           </div>
           <PolicyTable

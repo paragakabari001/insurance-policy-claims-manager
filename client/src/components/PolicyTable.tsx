@@ -76,12 +76,14 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
     }
   };
 
+  const activeCount = policies.filter((p) => p.coverageStatus === 'Active').length;
+
   return (
     <div className="space-y-3.5">
       {/* View Switcher Header Toolbar */}
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-500">
-          Showing {policies.length} policies
+          {policies.length} policies &middot; {activeCount} active
         </span>
         <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
           <button

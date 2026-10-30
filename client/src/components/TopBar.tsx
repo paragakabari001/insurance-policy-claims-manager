@@ -39,17 +39,17 @@ export const TopBar: React.FC<TopBarProps> = ({
   > = {
     dashboard: {
       title: 'Dashboard',
-      subtitle: 'Overview & Portfolio Analytics',
+      subtitle: isAdmin ? 'Overview & Portfolio Analytics' : 'Your policies and claims',
       icon: <LayoutDashboard className="w-4 h-4 text-emerald-700" />,
     },
     policies: {
       title: 'Policies',
-      subtitle: 'Underwriting & Coverage Ledger',
+      subtitle: isAdmin ? 'All Customer Policies' : 'Your insurance policies',
       icon: <FileText className="w-4 h-4 text-emerald-700" />,
     },
     claims: {
       title: 'Claims',
-      subtitle: 'Adjudication & Claims Review',
+      subtitle: isAdmin ? 'Claims Review & Decisions' : 'Your claims and status history',
       icon: <FileCheck2 className="w-4 h-4 text-emerald-700" />,
     },
   };
@@ -97,9 +97,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
         </span>
-        <span className="font-semibold text-slate-700">ACID Ledger Active</span>
-        <span className="text-slate-300">&bull;</span>
-        <span>IST (Asia/Kolkata)</span>
+        <span className="font-semibold text-slate-700">IST (Asia/Kolkata)</span>
       </div>
 
       {/* Right: User Role & Actions */}

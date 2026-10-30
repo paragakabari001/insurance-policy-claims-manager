@@ -12,6 +12,13 @@
 
 This project is an end-to-end insurance policy and claims management web application designed for TailVaR Consulting. It provides a secure, role-based platform where administrators can create customer policies and adjudicate claims, while customers can view their active policies and file claims against remaining coverage limits.
 
+### Recent Enhancements & Fixes
+- **Accurate Policy Counting:** Replaced blanket "active" labeling with data-driven counts (`2 policies · 1 active`) calculated dynamically using `Asia/Kolkata` (IST) date boundaries.
+- **UI Clean-up & Subtitles:** Removed "ACID Ledger Active" from the header, expanded abbreviated counts (`5 approved`), added customer-facing subtitles ("Your policies and claims"), and fixed missing spaces in claims rules text.
+- **Enhanced Claim Form:** Displays coverage dates and remaining balance, dynamic placeholders based on policy limits, "Maximum claim amount: ₹...", clear field-level validation messages, disabled submission during in-flight requests, and immediate balance refresh.
+- **Robust Server-Side ID Generation:** Final policy and claim IDs are generated on the server with database uniqueness enforcement, eliminating frontend random ID collisions and removing "Regenerate ID" controls.
+- **Official shadcn/ui Popover Calendar:** Integrated Radix-powered popover datepicker with collision detection and top-oriented placement in modals, preventing clipping and z-index overlap.
+
 ### Pre-Configured Demo Accounts
 The system is automatically seeded with the three required evaluation accounts:
 

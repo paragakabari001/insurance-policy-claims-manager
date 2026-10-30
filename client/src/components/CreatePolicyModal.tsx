@@ -10,8 +10,6 @@ import {
   User,
   ArrowRight,
   AlertTriangle,
-  RefreshCw,
-  Sparkles,
   ChevronDown,
 } from 'lucide-react';
 
@@ -38,17 +36,11 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
   const [startDate, setStartDate] = useState('2026-01-01');
   const [endDate, setEndDate] = useState('2026-12-31');
   const [sumInsured, setSumInsured] = useState<string>('1000000');
-  const [customId, setCustomId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const generateAutoPolicyId = () => {
-    return `POL-${Math.floor(1000 + Math.random() * 9000)}`;
-  };
-
   useEffect(() => {
     if (isOpen) {
-      setCustomId(generateAutoPolicyId());
       setError(null);
     }
   }, [isOpen]);
@@ -93,7 +85,6 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
         startDate,
         endDate,
         sumInsured: parsedSI,
-        customId: customId.trim() || undefined,
       });
       onClose();
     } catch (err: any) {
@@ -247,36 +238,6 @@ export const CreatePolicyModal: React.FC<CreatePolicyModalProps> = ({
                 className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 font-bold text-slate-900 bg-white text-sm shadow-2xs"
                 required
               />
-            </div>
-          </div>
-
-          {/* Auto-generated Custom Policy ID */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                Policy ID <span className="text-emerald-700 font-normal lowercase">(auto-generated)</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => setCustomId(generateAutoPolicyId())}
-                className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 hover:underline"
-                title="Generate new ID"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Regenerate ID
-              </button>
-            </div>
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                value={customId}
-                onChange={(e) => setCustomId(e.target.value)}
-                placeholder="e.g. POL-1004"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-xs font-mono font-bold text-slate-900 bg-slate-50/50 shadow-2xs"
-              />
-              <span className="absolute right-3 text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> Auto
-              </span>
             </div>
           </div>
 

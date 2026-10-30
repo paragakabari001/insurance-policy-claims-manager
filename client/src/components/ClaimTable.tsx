@@ -89,9 +89,9 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
       {/* Accounting Rules Banner */}
       <div className="px-4 sm:px-5 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-slate-600">
         <span className="font-semibold text-slate-800">Rules:</span>
-        <span>Submitted <strong className="text-amber-700">reserves</strong> coverage.</span>
-        <span>Approved <strong className="text-emerald-700">uses</strong> coverage.</span>
-        <span>Rejected <strong className="text-slate-700">restores</strong> coverage.</span>
+        <span>Submitted{' '}<strong className="text-amber-700">reserves</strong>{' '}coverage.</span>
+        <span>Approved{' '}<strong className="text-emerald-700">uses</strong>{' '}coverage.</span>
+        <span>Rejected{' '}<strong className="text-slate-700">restores</strong>{' '}coverage.</span>
       </div>
 
       {/* Header filter toolbar */}
