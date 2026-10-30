@@ -65,7 +65,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const reservedAndUsedSI = totalSI - remainingSI;
   const pendingClaims = claims.filter((c) => c.status === 'Submitted').length;
   const approvedClaims = claims.filter((c) => c.status === 'Approved').length;
-  const rejectedClaims = claims.filter((c) => c.status === 'Rejected').length;
 
   const remainingPercent = totalSI > 0 ? Math.round((remainingSI / totalSI) * 100) : 0;
   const usedPercent = 100 - remainingPercent;
@@ -152,43 +151,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Sub-Navigation Tabs (Shadcnblocks Match) */}
-      <div className="flex items-center gap-1 border-b border-slate-200/80 -mb-2 overflow-x-auto no-scrollbar py-1">
-        {[
-          { id: 'dashboard', label: 'Overview' },
-          { id: 'policies', label: 'Policies' },
-          { id: 'claims', label: 'Claims' },
-          { id: 'customers', label: 'Customers' },
-          { id: 'analytics', label: 'Analytics' },
-          { id: 'reports', label: 'Reports' },
-        ].map((tab) => {
-          const isActive = activeView === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveView && setActiveView(tab.id as ActiveView)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer shrink-0 ${
-                isActive
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
       {/* View: DASHBOARD (Overview) */}
       {activeView === 'dashboard' && (
         <div className="space-y-6">
-          {/* Section Heading: Overview */}
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-800 tracking-tight">Overview</h2>
-          </div>
-
-          {/* Top 4 KPI Cards with mini wave graphs & trend tags (Responsive 3-Grid Mobile + Compact Chat Mode) */}
+                    {/* Top 4 KPI Cards with mini wave graphs & trend tags (Responsive 3-Grid Mobile + Compact Chat Mode) */}
           <div className={`grid gap-2 sm:gap-3.5 ${isAIOpen ? 'grid-cols-3 sm:grid-cols-2 2xl:grid-cols-4' : 'grid-cols-3 sm:grid-cols-2 lg:grid-cols-4'}`}>
             {/* Card 1: Total Policies */}
             <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
@@ -413,82 +379,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
-          {/* Section: Status Distribution Summary (Matching Shadcnblocks Admin) */}
-          <div className="space-y-2.5">
-            <h3 className="text-xs font-bold text-slate-700 tracking-tight">Portfolio Status</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
-              {/* Active Policies */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-3 shadow-xs flex items-center justify-between hover:border-slate-300 transition-colors">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-xs bg-[#00ba63]" />
-                    <span className="text-[11px] font-semibold text-slate-600">Active</span>
-                  </div>
-                  <p className="text-lg font-black text-slate-900 mt-0.5">{activePolicies}</p>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  Covered
-                </span>
-              </div>
-
-              {/* Expired Policies */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-3 shadow-xs flex items-center justify-between hover:border-slate-300 transition-colors">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-xs bg-slate-400" />
-                    <span className="text-[11px] font-semibold text-slate-600">Expired</span>
-                  </div>
-                  <p className="text-lg font-black text-slate-900 mt-0.5">{expiredPolicies}</p>
-                </div>
-                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                  Matured
-                </span>
-              </div>
-
-              {/* Submitted Claims */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-3 shadow-xs flex items-center justify-between hover:border-slate-300 transition-colors">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-xs bg-amber-500" />
-                    <span className="text-[11px] font-semibold text-slate-600">Submitted</span>
-                  </div>
-                  <p className="text-lg font-black text-slate-900 mt-0.5">{pendingClaims}</p>
-                </div>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-                  Pending
-                </span>
-              </div>
-
-              {/* Approved Claims */}
-              <div className="bg-white rounded-xl border border-slate-200/80 p-3 shadow-xs flex items-center justify-between hover:border-slate-300 transition-colors">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-xs bg-[#00ba63]" />
-                    <span className="text-[11px] font-semibold text-slate-600">Approved</span>
-                  </div>
-                  <p className="text-lg font-black text-slate-900 mt-0.5">{approvedClaims}</p>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  Settled
-                </span>
-              </div>
-
-              {/* Rejected Claims */}
-              <div className="col-span-2 sm:col-span-1 bg-white rounded-xl border border-slate-200/80 p-3 shadow-xs flex items-center justify-between hover:border-slate-300 transition-colors">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-xs bg-rose-500" />
-                    <span className="text-[11px] font-semibold text-slate-600">Rejected</span>
-                  </div>
-                  <p className="text-lg font-black text-slate-900 mt-0.5">{rejectedClaims}</p>
-                </div>
-                <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">
-                  Declined
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Section: Policies Overview */}
           <div className="space-y-3">
             <PolicyTable policies={policies} isAdmin={true} />
@@ -664,12 +554,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         />
       )}
 
-      {/* View: ANALYTICS */}
+      {/* View: ANALYTICS (Matches exact UI design with charts, KPIs & customer summary) */}
       {activeView === 'analytics' && (
         <AnalyticsView
           user={adminUser}
           policies={policies}
           claims={claims}
+          customers={customers}
+          onOpenPolicies={(q) => {
+            if (setActiveView) setActiveView('policies');
+          }}
+          onOpenClaims={(q) => {
+            if (setActiveView) setActiveView('claims');
+          }}
         />
       )}
 

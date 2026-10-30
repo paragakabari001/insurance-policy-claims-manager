@@ -483,6 +483,6 @@ describe('Comprehensive Insurance Policy & Claims Verification Suite', () => {
       expect(typeof res.body.reply).toBe('string');
       expect(res.body.reply.length).toBeGreaterThan(0);
       expect(Array.isArray(res.body.suggestedQuestions)).toBe(true);
-    });
+    }, 15000);
   });
 });

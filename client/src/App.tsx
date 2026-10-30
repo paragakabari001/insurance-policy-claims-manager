@@ -280,7 +280,6 @@ export function App() {
               policies={policies}
               claims={claims}
               activeView={activeView}
-              setActiveView={setActiveView}
               onOpenSubmitClaim={handleOpenClaimModalForPolicy}
               isAIOpen={isAIOpen}
             />
