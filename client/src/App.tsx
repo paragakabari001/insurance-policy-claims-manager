@@ -13,11 +13,66 @@ import { AIAssistantWidget } from './components/AIAssistantWidget';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { formatCurrency } from './utils/formatters';
 
+// Helper functions to map URL paths to application views and back
+export const pathToView = (path: string): ActiveView => {
+  const clean = path.replace(/^\/+/, '').split('/')[0].split('?')[0].toLowerCase();
+  switch (clean) {
+    case 'policies':
+      return 'policies';
+    case 'claims':
+      return 'claims';
+    case 'customers':
+      return 'customers';
+    case 'analytics':
+      return 'analytics';
+    case 'reports':
+      return 'reports';
+    case 'dashboard':
+    default:
+      return 'dashboard';
+  }
+};
+
+export const viewToPath = (view: ActiveView): string => {
+  return view === 'dashboard' ? '/dashboard' : `/${view}`;
+};
+
 export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
+  const [activeView, setActiveViewState] = useState<ActiveView>(() => {
+    return pathToView(window.location.pathname);
+  });
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Synchronized navigation function: updates React view and browser history / URL
+  const setActiveView = (view: ActiveView, replace = false) => {
+    setActiveViewState(view);
+    const targetPath = viewToPath(view);
+    if (window.location.pathname !== targetPath) {
+      if (replace) {
+        window.history.replaceState({ view }, '', targetPath);
+      } else {
+        window.history.pushState({ view }, '', targetPath);
+      }
+    }
+  };
+
+  // Listen to popstate (browser Back and Forward buttons) and sync URL on mount
+  useEffect(() => {
+    const handlePopState = () => {
+      const view = pathToView(window.location.pathname);
+      setActiveViewState(view);
+    };
+
+    // If currently on '/' or empty, normalize to '/dashboard' without extra history entry
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+      window.history.replaceState({ view: 'dashboard' }, '', '/dashboard');
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Core Data
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -106,6 +161,15 @@ export function App() {
     }
   }, [user?.id]);
 
+  const handleLoginSuccess = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    const targetView = pathToView(
+      window.location.pathname === '/login' ? '/dashboard' : window.location.pathname
+    );
+    setActiveView(targetView, true);
+    addToast('success', `Welcome back, ${loggedInUser.name}`);
+  };
+
   const handleLogout = async () => {
     try {
       await api.logout();
@@ -116,7 +180,8 @@ export function App() {
     setUser(null);
     setPolicies([]);
     setClaims([]);
-    setActiveView('dashboard');
+    setActiveViewState('dashboard');
+    window.history.replaceState({ view: 'dashboard' }, '', '/login');
     addToast('success', 'You have been signed out.');
   };
 
@@ -213,7 +278,7 @@ export function App() {
   if (!user) {
     return (
       <>
-        <LoginPage onLoginSuccess={setUser} onNotify={addToast} />
+        <LoginPage onLoginSuccess={handleLoginSuccess} onNotify={addToast} />
         <ToastContainer toasts={toasts} onDismiss={removeToast} />
       </>
     );

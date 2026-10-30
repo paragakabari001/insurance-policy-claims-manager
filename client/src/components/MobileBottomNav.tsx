@@ -29,8 +29,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 px-3 pb-4 pt-1 pointer-events-none">
       <nav className="pointer-events-auto bg-[#06241b]/95 backdrop-blur-xl border border-emerald-500/20 text-white shadow-[0_8px_32px_rgba(0,0,0,0.36)] rounded-2xl p-1.5 flex items-center justify-around">
         {/* Dashboard */}
-        <button
-          onClick={() => setActiveView('dashboard')}
+        <a
+          href="/dashboard"
+          onClick={(e) => {
+            if (!e.metaKey && !e.ctrlKey) {
+              e.preventDefault();
+              setActiveView('dashboard');
+            }
+          }}
           className={`flex-1 py-2 px-2 flex flex-col items-center gap-1 rounded-xl transition-all ${
             activeView === 'dashboard'
               ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm'
@@ -39,11 +45,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         >
           <LayoutDashboard className="w-4 h-4" />
           <span className="text-[10px] tracking-tight">Dashboard</span>
-        </button>
+        </a>
 
         {/* Policies */}
-        <button
-          onClick={() => setActiveView('policies')}
+        <a
+          href="/policies"
+          onClick={(e) => {
+            if (!e.metaKey && !e.ctrlKey) {
+              e.preventDefault();
+              setActiveView('policies');
+            }
+          }}
           className={`flex-1 py-2 px-2 flex flex-col items-center gap-1 rounded-xl transition-all relative ${
             activeView === 'policies'
               ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm'
@@ -65,11 +77,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             )}
           </div>
           <span className="text-[10px] tracking-tight">Policies</span>
-        </button>
+        </a>
 
         {/* Claims */}
-        <button
-          onClick={() => setActiveView('claims')}
+        <a
+          href="/claims"
+          onClick={(e) => {
+            if (!e.metaKey && !e.ctrlKey) {
+              e.preventDefault();
+              setActiveView('claims');
+            }
+          }}
           className={`flex-1 py-2 px-2 flex flex-col items-center gap-1 rounded-xl transition-all relative ${
             activeView === 'claims'
               ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm'
@@ -85,7 +103,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             )}
           </div>
           <span className="text-[10px] tracking-tight">Claims</span>
-        </button>
+        </a>
 
         {/* Profiles / Quick Switch */}
         <button

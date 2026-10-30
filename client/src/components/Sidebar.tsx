@@ -85,11 +85,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.highlightable && activeView === item.view;
+          const href = item.view === 'dashboard' ? '/dashboard' : `/${item.view}`;
           return (
-            <button
+            <a
               key={item.key}
-              type="button"
-              onClick={() => handleNavClick(item.view)}
+              href={href}
+              onClick={(e) => {
+                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                  e.preventDefault();
+                  handleNavClick(item.view);
+                }
+              }}
               title={collapsed ? item.label : undefined}
               aria-current={isActive ? 'page' : undefined}
               className={`relative w-full flex items-center ${
@@ -124,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }`}
                 />
               )}
-            </button>
+            </a>
           );
         })}
       </nav>

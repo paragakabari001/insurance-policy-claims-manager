@@ -66,9 +66,9 @@ const SvgDonutChart: React.FC<{
   centerLabel: string;
   slices: { label: string; value: number; color: string; dotColor: string }[];
 }> = ({ total, centerLabel, slices }) => {
-  const radius = 50;
-  const strokeWidth = 15;
-  const circumference = 2 * Math.PI * radius; // ~314.16
+  const radius = 40;
+  const strokeWidth = 11;
+  const circumference = 2 * Math.PI * radius; // ~251.32
 
   // Calculate segment offsets
   let accumulatedOffset = 0;
@@ -86,14 +86,14 @@ const SvgDonutChart: React.FC<{
   });
 
   return (
-    <div className="flex items-center gap-4 sm:gap-6 w-full">
-      {/* SVG Donut Canvas with Center Text */}
-      <div className="relative w-32 h-32 sm:w-36 sm:h-36 shrink-0 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 130 130">
+    <div className="flex items-center gap-3 sm:gap-4 w-full">
+      {/* SVG Donut Canvas with Center Text (Compact size) */}
+      <div className="relative w-24 h-24 sm:w-26 sm:h-26 shrink-0 flex items-center justify-center">
+        <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
           {/* Base background circle */}
           <circle
-            cx="65"
-            cy="65"
+            cx="50"
+            cy="50"
             r={radius}
             fill="none"
             stroke="#f1f5f9"
@@ -104,8 +104,8 @@ const SvgDonutChart: React.FC<{
             segments.map((seg, idx) => (
               <circle
                 key={idx}
-                cx="65"
-                cy="65"
+                cx="50"
+                cy="50"
                 r={radius}
                 fill="none"
                 stroke={seg.color}
@@ -120,28 +120,28 @@ const SvgDonutChart: React.FC<{
 
         {/* Centered Total & Label */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-          <span className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+          <span className="text-base sm:text-lg font-black text-slate-900 leading-tight">
             {total}
           </span>
-          <span className="text-[10px] font-semibold text-slate-400 capitalize">
+          <span className="text-[9px] font-semibold text-slate-400 capitalize">
             {centerLabel}
           </span>
         </div>
       </div>
 
       {/* Legend with matching color dots, values and percentages */}
-      <div className="flex-1 space-y-2 min-w-0">
+      <div className="flex-1 space-y-1.5 min-w-0">
         {slices.map((slice) => {
           const pct = total > 0 ? Math.round((slice.value / total) * 100) : 0;
           return (
-            <div key={slice.label} className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className={`w-2.5 h-2.5 rounded-full ${slice.dotColor} shrink-0`} />
+            <div key={slice.label} className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className={`w-2 h-2 rounded-full ${slice.dotColor} shrink-0`} />
                 <span className="font-semibold text-slate-700 truncate">{slice.label}</span>
               </div>
-              <div className="flex items-center gap-2 font-bold text-slate-900 shrink-0">
-                <span className="w-5 text-right">{slice.value}</span>
-                <span className="text-slate-400 text-[11px] w-8 text-right font-medium">{pct}%</span>
+              <div className="flex items-center gap-1.5 font-bold text-slate-900 shrink-0">
+                <span className="w-4 text-right">{slice.value}</span>
+                <span className="text-slate-400 text-[10px] w-7 text-right font-medium">{pct}%</span>
               </div>
             </div>
           );
@@ -576,161 +576,118 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         })}
       </div>
 
-      {/* 3. Top 4 KPI Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+      {/* 3. Space-Efficient Executive KPI Metrics (Compact Height: ~62px, 0 wasted vertical space) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {/* Card 1: Total Policies */}
-        <div className="relative bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs overflow-hidden flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center">
-              <FileText className="w-4.5 h-4.5 text-[#00ba63]" />
+        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-emerald-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0 z-10">
+            <div className="w-8 h-8 rounded-lg bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+              <FileText className="w-4 h-4 text-[#00ba63]" />
             </div>
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-              <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" />
-              <span>↑ 20%</span>
-            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Policies</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+                  {analyticsData.totalPolicies}
+                </span>
+                <span className="text-[10px] font-bold text-slate-400">policies</span>
+              </div>
+            </div>
           </div>
-          <div className="mt-3 z-10">
-            <p className="text-xs font-semibold text-slate-500">Total Policies</p>
-            <p className="text-2xl font-black text-slate-900 mt-0.5 tracking-tight">
-              {analyticsData.totalPolicies}
-            </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">Across all customers</p>
-          </div>
-          {/* Smooth Green Wave SVG */}
-          <svg
-            className="absolute bottom-0 left-0 right-0 w-full h-8 pointer-events-none"
-            viewBox="0 0 100 25"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,20 Q25,8 50,16 T100,6 L100,25 L0,25 Z"
-              fill="rgba(0, 186, 99, 0.08)"
-            />
-            <path
-              d="M0,20 Q25,8 50,16 T100,6"
-              fill="none"
-              stroke="#00ba63"
-              strokeWidth="1.5"
-            />
+          <span className="z-10 inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
+            ↑ 20%
+          </span>
+          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
+            <path d="M0,20 Q25,8 50,16 T100,6 L100,25 L0,25 Z" fill="rgba(0, 186, 99, 0.15)" />
+            <path d="M0,20 Q25,8 50,16 T100,6" fill="none" stroke="#00ba63" strokeWidth="1.5" />
           </svg>
         </div>
 
         {/* Card 2: Total Sum Insured */}
-        <div className="relative bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs overflow-hidden flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Layers className="w-4.5 h-4.5 text-blue-600" />
+        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-blue-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0 z-10">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Layers className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Sum Insured</p>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+                  {formatCurrency(analyticsData.totalSI)}
+                </span>
+              </div>
             </div>
           </div>
-          <div className="mt-3 z-10">
-            <p className="text-xs font-semibold text-slate-500">Total Sum Insured</p>
-            <p className="text-2xl font-black text-slate-900 mt-0.5 tracking-tight">
-              {formatCurrency(analyticsData.totalSI)}
-            </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">Across all customers</p>
-          </div>
-          {/* Smooth Blue Wave SVG */}
-          <svg
-            className="absolute bottom-0 left-0 right-0 w-full h-8 pointer-events-none"
-            viewBox="0 0 100 25"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,22 Q30,12 60,18 T100,8 L100,25 L0,25 Z"
-              fill="rgba(37, 99, 235, 0.08)"
-            />
-            <path
-              d="M0,22 Q30,12 60,18 T100,8"
-              fill="none"
-              stroke="#3b82f6"
-              strokeWidth="1.5"
-            />
+          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
+            <path d="M0,22 Q30,12 60,18 T100,8 L100,25 L0,25 Z" fill="rgba(37, 99, 235, 0.15)" />
+            <path d="M0,22 Q30,12 60,18 T100,8" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
           </svg>
         </div>
 
         {/* Card 3: Total Coverage (Available) */}
-        <div className="relative bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs overflow-hidden flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center">
-              <ShieldCheck className="w-4.5 h-4.5 text-[#00ba63]" />
+        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-emerald-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0 z-10">
+            <div className="w-8 h-8 rounded-lg bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Coverage (Available)</p>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-base sm:text-lg font-black text-[#008f4c] tracking-tight leading-tight">
+                  {formatCurrency(analyticsData.totalRemaining)}
+                </span>
+              </div>
             </div>
           </div>
-          <div className="mt-3 z-10">
-            <p className="text-xs font-semibold text-slate-500">Total Coverage (Available)</p>
-            <p className="text-2xl font-black text-[#008f4c] mt-0.5 tracking-tight">
-              {formatCurrency(analyticsData.totalRemaining)}
-            </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">{remainingPct}% of total</p>
-          </div>
-          {/* Smooth Green Wave SVG */}
-          <svg
-            className="absolute bottom-0 left-0 right-0 w-full h-8 pointer-events-none"
-            viewBox="0 0 100 25"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,20 Q20,10 50,15 T100,5 L100,25 L0,25 Z"
-              fill="rgba(0, 186, 99, 0.08)"
-            />
-            <path
-              d="M0,20 Q20,10 50,15 T100,5"
-              fill="none"
-              stroke="#00ba63"
-              strokeWidth="1.5"
-            />
+          <span className="z-10 text-[10px] font-bold text-slate-500 shrink-0">
+            {remainingPct}% of total
+          </span>
+          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
+            <path d="M0,20 Q20,10 50,15 T100,5 L100,25 L0,25 Z" fill="rgba(0, 186, 99, 0.15)" />
+            <path d="M0,20 Q20,10 50,15 T100,5" fill="none" stroke="#00ba63" strokeWidth="1.5" />
           </svg>
         </div>
 
         {/* Card 4: Total Claims */}
-        <div className="relative bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs overflow-hidden flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
-              <Target className="w-4.5 h-4.5 text-orange-500" />
+        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-orange-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0 z-10">
+            <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
+              <Target className="w-4 h-4 text-orange-500" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Claims</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+                  {analyticsData.totalClaims}
+                </span>
+                <span className="text-[10px] font-medium text-slate-400">claims</span>
+              </div>
             </div>
           </div>
-          <div className="mt-3 z-10">
-            <p className="text-xs font-semibold text-slate-500">Total Claims</p>
-            <p className="text-2xl font-black text-slate-900 mt-0.5 tracking-tight">
-              {analyticsData.totalClaims}
-            </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-              ({analyticsData.approvedClaims} Approved, {analyticsData.rejectedClaims} Rejected)
-            </p>
-          </div>
-          {/* Smooth Orange Wave SVG */}
-          <svg
-            className="absolute bottom-0 left-0 right-0 w-full h-8 pointer-events-none"
-            viewBox="0 0 100 25"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,22 Q30,14 65,18 T100,10 L100,25 L0,25 Z"
-              fill="rgba(249, 115, 22, 0.08)"
-            />
-            <path
-              d="M0,22 Q30,14 65,18 T100,10"
-              fill="none"
-              stroke="#f97316"
-              strokeWidth="1.5"
-            />
+          <span className="z-10 text-[9px] font-bold text-slate-400 shrink-0">
+            {analyticsData.approvedClaims} App &bull; {analyticsData.rejectedClaims} Rej
+          </span>
+          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
+            <path d="M0,22 Q30,14 65,18 T100,10 L100,25 L0,25 Z" fill="rgba(249, 115, 22, 0.15)" />
+            <path d="M0,22 Q30,14 65,18 T100,10" fill="none" stroke="#f97316" strokeWidth="1.5" />
           </svg>
         </div>
       </div>
 
-      {/* 4. Row 2: Coverage Summary (Left) & Policies by Status Donut (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* 4. Row 2: Coverage Summary (Left) & Policies by Status Donut (Right) - High-Density */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4">
         {/* Coverage Summary Card */}
-        <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
-              <FileText className="w-4 h-4 text-[#00ba63]" />
+        <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center gap-2 mb-2.5">
+            <div className="w-6 h-6 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
+              <FileText className="w-3.5 h-3.5 text-[#00ba63]" />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">Coverage Summary</h3>
+            <h3 className="text-xs font-bold text-slate-900">Coverage Summary</h3>
           </div>
 
           {/* Large Two-Tone Horizontal Progress Bar */}
-          <div className="space-y-3">
-            <div className="w-full h-5 rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
+          <div className="space-y-2">
+            <div className="w-full h-4 rounded-full bg-slate-100 overflow-hidden flex shadow-inner">
               <div
                 className="bg-[#00c569] h-full transition-all duration-700 ease-out"
                 style={{ width: `${usedPct}%` }}
@@ -744,26 +701,26 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             </div>
 
             {/* Three Breakdown Stat Values matching screenshot */}
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00c569]" />
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] pt-1">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#00c569]" />
                 <span className="font-semibold text-slate-600">Reserved + Used</span>
-                <span className="font-extrabold text-slate-900">
+                <span className="font-bold text-slate-900">
                   {formatCurrency(analyticsData.totalUsed)} ({usedPct}%)
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00ba63]" />
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#00ba63]" />
                 <span className="font-semibold text-slate-600">Remaining</span>
-                <span className="font-extrabold text-[#008f4c]">
+                <span className="font-bold text-[#008f4c]">
                   {formatCurrency(analyticsData.totalRemaining)} ({remainingPct}%)
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <span className="font-semibold text-slate-500">Total Sum Insured</span>
-                <span className="font-black text-slate-900">
+                <span className="font-extrabold text-slate-900">
                   {formatCurrency(analyticsData.totalSI)}
                 </span>
               </div>
@@ -772,12 +729,12 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
 
         {/* Policies by Status Donut Chart */}
-        <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
-              <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
+        <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#00ba63]" />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">Policies by Status</h3>
+            <h3 className="text-xs font-bold text-slate-900">Policies by Status</h3>
           </div>
 
           <SvgDonutChart
@@ -807,10 +764,10 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
       </div>
 
-      {/* 5. Row 3: Three Visualizations (Claims by Outcome, Customer Wise Distribution, Monthly Claim Trend) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* 5. Row 3: Three Visualizations (Claims by Outcome, Customer Wise Distribution, Monthly Claim Trend) - Space-Efficient */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
         {/* Chart 1: Claims by Outcome Donut */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
           <h3 className="text-xs font-bold text-slate-900 mb-2">Claims by Outcome</h3>
           <SvgDonutChart
             total={analyticsData.totalClaims}
@@ -839,7 +796,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
 
         {/* Chart 2: Customer Wise Distribution Bar Chart */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
           <div className="flex items-center gap-1.5 mb-2">
             <div className="w-5 h-5 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
               <Users className="w-3 h-3 text-[#00ba63]" />
@@ -847,12 +804,12 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <h3 className="text-xs font-bold text-slate-900">Customer Wise Distribution</h3>
           </div>
 
-          <div className="relative pt-4 pb-1 flex-1 flex flex-col justify-end">
+          <div className="relative pt-2 pb-1 flex-1 flex flex-col justify-end">
             {/* Horizontal Dashed Gridlines & Left Y-Axis labels */}
-            <div className="absolute inset-x-0 inset-y-4 flex flex-col justify-between pointer-events-none">
+            <div className="absolute inset-x-0 inset-y-2 flex flex-col justify-between pointer-events-none">
               {[8, 6, 4, 2, 0].map((val) => (
                 <div key={val} className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-400 font-medium w-3 text-right">
+                  <span className="text-[9px] text-slate-400 font-medium w-3 text-right">
                     {val}
                   </span>
                   <div className="flex-1 border-b border-dashed border-slate-100" />
@@ -861,26 +818,24 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             </div>
 
             {/* Vertical Bars */}
-            <div className="relative z-10 pl-6 pr-2 h-28 flex items-end justify-around">
+            <div className="relative z-10 pl-5 pr-2 h-22 flex items-end justify-around">
               {analyticsData.barDistribution.map((bar, idx) => {
                 const heightPct = Math.min(100, Math.max(0, (bar.value / 8) * 100));
                 const barColor =
                   idx === 0 ? 'bg-[#00ba63]' : idx === 1 ? 'bg-[#6ee7b7]' : 'bg-[#a7f3d0]';
 
                 return (
-                  <div key={bar.name} className="flex flex-col items-center gap-1.5 w-16 group">
-                    {/* Value Badge above Bar */}
-                    <span className="text-[11px] font-bold text-slate-700">
+                  <div key={bar.name} className="flex flex-col items-center gap-1 w-14 group">
+                    <span className="text-[10px] font-bold text-slate-700">
                       {bar.value}
                     </span>
-                    <div className="w-9 bg-slate-100/60 rounded-t-lg h-24 flex items-end">
+                    <div className="w-7 bg-slate-100/60 rounded-t-md h-16 flex items-end">
                       <div
-                        className={`w-full ${barColor} rounded-t-lg transition-all duration-700 ease-out group-hover:opacity-90`}
+                        className={`w-full ${barColor} rounded-t-md transition-all duration-700 ease-out group-hover:opacity-90`}
                         style={{ height: `${heightPct}%` }}
                       />
                     </div>
-                    {/* Bottom Label */}
-                    <span className="text-[10px] font-semibold text-slate-600 truncate max-w-full text-center">
+                    <span className="text-[9px] font-semibold text-slate-600 truncate max-w-full text-center">
                       {bar.name}
                     </span>
                   </div>
@@ -891,15 +846,15 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
 
         {/* Chart 3: Monthly Claim Trend Area/Line Chart */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col justify-between">
           <h3 className="text-xs font-bold text-slate-900 mb-2">Monthly Claim Trend</h3>
 
-          <div className="relative pt-4 pb-1 flex-1 flex flex-col justify-end">
+          <div className="relative pt-2 pb-1 flex-1 flex flex-col justify-end">
             {/* Y-axis Ticks & Gridlines */}
-            <div className="absolute inset-x-0 inset-y-4 flex flex-col justify-between pointer-events-none">
+            <div className="absolute inset-x-0 inset-y-2 flex flex-col justify-between pointer-events-none">
               {[4, 3, 2, 1, 0].map((val) => (
                 <div key={val} className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-400 font-medium w-3 text-right">
+                  <span className="text-[9px] text-slate-400 font-medium w-3 text-right">
                     {val}
                   </span>
                   <div className="flex-1 border-b border-dashed border-slate-100" />
@@ -908,45 +863,45 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             </div>
 
             {/* SVG Spline Curve with Gradient Area Fill */}
-            <div className="relative z-10 pl-6 pr-2 h-28 flex flex-col justify-between">
-              <svg className="w-full h-24 overflow-visible" viewBox="0 0 280 80">
+            <div className="relative z-10 pl-5 pr-2 h-22 flex flex-col justify-between">
+              <svg className="w-full h-18 overflow-visible" viewBox="0 0 280 70">
                 <defs>
                   <linearGradient id="claimTrendGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00ba63" stopOpacity="0.28" />
+                    <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
                     <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
                 {/* Area Fill */}
                 <path
-                  d="M 15,60 C 35,50 45,45 65,45 C 90,45 95,60 115,60 C 140,60 145,20 165,20 C 190,20 195,45 215,45 C 240,45 245,60 265,60 L 265,80 L 15,80 Z"
+                  d="M 15,50 C 35,42 45,38 65,38 C 90,38 95,50 115,50 C 140,50 145,16 165,16 C 190,16 195,38 215,38 C 240,38 245,50 265,50 L 265,70 L 15,70 Z"
                   fill="url(#claimTrendGradient)"
                 />
 
                 {/* Line Path */}
                 <path
-                  d="M 15,60 C 35,50 45,45 65,45 C 90,45 95,60 115,60 C 140,60 145,20 165,20 C 190,20 195,45 215,45 C 240,45 245,60 265,60"
+                  d="M 15,50 C 35,42 45,38 65,38 C 90,38 95,50 115,50 C 140,50 145,16 165,16 C 190,16 195,38 215,38 C 240,42 245,50 265,50"
                   fill="none"
                   stroke="#00ba63"
-                  strokeWidth="2.5"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                 />
 
                 {/* Data Points */}
                 {[
-                  { cx: 15, cy: 60, val: 1 },
-                  { cx: 65, cy: 45, val: 2 },
-                  { cx: 115, cy: 60, val: 1 },
-                  { cx: 165, cy: 20, val: 3, isPeak: true },
-                  { cx: 215, cy: 45, val: 2 },
-                  { cx: 265, cy: 60, val: 1 },
+                  { cx: 15, cy: 50, val: 1 },
+                  { cx: 65, cy: 38, val: 2 },
+                  { cx: 115, cy: 50, val: 1 },
+                  { cx: 165, cy: 16, val: 3, isPeak: true },
+                  { cx: 215, cy: 38, val: 2 },
+                  { cx: 265, cy: 50, val: 1 },
                 ].map((pt, i) => (
                   <g key={i} className="group cursor-pointer">
                     {pt.isPeak && (
                       <circle
                         cx={pt.cx}
                         cy={pt.cy}
-                        r="7"
+                        r="6"
                         fill="#00ba63"
                         opacity="0.25"
                         className="animate-ping"
@@ -955,17 +910,17 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                     <circle
                       cx={pt.cx}
                       cy={pt.cy}
-                      r="4"
+                      r="3.5"
                       fill="#00ba63"
                       stroke="#ffffff"
-                      strokeWidth="2"
+                      strokeWidth="1.5"
                     />
                   </g>
                 ))}
               </svg>
 
               {/* Month Labels below chart */}
-              <div className="flex justify-between text-[10px] font-semibold text-slate-500 pt-1 px-1">
+              <div className="flex justify-between text-[9px] font-semibold text-slate-500 pt-0.5 px-1">
                 {['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
                   <span key={m}>{m}</span>
                 ))}
@@ -975,27 +930,27 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         </div>
       </div>
 
-      {/* 6. Row 4: Customer Wise Summary Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+      {/* 6. Row 4: Customer Wise Summary Table (Compact Space-Efficient View) */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
         {/* Table Top Header: Title & Search + Columns Dropdown */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
-              <Users className="w-4 h-4 text-[#00ba63]" />
+            <div className="w-6 h-6 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
+              <Users className="w-3.5 h-3.5 text-[#00ba63]" />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">Customer Wise Summary</h3>
+            <h3 className="text-xs font-bold text-slate-900">Customer Wise Summary</h3>
           </div>
 
           <div className="flex items-center gap-2.5">
             {/* Live Search Input */}
-            <div className="relative w-56 sm:w-64">
+            <div className="relative w-52 sm:w-60">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search customers..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00ba63] focus:bg-white transition-all"
+                className="w-full pl-8 pr-3 py-1 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00ba63] focus:bg-white transition-all"
               />
             </div>
 
@@ -1004,7 +959,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="h-8 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                  className="h-7.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                 >
                   <Columns3 className="w-3.5 h-3.5 text-slate-500" />
                   <span>Columns</span>
@@ -1055,70 +1010,70 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-50/90 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
               <tr>
-                {visibleColumns.customerId && <th className="px-3.5 py-3">Customer ID</th>}
-                {visibleColumns.customerName && <th className="px-3.5 py-3">Customer Name</th>}
-                {visibleColumns.totalPolicies && <th className="px-3.5 py-3 text-center">Total Policies</th>}
-                {visibleColumns.sumInsured && <th className="px-3.5 py-3">Sum Insured</th>}
-                {visibleColumns.usedReserved && <th className="px-3.5 py-3">Used / Reserved</th>}
-                {visibleColumns.remainingCoverage && <th className="px-3.5 py-3">Remaining Coverage</th>}
-                {visibleColumns.totalClaims && <th className="px-3.5 py-3 text-center">Total Claims</th>}
-                {visibleColumns.approved && <th className="px-3.5 py-3 text-center">Approved</th>}
-                {visibleColumns.rejected && <th className="px-3.5 py-3 text-center">Rejected</th>}
-                {visibleColumns.pending && <th className="px-3.5 py-3 text-center">Pending</th>}
-                {visibleColumns.actions && <th className="px-3.5 py-3 text-center">Actions</th>}
+                {visibleColumns.customerId && <th className="px-3 py-2">Customer ID</th>}
+                {visibleColumns.customerName && <th className="px-3 py-2">Customer Name</th>}
+                {visibleColumns.totalPolicies && <th className="px-3 py-2 text-center">Total Policies</th>}
+                {visibleColumns.sumInsured && <th className="px-3 py-2">Sum Insured</th>}
+                {visibleColumns.usedReserved && <th className="px-3 py-2">Used / Reserved</th>}
+                {visibleColumns.remainingCoverage && <th className="px-3 py-2">Remaining Coverage</th>}
+                {visibleColumns.totalClaims && <th className="px-3 py-2 text-center">Total Claims</th>}
+                {visibleColumns.approved && <th className="px-3 py-2 text-center">Approved</th>}
+                {visibleColumns.rejected && <th className="px-3 py-2 text-center">Rejected</th>}
+                {visibleColumns.pending && <th className="px-3 py-2 text-center">Pending</th>}
+                {visibleColumns.actions && <th className="px-3 py-2 text-center">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
               {filteredCustomers.map((row) => (
                 <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
                   {visibleColumns.customerId && (
-                    <td className="px-3.5 py-3.5 font-bold text-slate-800">{row.id}</td>
+                    <td className="px-3 py-2 font-bold text-slate-800">{row.id}</td>
                   )}
                   {visibleColumns.customerName && (
-                    <td className="px-3.5 py-3.5 font-semibold text-slate-700">{row.name}</td>
+                    <td className="px-3 py-2 font-semibold text-slate-700">{row.name}</td>
                   )}
                   {visibleColumns.totalPolicies && (
-                    <td className="px-3.5 py-3.5 text-center font-bold text-slate-900">
+                    <td className="px-3 py-2 text-center font-bold text-slate-900">
                       {row.totalPolicies}
                     </td>
                   )}
                   {visibleColumns.sumInsured && (
-                    <td className="px-3.5 py-3.5 font-bold text-slate-900">
+                    <td className="px-3 py-2 font-bold text-slate-900">
                       {formatCurrency(row.sumInsured)}
                     </td>
                   )}
                   {visibleColumns.usedReserved && (
-                    <td className="px-3.5 py-3.5 font-bold text-slate-800">
+                    <td className="px-3 py-2 font-bold text-slate-800">
                       {formatCurrency(row.usedReserved)}
                     </td>
                   )}
                   {visibleColumns.remainingCoverage && (
-                    <td className="px-3.5 py-3.5 font-extrabold text-[#008f4c]">
+                    <td className="px-3 py-2 font-extrabold text-[#008f4c]">
                       {formatCurrency(row.remainingCoverage)}
                     </td>
                   )}
                   {visibleColumns.totalClaims && (
-                    <td className="px-3.5 py-3.5 text-center font-bold text-slate-900">
+                    <td className="px-3 py-2 text-center font-bold text-slate-900">
                       {row.totalClaims}
                     </td>
                   )}
                   {visibleColumns.approved && (
-                    <td className="px-3.5 py-3.5 text-center font-bold text-[#008f4c]">
+                    <td className="px-3 py-2 text-center font-bold text-[#008f4c]">
                       {row.approvedClaims}
                     </td>
                   )}
                   {visibleColumns.rejected && (
-                    <td className="px-3.5 py-3.5 text-center font-bold text-rose-500">
+                    <td className="px-3 py-2 text-center font-bold text-rose-500">
                       {row.rejectedClaims}
                     </td>
                   )}
                   {visibleColumns.pending && (
-                    <td className="px-3.5 py-3.5 text-center font-bold text-amber-500">
+                    <td className="px-3 py-2 text-center font-bold text-amber-500">
                       {row.pendingClaims}
                     </td>
                   )}
                   {visibleColumns.actions && (
-                    <td className="px-3.5 py-3.5 text-center">
+                    <td className="px-3 py-2 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button
@@ -1151,7 +1106,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
               {filteredCustomers.length === 0 && (
                 <tr>
-                  <td colSpan={11} className="py-8 text-center text-xs text-slate-400">
+                  <td colSpan={11} className="py-6 text-center text-xs text-slate-400">
                     No customers found matching &quot;{searchQuery}&quot;
                   </td>
                 </tr>
@@ -1163,50 +1118,50 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               <tfoot className="bg-slate-50/90 font-black text-slate-900 border-t-2 border-slate-200">
                 <tr>
                   {visibleColumns.customerId && (
-                    <td className="px-3.5 py-3.5 font-black text-slate-900">Total</td>
+                    <td className="px-3 py-2.5 font-black text-slate-900">Total</td>
                   )}
-                  {visibleColumns.customerName && <td className="px-3.5 py-3.5"></td>}
+                  {visibleColumns.customerName && <td className="px-3 py-2.5"></td>}
                   {visibleColumns.totalPolicies && (
-                    <td className="px-3.5 py-3.5 text-center font-black text-slate-900">
+                    <td className="px-3 py-2.5 text-center font-black text-slate-900">
                       {tableTotals.totalPolicies}
                     </td>
                   )}
                   {visibleColumns.sumInsured && (
-                    <td className="px-3.5 py-3.5 font-black text-slate-900">
+                    <td className="px-3 py-2.5 font-black text-slate-900">
                       {formatCurrency(tableTotals.sumInsured)}
                     </td>
                   )}
                   {visibleColumns.usedReserved && (
-                    <td className="px-3.5 py-3.5 font-black text-slate-900">
+                    <td className="px-3 py-2.5 font-black text-slate-900">
                       {formatCurrency(tableTotals.usedReserved)}
                     </td>
                   )}
                   {visibleColumns.remainingCoverage && (
-                    <td className="px-3.5 py-3.5 font-black text-[#008f4c]">
+                    <td className="px-3 py-2.5 font-black text-[#008f4c]">
                       {formatCurrency(tableTotals.remainingCoverage)}
                     </td>
                   )}
                   {visibleColumns.totalClaims && (
-                    <td className="px-3.5 py-3.5 text-center font-black text-slate-900">
+                    <td className="px-3 py-2.5 text-center font-black text-slate-900">
                       {tableTotals.totalClaims}
                     </td>
                   )}
                   {visibleColumns.approved && (
-                    <td className="px-3.5 py-3.5 text-center font-black text-[#008f4c]">
+                    <td className="px-3 py-2.5 text-center font-black text-[#008f4c]">
                       {tableTotals.approvedClaims}
                     </td>
                   )}
                   {visibleColumns.rejected && (
-                    <td className="px-3.5 py-3.5 text-center font-black text-rose-500">
+                    <td className="px-3 py-2.5 text-center font-black text-rose-500">
                       {tableTotals.rejectedClaims}
                     </td>
                   )}
                   {visibleColumns.pending && (
-                    <td className="px-3.5 py-3.5 text-center font-black text-amber-500">
+                    <td className="px-3 py-2.5 text-center font-black text-amber-500">
                       {tableTotals.pendingClaims}
                     </td>
                   )}
-                  {visibleColumns.actions && <td className="px-3.5 py-3.5"></td>}
+                  {visibleColumns.actions && <td className="px-3 py-2.5"></td>}
                 </tr>
               </tfoot>
             )}

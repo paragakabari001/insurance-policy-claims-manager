@@ -85,75 +85,74 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   return (
     <div className="space-y-6 w-full">
-      {/* Page Title & Action Bar (Figma Match) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Dashboard</h1>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Overview & Portfolio Analytics
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Date Range Filter Button (Interactive Dropdown) */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="h-9 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
-              >
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <span>{dateRange}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60 p-1.5">
-              <DropdownMenuLabel>Coverage Period Preset</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {datePresets.map((preset) => (
-                <DropdownMenuItem
-                  key={preset}
-                  onSelect={() => setDateRange(preset)}
-                  className="flex items-center justify-between"
-                >
-                  <span>{preset}</span>
-                  {dateRange === preset && <Check className="w-3.5 h-3.5 text-[#00ba63]" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Primary Action Button: Create Policy */}
-          {onOpenCreatePolicy && (
-            <button
-              onClick={onOpenCreatePolicy}
-              className="h-9 px-4 rounded-xl bg-[#031d16] hover:bg-[#072d22] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#031d16]/20 transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4 text-[#00c569]" />
-              <span>Create Policy</span>
-            </button>
-          )}
-
-          {/* AI Assistant Toggle Button (Figma Match) */}
-          {onToggleAI && (
-            <button
-              onClick={onToggleAI}
-              className={`h-9 px-3.5 rounded-xl border text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer ${
-                isAIOpen
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
-                  : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#00c569]" />
-              <span>AI Assistant</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* View: DASHBOARD (Overview) */}
+      {/* View: DASHBOARD (Overview - Header only shown when on dashboard view to prevent double headers) */}
       {activeView === 'dashboard' && (
         <div className="space-y-6">
+          {/* Page Title & Action Bar (Figma Match) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Dashboard</h1>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                Overview & Portfolio Analytics
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Date Range Filter Button (Interactive Dropdown) */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="h-9 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{dateRange}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-60 p-1.5">
+                  <DropdownMenuLabel>Coverage Period Preset</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {datePresets.map((preset) => (
+                    <DropdownMenuItem
+                      key={preset}
+                      onSelect={() => setDateRange(preset)}
+                      className="flex items-center justify-between"
+                    >
+                      <span>{preset}</span>
+                      {dateRange === preset && <Check className="w-3.5 h-3.5 text-[#00ba63]" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Primary Action Button: Create Policy */}
+              {onOpenCreatePolicy && (
+                <button
+                  onClick={onOpenCreatePolicy}
+                  className="h-9 px-4 rounded-xl bg-[#031d16] hover:bg-[#072d22] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#031d16]/20 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 text-[#00c569]" />
+                  <span>Create Policy</span>
+                </button>
+              )}
+
+              {/* AI Assistant Toggle Button (Figma Match) */}
+              {onToggleAI && (
+                <button
+                  onClick={onToggleAI}
+                  className={`h-9 px-3.5 rounded-xl border text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer ${
+                    isAIOpen
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
+                      : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#00c569]" />
+                  <span>AI Assistant</span>
+                </button>
+              )}
+            </div>
+          </div>
                     {/* Top 4 KPI Cards with mini wave graphs & trend tags (Responsive 3-Grid Mobile + Compact Chat Mode) */}
           <div className={`grid gap-2 sm:gap-3.5 ${isAIOpen ? 'grid-cols-3 sm:grid-cols-2 2xl:grid-cols-4' : 'grid-cols-3 sm:grid-cols-2 lg:grid-cols-4'}`}>
             {/* Card 1: Total Policies */}
