@@ -190,15 +190,21 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[420px] xl:w-[450px] h-screen shrink-0 flex flex-col bg-[#011f17] p-2.5 sm:p-3 md:rounded-l-[36px] shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[420px] xl:w-[450px] h-screen shrink-0 flex flex-col bg-[#011f17] p-2.5 sm:p-3 rounded-l-[32px] md:rounded-l-[36px] shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
         >
           {/* Inner Floating Box with custom background image and smooth rounded corners */}
-          <div
-            style={{ backgroundImage: 'url(/chat-bg.png)' }}
-            className="flex-1 min-h-0 flex flex-col rounded-[26px] sm:rounded-[30px] overflow-hidden border border-emerald-500/20 shadow-2xl bg-[#eafaf2] bg-cover bg-center relative"
-          >
-            {/* Ultra-Modern Frosted Glass Header (Allows background image wallpaper to show through softly) */}
-            <div className="shrink-0 px-4 py-3 bg-white/75 backdrop-blur-md border-b border-emerald-900/10 flex items-center justify-between shadow-2xs">
+          <div className="flex-1 min-h-0 flex flex-col rounded-[26px] sm:rounded-[30px] overflow-hidden border border-emerald-500/20 shadow-2xl bg-[#f0faf5] relative">
+            {/* Background image layer with controlled lowered opacity and rounded corners */}
+            <div
+              className="absolute inset-0 bg-cover bg-center pointer-events-none rounded-[26px] sm:rounded-[30px]"
+              style={{
+                backgroundImage: 'url(/chat-bg.png)',
+                opacity: 0.35,
+              }}
+            />
+
+            {/* Ultra-Modern Frosted Glass Header */}
+            <div className="relative z-10 shrink-0 px-4 py-3 bg-white/40 backdrop-blur-md border-b border-emerald-900/10 flex items-center justify-between shadow-2xs">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-9 h-9 rounded-2xl bg-[#00ba63]/15 border border-[#00ba63]/30 flex items-center justify-center text-[#008f4c] shrink-0 shadow-2xs">
                   <Sparkles className="w-4 h-4 text-[#008f4c]" />
@@ -242,7 +248,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
             </div>
 
             {/* Quick Action Top Cards (Translucent glass floating directly on wallpaper) */}
-            <div className="p-3 bg-white/40 backdrop-blur-xs border-b border-emerald-900/10 shrink-0">
+            <div className="relative z-10 p-3 bg-white/20 backdrop-blur-xs border-b border-emerald-900/10 shrink-0">
               {/* Rounded 3D-effect Avatar Card */}
               <div className="flex flex-col items-center justify-center text-center py-1">
                 <div className="w-13 h-13 rounded-2xl bg-white/95 p-1 shadow-md shadow-emerald-950/10 border border-emerald-200/70 mb-2 flex items-center justify-center transition-transform hover:scale-105">
@@ -336,7 +342,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
             </div>
 
             {/* Messages Flow Area with Markdown Rendering */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3 bg-transparent scrollbar-thin scrollbar-thumb-emerald-200/60">
+            <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3 bg-transparent scrollbar-thin scrollbar-thumb-emerald-200/60">
               {messages.map((msg) => {
                 const isUser = msg.role === 'user';
 
@@ -348,10 +354,10 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                     <div
                       className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-xs shadow-xs ${
                         isUser
-                          ? 'bg-[#011f17] text-white rounded-tr-xs font-medium shadow-md shadow-emerald-950/20'
+                          ? 'bg-[#011f17] text-white rounded-2xl font-medium shadow-md shadow-emerald-950/20'
                           : msg.isError
-                          ? 'bg-rose-50 text-rose-900 border border-rose-200 rounded-tl-xs'
-                          : 'bg-white/95 backdrop-blur-md text-slate-800 border border-emerald-100/90 rounded-tl-xs shadow-xs'
+                          ? 'bg-rose-50 text-rose-900 border border-rose-200 rounded-2xl'
+                          : 'bg-white/95 backdrop-blur-md text-slate-800 border border-emerald-100/90 rounded-2xl shadow-xs'
                       }`}
                     >
                       {isUser ? (
@@ -383,7 +389,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
               {/* In-flight typing indicator */}
               {isLoading && (
                 <div className="flex items-start">
-                  <div className="bg-white/95 backdrop-blur-md border border-emerald-100 rounded-2xl rounded-tl-xs px-3.5 py-2 shadow-2xs flex items-center gap-2 text-slate-600 text-xs font-medium">
+                  <div className="bg-white/95 backdrop-blur-md border border-emerald-100 rounded-2xl px-3.5 py-2 shadow-2xs flex items-center gap-2 text-slate-600 text-xs font-medium">
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00ba63]" />
                     <span>Analyzing authoritative policy data...</span>
                   </div>
@@ -395,7 +401,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
 
             {/* Quick Query Pill Suggestions */}
             {!isLoading && suggestedQuestions.length > 0 && (
-              <div className="px-3 py-2 bg-white/60 backdrop-blur-xs border-t border-emerald-900/10 flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto shrink-0">
+              <div className="relative z-10 px-3 py-2 bg-white/40 backdrop-blur-xs border-t border-emerald-900/10 flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto shrink-0">
                 {suggestedQuestions.map((q) => (
                   <button
                     key={q}
@@ -410,7 +416,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
             )}
 
             {/* Chat Composer Input Form */}
-            <div className="shrink-0 p-3 bg-white/75 backdrop-blur-md border-t border-emerald-900/10">
+            <div className="relative z-10 shrink-0 p-3 bg-white/50 backdrop-blur-md border-t border-emerald-900/10">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
