@@ -48,8 +48,6 @@ interface TopBarProps {
   onRefresh: () => void;
   isLoading?: boolean;
   onOpenMobileMenu?: () => void;
-  isAIOpen?: boolean;
-  onToggleAI?: () => void;
   onQuickSwitch?: (username: string) => void;
   onLogout?: () => void;
 }
@@ -73,8 +71,6 @@ export const TopBar: React.FC<TopBarProps> = ({
   onRefresh,
   isLoading = false,
   onOpenMobileMenu,
-  isAIOpen = false,
-  onToggleAI,
   onLogout,
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -445,7 +441,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <button
                       key={cu.id}
                       type="button"
-                      onClick={() => handleSelectResult(user.role === 'Administrator' ? 'customers' : 'policies')}
+                      onClick={() => handleSelectResult('policies')}
                       className="w-full p-2.5 rounded-xl hover:bg-emerald-50/60 flex items-center justify-between text-left text-xs transition-colors cursor-pointer group"
                     >
                       <div>

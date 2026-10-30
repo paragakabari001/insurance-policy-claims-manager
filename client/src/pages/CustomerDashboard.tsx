@@ -36,8 +36,6 @@ interface CustomerDashboardProps {
   claims: Claim[];
   activeView: ActiveView;
   onOpenSubmitClaim: (policyId?: string) => void;
-  isAIOpen?: boolean;
-  onToggleAI?: () => void;
 }
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
@@ -46,8 +44,6 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   claims: allClaims,
   activeView,
   onOpenSubmitClaim,
-  isAIOpen = false,
-  onToggleAI,
 }) => {
   const [dateRange, setDateRange] = useState('Jan 1, 2026 – Dec 31, 2026');
   // The period selector scopes the dashboard overview; other pages always use the full dataset
@@ -135,26 +131,12 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                   <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00c569]" />
                   <span>Submit Claim</span>
                 </button>
-
-                {onToggleAI && (
-                  <button
-                    onClick={onToggleAI}
-                    className={`hidden sm:flex h-9 px-3.5 rounded-xl border text-xs font-bold items-center gap-2 shadow-2xs transition-all cursor-pointer ${
-                      isAIOpen
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
-                        : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-[#00c569]" />
-                    <span>AI Assistant</span>
-                  </button>
-                )}
               </div>
             </div>
           </div>
 
           {/* Top 4 KPI Cards: 2x2 Grid on Mobile, 4-Cols on Desktop (Clean Flat Executive Style without bottom wave) */}
-          <div className={`grid grid-cols-2 gap-2.5 sm:gap-3.5 ${isAIOpen ? 'lg:grid-cols-2 2xl:grid-cols-4' : 'lg:grid-cols-4'}`}>
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 lg:grid-cols-4">
             {/* Card 1: Total Policies */}
             <div className="kpi-card relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
               <div className="flex items-center justify-between gap-1">

@@ -9,7 +9,6 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { CustomerDashboard } from './pages/CustomerDashboard';
 import { CreatePolicyModal } from './components/CreatePolicyModal';
 import { SubmitClaimModal } from './components/SubmitClaimModal';
-import { AIAssistantWidget } from './components/AIAssistantWidget';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { formatCurrency } from './utils/formatters';
 
@@ -21,8 +20,6 @@ export const pathToView = (path: string): ActiveView => {
       return 'policies';
     case 'claims':
       return 'claims';
-    case 'customers':
-      return 'customers';
     case 'analytics':
       return 'analytics';
     case 'reports':
@@ -74,13 +71,6 @@ export function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Role-based route protection: Customer cannot access '/customers'
-  useEffect(() => {
-    if (user && user.role !== 'Administrator' && activeView === 'customers') {
-      setActiveView('dashboard', true);
-    }
-  }, [user?.role, activeView]);
-
   // Core Data
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -94,7 +84,6 @@ export function App() {
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [isAIOpen, setIsAIOpen] = useState(false);
 
   // Hamburger: opens the drawer on mobile, collapses/expands the sidebar on desktop.
   const handleMenuToggle = () => {
@@ -308,7 +297,6 @@ export function App() {
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         isMobileOpen={isMobileDrawerOpen}
         onCloseMobile={() => setIsMobileDrawerOpen(false)}
-        onOpenAI={() => setIsAIOpen(true)}
       />
 
       {/* Main Content Area (Unified full-height canvas, flush with sidebar & topbar, zero double-backgrounds) */}
@@ -325,8 +313,6 @@ export function App() {
           onRefresh={loadData}
           isLoading={isDataLoading}
           onOpenMobileMenu={handleMenuToggle}
-          isAIOpen={isAIOpen}
-          onToggleAI={() => setIsAIOpen((prev) => !prev)}
           onQuickSwitch={handleQuickSwitch}
           onLogout={handleLogout}
         />
@@ -344,8 +330,6 @@ export function App() {
               onDecideClaim={handleDecideClaim}
               isLoadingDecision={isLoadingDecision}
               onOpenCreatePolicy={() => setIsPolicyModalOpen(true)}
-              isAIOpen={isAIOpen}
-              onToggleAI={() => setIsAIOpen((prev) => !prev)}
             />
           ) : (
             <CustomerDashboard
@@ -354,8 +338,6 @@ export function App() {
               claims={claims}
               activeView={activeView}
               onOpenSubmitClaim={handleOpenClaimModalForPolicy}
-              isAIOpen={isAIOpen}
-              onToggleAI={() => setIsAIOpen((prev) => !prev)}
             />
           )}
           </div>
@@ -387,14 +369,6 @@ export function App() {
         policies={policies}
         preselectedPolicyId={preselectedPolicyId}
         onSubmit={handleSubmitClaim}
-      />
-
-      {/* AI Policy & Claims Assistant Layout Panel */}
-      <AIAssistantWidget
-        user={user}
-        isOpen={isAIOpen}
-        onToggle={() => setIsAIOpen((prev) => !prev)}
-        onClose={() => setIsAIOpen(false)}
       />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />

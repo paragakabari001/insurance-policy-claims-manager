@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-export type ActiveView = 'dashboard' | 'policies' | 'claims' | 'customers' | 'analytics' | 'reports';
+export type ActiveView = 'dashboard' | 'policies' | 'claims' | 'analytics' | 'reports';
 
 interface SidebarProps {
   user: User;
@@ -29,7 +29,6 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
-  onOpenAI?: () => void;
 }
 
 interface NavItem {
@@ -51,15 +50,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false,
   isMobileOpen = false,
   onCloseMobile,
-  onOpenAI,
 }) => {
   const navItems: NavItem[] = [
     { key: 'dashboard', label: 'Dashboard', icon: LayoutGrid, view: 'dashboard', highlightable: true },
     { key: 'policies', label: 'Policies', icon: FileText, view: 'policies', highlightable: true, badge: policiesCount, badgeTone: 'green' },
     { key: 'claims', label: 'Claims', icon: FileCheck2, view: 'claims', highlightable: true, badge: pendingClaimsCount, badgeTone: 'amber' },
-    ...(user.role === 'Administrator'
-      ? [{ key: 'customers', label: 'Customers', icon: Users, view: 'customers' as ActiveView, highlightable: true }]
-      : []),
     { key: 'analytics', label: 'Analytics', icon: TrendingUp, view: 'analytics', highlightable: true },
     { key: 'reports', label: 'Reports', icon: FileSpreadsheet, view: 'reports', highlightable: true },
   ];
@@ -140,36 +135,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const renderFooter = (collapsed: boolean) => (
     <div className="p-3 shrink-0">
-      {collapsed ? (
-        <button
-          type="button"
-          onClick={onOpenAI}
-          title="Need Help?"
-          className="w-full h-11 rounded-2xl bg-white/[0.04] border border-white/10 text-[#2bec8f] hover:bg-white/10 flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
-        >
-          <Headphones className="w-4 h-4" />
-        </button>
-      ) : (
-        <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-emerald-400/30 transition-colors flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-emerald-400/15 flex items-center justify-center shrink-0">
-              <Headphones className="w-4 h-4 text-[#00ba63]" />
-            </div>
-            <div className="truncate">
-              <p className="text-xs font-bold text-white truncate leading-tight">Need Help?</p>
-              <p className="text-[10px] text-emerald-300/70 truncate leading-tight mt-0.5">
-                Get support or talk to AI
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onOpenAI}
-            className="w-7 h-7 rounded-full bg-emerald-400/15 text-emerald-300 hover:text-[#011f17] hover:bg-[#00ba63] transition-colors flex items-center justify-center shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
-            aria-label="Open AI Assistant"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+      {!collapsed && (
+        <div className="px-3 py-2 rounded-xl bg-white/[0.04] border border-white/5 text-center">
+          <p className="text-[11px] font-bold text-white/90 leading-tight">TailVaR Insurance</p>
+          <p className="text-[9px] text-emerald-300/60 font-medium leading-tight mt-0.5">Policy & Claims Manager</p>
         </div>
       )}
     </div>
