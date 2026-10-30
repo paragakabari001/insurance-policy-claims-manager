@@ -286,7 +286,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                     <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
                   </span>
                   <div className="min-w-0">
-                    <span className="font-bold text-slate-900 text-sm block truncate">{policy.id}</span>
+                    <span className="font-bold text-slate-900 text-sm block truncate whitespace-nowrap">{policy.id}</span>
                     {policy.customerName && (
                       <span className="text-[11px] text-slate-500 font-medium block truncate">
                         {policy.customerName} (@{policy.customerUsername})
@@ -398,7 +398,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
                       <span className="p-1.5 rounded-lg bg-emerald-50 border border-emerald-100 shrink-0">
                         <ShieldCheck className="w-3.5 h-3.5 text-[#00ba63]" />
                       </span>
-                      <span className="font-bold text-slate-900 break-all">{policy.id}</span>
+                      <span className="font-bold text-slate-900 whitespace-nowrap">{policy.id}</span>
                     </div>
                   </td>
                   {showCustomerColumn && (

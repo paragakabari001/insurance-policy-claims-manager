@@ -1064,13 +1064,34 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                 className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all flex flex-col justify-between gap-3"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-9 h-9 rounded-xl bg-emerald-50 text-[#008f4c] font-black text-xs flex items-center justify-center shrink-0">
-                      {row.id}
-                    </span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#00ba63] flex items-center justify-center shrink-0">
+                      {isAdmin ? (
+                        <span className="font-black text-xs text-[#008f4c] whitespace-nowrap">{row.id}</span>
+                      ) : (
+                        <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
+                      )}
+                    </div>
                     <div className="min-w-0">
-                      <p className="font-black text-slate-900 text-xs truncate">{row.name}</p>
-                      <p className="text-[10px] text-slate-400 font-medium">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-black text-slate-900 text-xs whitespace-nowrap">
+                          {isAdmin ? row.name : row.id}
+                        </span>
+                        {!isAdmin && (
+                          <span
+                            className={`text-[9px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${
+                              row.name === 'Active'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : row.name === 'Upcoming'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-slate-50 text-slate-500 border-slate-200'
+                            }`}
+                          >
+                            {row.name}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap mt-0.5">
                         {row.totalPolicies} {row.totalPolicies === 1 ? 'Policy' : 'Policies'} &bull; {row.totalClaims} {row.totalClaims === 1 ? 'Claim' : 'Claims'}
                       </p>
                     </div>
@@ -1159,7 +1180,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               {filteredCustomers.map((row) => (
                 <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
                   {visibleColumns.customerId && (
-                    <td className="px-3 py-2 font-bold text-slate-800">{row.id}</td>
+                    <td className="px-3 py-2 font-bold text-slate-800 whitespace-nowrap">{row.id}</td>
                   )}
                   {visibleColumns.customerName && (
                     <td className="px-3 py-2 font-semibold text-slate-700">{row.name}</td>
