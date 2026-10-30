@@ -32,7 +32,7 @@ export function App() {
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [isAIOpen, setIsAIOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(true);
 
   const addToast = (type: 'success' | 'error', text: string) => {
     const id = Math.random().toString(36).substring(2, 9);

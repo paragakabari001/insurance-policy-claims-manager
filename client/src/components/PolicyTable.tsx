@@ -10,6 +10,9 @@ import {
   ArrowRight,
   LayoutGrid,
   List,
+  Search,
+  Filter,
+  MoreHorizontal,
 } from 'lucide-react';
 
 interface PolicyTableProps {
@@ -23,100 +26,142 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
   isAdmin = false,
   onSelectForClaim,
 }) => {
-  // Default to Table view on web (desktop >= 768px) and Cards view on mobile
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
-    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
-      return 'table';
-    }
-    return 'grid';
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPolicies, setSelectedPolicies] = useState<Record<string, boolean>>({});
+
+  const filteredPolicies = policies.filter((p) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.id.toLowerCase().includes(q) ||
+      (p.customerName && p.customerName.toLowerCase().includes(q)) ||
+      (p.customerUsername && p.customerUsername.toLowerCase().includes(q))
+    );
   });
 
-  if (policies.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center shadow-sm">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-          <FileText className="w-6 h-6 sm:w-7 sm:h-7" />
-        </div>
-        <h3 className="text-sm sm:text-base font-bold text-slate-800">No Policies Found</h3>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">
-          {isAdmin
-            ? 'Get started by creating a coverage policy for Customer 1 or Customer 2.'
-            : 'You currently have no active policies registered.'}
-        </p>
-      </div>
-    );
-  }
+  const activeCount = policies.filter((p) => p.coverageStatus === 'Active').length;
+
+  const toggleSelectAll = () => {
+    if (Object.keys(selectedPolicies).length === filteredPolicies.length) {
+      setSelectedPolicies({});
+    } else {
+      const all: Record<string, boolean> = {};
+      filteredPolicies.forEach((p) => {
+        all[p.id] = true;
+      });
+      setSelectedPolicies(all);
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedPolicies((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   const getCoverageStatusBadge = (status?: string) => {
     switch (status) {
       case 'Active':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#e6fbf1] text-[#00c569] border border-[#a2f4cc]">
             Active
           </span>
         );
       case 'Upcoming':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
             Upcoming
           </span>
         );
       case 'Expired':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-300">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
             Expired
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#e6fbf1] text-[#00c569] border border-[#a2f4cc]">
             Active
           </span>
         );
     }
   };
 
-  const activeCount = policies.filter((p) => p.coverageStatus === 'Active').length;
-
   return (
-    <div className="space-y-3.5">
-      {/* View Switcher Header Toolbar */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-500">
-          {policies.length} policies &middot; {activeCount} active
-        </span>
-        <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+      {/* Table Header Bar (Figma Match: Policies Overview, Search, Filter, Cards/Table toggle) */}
+      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-4 h-4 text-[#00c569]" />
+          </div>
+          <div>
+            <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight">
+              Policies Overview
+            </h3>
+            <p className="text-xs text-slate-500 font-medium">
+              {policies.length} policies &bull; {activeCount} active
+            </p>
+          </div>
+        </div>
+
+        {/* Right Search, Filter & View Controls (Figma Match) */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search policies..."
+              className="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#00c569] w-40 sm:w-48 transition-all"
+            />
+          </div>
+
           <button
-            onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              viewMode === 'grid'
-                ? 'bg-[#06241b] text-white shadow-2xs'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-            }`}
-            title="Grid Cards View"
+            type="button"
+            className="h-8 px-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <LayoutGrid className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Cards</span>
+            <Filter className="w-3 h-3 text-slate-400" />
+            <span>Filter</span>
           </button>
-          <button
-            onClick={() => setViewMode('table')}
-            className={`p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              viewMode === 'table'
-                ? 'bg-[#06241b] text-white shadow-2xs'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-            }`}
-            title="Table List View"
-          >
-            <List className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Table</span>
-          </button>
+
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200/80">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+              title="Cards"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="text-[11px]">Cards</span>
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                viewMode === 'table'
+                  ? 'bg-[#031d16] text-white shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+              title="Table"
+            >
+              <List className="w-3.5 h-3.5" />
+              <span className="text-[11px]">Table</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Grid Mode: Individual Standalone Cards */}
+      {/* Grid Mode */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {policies.map((policy) => {
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredPolicies.map((policy) => {
             const consumedPercentage = Math.min(
               100,
               Math.round(
@@ -128,112 +173,61 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
             return (
               <div
                 key={policy.id}
-                className="bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500/50 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                className="bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500/50 p-5 shadow-xs transition-all flex flex-col justify-between space-y-4"
               >
-                {/* Card Top: Policy ID + Status Badge */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5">
-                    <span className="p-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60 group-hover:bg-emerald-600 group-hover:text-white transition-colors shrink-0">
-                      <ShieldCheck className="w-5 h-5" />
+                    <span className="p-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                      <ShieldCheck className="w-5 h-5 text-[#00c569]" />
                     </span>
                     <div>
                       <span className="font-mono font-bold text-slate-900 text-sm block">
                         {policy.id}
                       </span>
-                      {isAdmin && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
-                          <User className="w-3 h-3 text-slate-400" />
-                          <span className="font-medium text-slate-700 truncate max-w-[150px]">
-                            {policy.customerName || policy.customerUsername}
-                          </span>
-                        </div>
+                      {policy.customerName && (
+                        <span className="text-xs text-slate-500 font-medium">
+                          {policy.customerName} (@{policy.customerUsername})
+                        </span>
                       )}
                     </div>
                   </div>
                   {getCoverageStatusBadge(policy.coverageStatus)}
                 </div>
 
-                {/* Coverage Dates */}
-                <div className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="font-medium">{formatDate(policy.startDate)}</span>
-                  </div>
-                  <span className="text-slate-400">&rarr;</span>
-                  <span className="font-medium">{formatDate(policy.endDate)}</span>
+                <div className="flex items-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/60">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span>
+                    {formatDate(policy.startDate)} &rarr; {formatDate(policy.endDate)}
+                  </span>
                 </div>
 
-                {/* Balances Grid */}
-                <div className="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100 text-xs">
+                <div className="grid grid-cols-2 gap-3 pt-1">
                   <div>
-                    <span className="text-slate-400 block font-medium">Original Sum Insured</span>
-                    <span className="font-extrabold text-slate-900 text-sm sm:text-base">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      Sum Insured
+                    </span>
+                    <span className="font-extrabold text-slate-900 text-sm">
                       {formatCurrency(policy.sumInsured)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block font-medium">Remaining Coverage</span>
-                    <div className="flex items-baseline gap-1.5">
-                      <span
-                        className={`text-sm sm:text-base font-black ${
-                          isAvailable ? 'text-emerald-700' : 'text-rose-600'
-                        }`}
-                      >
-                        {formatCurrency(policy.remainingClaimableSI)}
-                      </span>
-                      <span
-                        className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${
-                          isAvailable
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
-                            : 'bg-rose-50 text-rose-700 border border-rose-200/60'
-                        }`}
-                      >
-                        {isAvailable ? 'Avail' : 'Exh'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Utilization Progress Bar */}
-                <div className="space-y-1.5 pt-1">
-                  <div className="flex justify-between text-xs text-slate-500 font-medium">
-                    <span>Utilization</span>
-                    <span className="font-bold text-slate-700">
-                      {consumedPercentage}% Reserved + Used
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      Remaining
+                    </span>
+                    <span className="font-extrabold text-[#00c569] text-sm">
+                      {formatCurrency(policy.remainingClaimableSI)}
                     </span>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
-                    <div
-                      className={`h-full transition-all duration-300 rounded-full ${
-                        consumedPercentage > 80
-                          ? 'bg-rose-500'
-                          : consumedPercentage > 40
-                          ? 'bg-amber-500'
-                          : 'bg-emerald-500'
-                      }`}
-                      style={{ width: `${consumedPercentage}%` }}
-                    />
-                  </div>
                 </div>
 
-                {/* Footer Action for Customers (Proper Button, Right-Aligned) */}
                 {!isAdmin && onSelectForClaim && (
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400 font-medium">
-                      {isAvailable ? 'Eligible for claim' : 'Coverage exhausted'}
-                    </span>
+                  <div className="pt-2 border-t border-slate-100 flex justify-end">
                     <button
                       onClick={() => onSelectForClaim(policy)}
                       disabled={!isAvailable}
-                      className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2 shadow-xs hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] ${
-                        isAvailable
-                          ? 'bg-[#06241b] hover:bg-[#0a382b] text-white border border-emerald-950/40'
-                          : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                      }`}
+                      className="h-8 px-3 rounded-xl text-xs font-bold bg-[#031d16] text-white hover:bg-[#072d22] transition-colors"
                     >
-                      <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Submit Claim</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-emerald-400/80" />
+                      Submit Claim
                     </button>
                   </div>
                 )}
@@ -242,141 +236,157 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
           })}
         </div>
       ) : (
-        /* Table Mode: Full Width Responsive Table */
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
-                <tr>
-                  <th scope="col" className="px-6 py-4">Policy ID</th>
-                  {isAdmin && <th scope="col" className="px-6 py-4">Customer</th>}
-                  <th scope="col" className="px-6 py-4">Coverage Period</th>
-                  <th scope="col" className="px-6 py-4">Coverage Status</th>
-                  <th scope="col" className="px-6 py-4">Original Sum Insured (SI)</th>
-                  <th scope="col" className="px-6 py-4">Remaining Coverage</th>
-                  <th scope="col" className="px-6 py-4">Reserved + Used</th>
-                  {!isAdmin && onSelectForClaim && (
-                    <th scope="col" className="px-6 py-4 text-right">Action</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {policies.map((policy) => {
-                  const consumedPercentage = Math.min(
-                    100,
-                    Math.round(
-                      ((policy.sumInsured - policy.remainingClaimableSI) / policy.sumInsured) * 100
-                    )
-                  );
-                  const isAvailable = policy.remainingClaimableSI > 0;
+        /* Table Mode (Figma Match: Checkbox, Customer avatar pill, rounded badges, Reserved+Used bars) */
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+            <thead className="bg-white text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200">
+              <tr>
+                <th scope="col" className="pl-5 pr-2 py-3.5 w-8">
+                  <input
+                    type="checkbox"
+                    checked={
+                      filteredPolicies.length > 0 &&
+                      Object.keys(selectedPolicies).length === filteredPolicies.length
+                    }
+                    onChange={toggleSelectAll}
+                    className="rounded border-slate-300 text-[#00c569] focus:ring-[#00c569] cursor-pointer"
+                  />
+                </th>
+                <th scope="col" className="px-4 py-3.5">Policy ID</th>
+                {isAdmin && <th scope="col" className="px-4 py-3.5">Customer</th>}
+                <th scope="col" className="px-4 py-3.5">Coverage Period</th>
+                <th scope="col" className="px-4 py-3.5">Status</th>
+                <th scope="col" className="px-4 py-3.5">Original Sum Insured (SI)</th>
+                <th scope="col" className="px-4 py-3.5">Remaining Coverage</th>
+                <th scope="col" className="px-4 py-3.5">Reserved + Used</th>
+                <th scope="col" className="px-4 py-3.5 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {filteredPolicies.map((policy) => {
+                const consumedPercentage = Math.min(
+                  100,
+                  Math.round(
+                    ((policy.sumInsured - policy.remainingClaimableSI) / policy.sumInsured) * 100
+                  )
+                );
+                const isAvailable = policy.remainingClaimableSI > 0;
+                const isSelected = !!selectedPolicies[policy.id];
+                const custShort = (policy.customerUsername || '').toUpperCase().slice(0, 2) || 'C1';
 
-                  return (
-                    <tr key={policy.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                return (
+                  <tr
+                    key={policy.id}
+                    className={`hover:bg-slate-50/80 transition-colors ${
+                      isSelected ? 'bg-emerald-50/30' : ''
+                    }`}
+                  >
+                    {/* Row Checkbox */}
+                    <td className="pl-5 pr-2 py-4">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(policy.id)}
+                        className="rounded border-slate-300 text-[#00c569] focus:ring-[#00c569] cursor-pointer"
+                      />
+                    </td>
+
+                    {/* Policy ID with Shield Icon */}
+                    <td className="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#00c569]" />
+                        </span>
+                        <span>{policy.id}</span>
+                      </div>
+                    </td>
+
+                    {/* Customer Info (Figma Match: C1/C2 pill with name + username) */}
+                    {isAdmin && (
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                            <ShieldCheck className="w-4 h-4" />
+                          <span className="w-6 h-6 rounded-md bg-blue-100 text-blue-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+                            {custShort}
                           </span>
-                          {policy.id}
-                        </div>
-                      </td>
-
-                      {isAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <User className="w-3.5 h-3.5 text-slate-400" />
-                            <div>
-                              <span className="font-semibold text-slate-800">
-                                {policy.customerName || policy.customerUsername}
-                              </span>
-                              <span className="text-xs text-slate-500 block">
-                                @{policy.customerUsername}
-                              </span>
-                            </div>
+                          <div>
+                            <span className="font-bold text-slate-900 text-xs block leading-tight">
+                              {policy.customerName || policy.customerUsername}
+                            </span>
+                            <span className="text-[11px] text-slate-400 block leading-tight">
+                              @{policy.customerUsername}
+                            </span>
                           </div>
-                        </td>
-                      )}
-
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-600">
-                        <div className="flex items-center gap-1.5 text-xs font-medium">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{formatDate(policy.startDate)}</span>
-                          <span className="text-slate-400">&rarr;</span>
-                          <span>{formatDate(policy.endDate)}</span>
                         </div>
                       </td>
+                    )}
 
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getCoverageStatusBadge(policy.coverageStatus)}
-                      </td>
+                    {/* Coverage Period */}
+                    <td className="px-4 py-4 whitespace-nowrap text-slate-600">
+                      <div className="flex items-center gap-1.5 text-xs font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{formatDate(policy.startDate)}</span>
+                        <span className="text-slate-400">&rarr;</span>
+                        <span>{formatDate(policy.endDate)}</span>
+                      </div>
+                    </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-800">
-                        {formatCurrency(policy.sumInsured)}
-                      </td>
+                    {/* Coverage Status Badge */}
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {getCoverageStatusBadge(policy.coverageStatus)}
+                    </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-base font-black ${
-                              isAvailable ? 'text-emerald-600' : 'text-rose-600'
-                            }`}
-                          >
-                            {formatCurrency(policy.remainingClaimableSI)}
+                    {/* Original Sum Insured */}
+                    <td className="px-4 py-4 whitespace-nowrap font-bold text-slate-900">
+                      {formatCurrency(policy.sumInsured)}
+                    </td>
+
+                    {/* Remaining Coverage with green available indicator */}
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-black text-slate-900">
+                          {formatCurrency(policy.remainingClaimableSI)}
+                        </span>
+                        {isAvailable && (
+                          <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-bold text-[#00c569] bg-[#e6fbf1] border border-[#a2f4cc]">
+                            Available
                           </span>
-                          {isAvailable ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              Available
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                              Exhausted
-                            </span>
-                          )}
-                        </div>
-                      </td>
+                        )}
+                      </div>
+                    </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap w-44">
-                        <div className="w-full">
-                          <div className="flex justify-between text-xs text-slate-500 mb-1 font-medium">
-                            <span>{consumedPercentage}% Reserved + Used</span>
-                          </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
-                            <div
-                              className={`h-full transition-all duration-300 rounded-full ${
-                                consumedPercentage > 80
-                                  ? 'bg-rose-500'
-                                  : consumedPercentage > 40
-                                  ? 'bg-amber-500'
-                                  : 'bg-emerald-500'
-                              }`}
-                              style={{ width: `${consumedPercentage}%` }}
-                            />
-                          </div>
+                    {/* Reserved + Used Progress Bar (Figma Match) */}
+                    <td className="px-4 py-4 whitespace-nowrap w-36">
+                      <div>
+                        <span className="text-[11px] text-slate-500 font-medium block mb-1">
+                          {consumedPercentage}% Reserved + Used
+                        </span>
+                        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="bg-[#00c569] h-full rounded-full transition-all"
+                            style={{ width: `${consumedPercentage}%` }}
+                          />
                         </div>
-                      </td>
+                      </div>
+                    </td>
 
-                      {!isAdmin && onSelectForClaim && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <button
-                            onClick={() => onSelectForClaim(policy)}
-                            disabled={!isAvailable}
-                            className={`h-8 px-3.5 rounded-lg text-xs font-semibold transition-all inline-flex items-center gap-1.5 shadow-2xs hover:shadow-xs hover:scale-[1.02] active:scale-[0.98] ${
-                              isAvailable
-                                ? 'bg-[#06241b] hover:bg-[#0a382b] text-white border border-emerald-950/40'
-                                : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                            }`}
-                          >
-                            <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                            Submit Claim
-                          </button>
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    {/* Row Action (3 dots menu icon) */}
+                    <td className="px-4 py-4 whitespace-nowrap text-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isAdmin && onSelectForClaim) onSelectForClaim(policy);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Actions"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

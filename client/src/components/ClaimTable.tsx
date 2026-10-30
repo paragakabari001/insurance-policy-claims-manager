@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import { Claim, ClaimStatus } from '../types';
+import { Claim } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { Button } from './ui/button';
 import {
-  Clock,
-  CheckCircle2,
-  XCircle,
   FileCheck,
-  AlertCircle,
-  Check,
-  X,
-  User,
+  CheckCircle2,
+  Clock,
+  XCircle,
   Calendar,
+  User,
+  Shield,
+  Search,
   Filter,
-  AlertTriangle,
-  ArrowRight,
+  MoreHorizontal,
 } from 'lucide-react';
 
 interface ClaimTableProps {
@@ -27,55 +26,65 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   claims,
   isAdmin = false,
   onDecideClaim,
-  isLoadingDecision = null,
+  isLoadingDecision,
 }) => {
-  const [statusFilter, setStatusFilter] = useState<'ALL' | ClaimStatus>('ALL');
-  const [pendingDecision, setPendingDecision] = useState<{
-    claim: Claim;
-    decision: 'Approved' | 'Rejected';
-  } | null>(null);
-  const [decisionError, setDecisionError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'Submitted' | 'Approved' | 'Rejected'>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedClaims, setSelectedClaims] = useState<Record<string, boolean>>({});
 
   const filteredClaims = claims.filter((claim) => {
-    if (statusFilter === 'ALL') return true;
-    return claim.status === statusFilter;
+    const matchesStatus = statusFilter === 'ALL' || claim.status === statusFilter;
+    if (!matchesStatus) return false;
+
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      claim.id.toLowerCase().includes(q) ||
+      claim.policyId.toLowerCase().includes(q) ||
+      (claim.customer?.name && claim.customer.name.toLowerCase().includes(q)) ||
+      (claim.customer?.username && claim.customer.username.toLowerCase().includes(q))
+    );
   });
 
-  const handleConfirmDecision = async () => {
-    if (!pendingDecision || !onDecideClaim) return;
-    setDecisionError(null);
-    try {
-      await onDecideClaim(pendingDecision.claim.id, pendingDecision.decision);
-      setPendingDecision(null);
-    } catch (err: any) {
-      setDecisionError(
-        err?.response?.data?.error ||
-        err?.message ||
-        'Failed to process decision. The claim may have already been reviewed.'
-      );
+  const toggleSelectAll = () => {
+    if (Object.keys(selectedClaims).length === filteredClaims.length) {
+      setSelectedClaims({});
+    } else {
+      const all: Record<string, boolean> = {};
+      filteredClaims.forEach((c) => {
+        all[c.id] = true;
+      });
+      setSelectedClaims(all);
     }
   };
 
-  const getStatusBadge = (status: ClaimStatus) => {
+  const toggleSelect = (id: string) => {
+    setSelectedClaims((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Submitted':
-        return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-300">
-            <Clock className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-            Submitted
-          </span>
-        );
       case 'Approved':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#e6fbf1] text-[#00c569] border border-[#a2f4cc]">
+            <CheckCircle2 className="w-3 h-3 text-[#00c569]" />
             Approved
+          </span>
+        );
+      case 'Submitted':
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+            <Clock className="w-3 h-3 text-amber-600" />
+            Submitted
           </span>
         );
       case 'Rejected':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-300">
-            <XCircle className="w-3.5 h-3.5 text-rose-500" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+            <XCircle className="w-3 h-3 text-rose-600" />
             Rejected
           </span>
         );
@@ -85,375 +94,207 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      {/* Accounting Rules Banner */}
-      <div className="px-4 sm:px-5 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-slate-600">
-        <span className="font-semibold text-slate-800">Rules:</span>
-        <span>Submitted{' '}<strong className="text-amber-700">reserves</strong>{' '}coverage.</span>
-        <span>Approved{' '}<strong className="text-emerald-700">uses</strong>{' '}coverage.</span>
-        <span>Rejected{' '}<strong className="text-slate-700">restores</strong>{' '}coverage.</span>
-      </div>
-
-      {/* Header filter toolbar */}
-      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
-        <div className="flex items-center gap-2">
-          <FileCheck className="w-5 h-5 text-emerald-700" />
-          <h3 className="font-bold text-slate-800 text-sm sm:text-base">
-            {isAdmin ? 'Claims Review' : 'My Claims History'}
-          </h3>
-          <span className="text-xs bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">
-            {filteredClaims.length}
-          </span>
-        </div>
-
-        {/* Filter buttons */}
-        <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 text-xs shadow-2xs overflow-x-auto">
-          <span className="text-slate-400 px-1 sm:px-2 flex items-center gap-1 font-semibold shrink-0">
-            <Filter className="w-3 h-3" /> Filter:
-          </span>
-          {(['ALL', 'Submitted', 'Approved', 'Rejected'] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition-all shrink-0 ${
-                statusFilter === status
-                  ? 'bg-[#06241b] text-white shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              {status === 'ALL' ? 'All' : status}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {filteredClaims.length === 0 ? (
-        <div className="p-8 sm:p-12 text-center">
-          <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <AlertCircle className="w-6 h-6" />
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+      {/* Table Header Bar (Figma Match: Claims Review title, Search, Filter, Status Tabs) */}
+      <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+            <FileCheck className="w-4 h-4 text-[#00c569]" />
           </div>
-          <p className="text-sm font-semibold text-slate-700">No claims match the filter.</p>
-          <p className="text-xs text-slate-500 mt-1">
-            {isAdmin
-              ? 'When customers file claims against policies, they will appear here.'
-              : 'Submit a new claim against an active policy above.'}
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-black text-slate-900 text-sm sm:text-base tracking-tight">
+                {isAdmin ? 'Claims Review' : 'My Claims History'}
+              </h3>
+              <span className="text-xs bg-slate-100 text-slate-700 font-bold px-2 py-0.2 rounded-full border border-slate-200">
+                {claims.length}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 font-medium">
+              Review and manage submitted claims
+            </p>
+          </div>
         </div>
-      ) : (
-        <>
-          {/* Mobile Feed View (Native App Feel on Screens < 768px) */}
-          <div className="md:hidden divide-y divide-slate-100">
+
+        {/* Right Filter & Search Toolbar (Figma Match) */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search claims..."
+              className="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#00c569] w-40 sm:w-48 transition-all"
+            />
+          </div>
+
+          <button
+            type="button"
+            className="h-8 px-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Filter className="w-3 h-3 text-slate-400" />
+            <span>Filter</span>
+          </button>
+
+          {/* Status Tabs (All, Submitted, Approved, Rejected) */}
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200/80">
+            {(['ALL', 'Submitted', 'Approved', 'Rejected'] as const).map((status) => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  statusFilter === status
+                    ? 'bg-[#031d16] text-white shadow-2xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {status === 'ALL' ? 'All' : status}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Table Content (Figma Match) */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
+          <thead className="bg-white text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200">
+            <tr>
+              <th scope="col" className="pl-5 pr-2 py-3.5 w-8">
+                <input
+                  type="checkbox"
+                  checked={
+                    filteredClaims.length > 0 &&
+                    Object.keys(selectedClaims).length === filteredClaims.length
+                  }
+                  onChange={toggleSelectAll}
+                  className="rounded border-slate-300 text-[#00c569] focus:ring-[#00c569] cursor-pointer"
+                />
+              </th>
+              <th scope="col" className="px-4 py-3.5">Claim ID</th>
+              {isAdmin && <th scope="col" className="px-4 py-3.5">Customer</th>}
+              <th scope="col" className="px-4 py-3.5">Policy ID</th>
+              <th scope="col" className="px-4 py-3.5">Incident Date</th>
+              <th scope="col" className="px-4 py-3.5">Claim Amount</th>
+              <th scope="col" className="px-4 py-3.5">Status</th>
+              <th scope="col" className="px-4 py-3.5">Review Action</th>
+              <th scope="col" className="px-4 py-3.5 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 bg-white">
             {filteredClaims.map((claim) => {
+              const isSelected = !!selectedClaims[claim.id];
               const isDeciding = isLoadingDecision === claim.id;
               const canDecide = isAdmin && claim.status === 'Submitted';
+              const custShort = (claim.customer?.username || '').toUpperCase().slice(0, 2) || 'C1';
 
               return (
-                <div key={claim.id} className="p-4 space-y-3 hover:bg-slate-50/60 transition-colors">
-                  {/* Top: ID + Status */}
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-slate-900 text-sm">
-                      {claim.id}
-                    </span>
-                    {getStatusBadge(claim.status)}
-                  </div>
-
-                  {/* Customer Info (Admin) */}
-                  {isAdmin && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs">
-                      <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="font-semibold text-slate-800">
-                        {claim.customer?.name || claim.customer?.username || 'Customer'}
-                      </span>
-                      <span className="text-slate-400">@{claim.customer?.username}</span>
-                    </div>
-                  )}
-
-                  {/* Amount & Policy Details */}
-                  <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100">
-                    <div>
-                      <span className="text-slate-400 block font-medium">Claim Amount</span>
-                      <span className="text-base font-extrabold text-slate-900">
-                        {formatCurrency(claim.amount)}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block font-medium">Linked Policy</span>
-                      <span className="font-mono font-bold text-slate-800 text-xs">
-                        {claim.policyId}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Incident Date */}
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Incident Date: {formatDate(claim.incidentDate)}</span>
-                  </div>
-
-                  {/* Review Actions for Admin on Mobile */}
-                  {isAdmin && onDecideClaim && (
-                    <div className="pt-2 border-t border-slate-100">
-                      {canDecide ? (
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={() => {
-                              setDecisionError(null);
-                              setPendingDecision({ claim, decision: 'Approved' });
-                            }}
-                            disabled={isDeciding}
-                            className="py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
-                          >
-                            <Check className="w-4 h-4" />
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => {
-                              setDecisionError(null);
-                              setPendingDecision({ claim, decision: 'Rejected' });
-                            }}
-                            disabled={isDeciding}
-                            className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
-                          >
-                            <X className="w-4 h-4" />
-                            Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="text-center py-1 text-xs text-slate-400 italic font-medium">
-                          Decided ({claim.status})
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Desktop Table View (Screens >= 768px) */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider text-xs">
-                <tr>
-                  <th scope="col" className="px-6 py-4">Claim ID</th>
-                  {isAdmin && <th scope="col" className="px-6 py-4">Customer</th>}
-                  <th scope="col" className="px-6 py-4">Policy ID</th>
-                  <th scope="col" className="px-6 py-4">Incident Date</th>
-                  <th scope="col" className="px-6 py-4">Claim Amount</th>
-                  <th scope="col" className="px-6 py-4">Status</th>
-                  {isAdmin && onDecideClaim && (
-                    <th scope="col" className="px-6 py-4 text-right">Review Action</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {filteredClaims.map((claim) => {
-                  const isDeciding = isLoadingDecision === claim.id;
-                  const canDecide = isAdmin && claim.status === 'Submitted';
-
-                  return (
-                    <tr key={claim.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-slate-900 whitespace-nowrap">
-                        {claim.id}
-                      </td>
-
-                      {isAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <User className="w-3.5 h-3.5 text-slate-400" />
-                            <div>
-                              <span className="font-semibold text-slate-800">
-                                {claim.customer?.name || claim.customer?.username || 'Customer'}
-                              </span>
-                              <span className="text-xs text-slate-500 block">
-                                @{claim.customer?.username}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                      )}
-
-                      <td className="px-6 py-4 whitespace-nowrap font-mono text-slate-600 font-medium">
-                        {claim.policyId}
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap text-slate-600">
-                        <div className="flex items-center gap-1.5 text-xs font-medium">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          {formatDate(claim.incidentDate)}
-                        </div>
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap font-extrabold text-slate-900">
-                        {formatCurrency(claim.amount)}
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(claim.status)}
-                      </td>
-
-                      {isAdmin && onDecideClaim && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          {canDecide ? (
-                            <div className="inline-flex items-center gap-2">
-                              <button
-                                onClick={() => {
-                                  setDecisionError(null);
-                                  setPendingDecision({ claim, decision: 'Approved' });
-                                }}
-                                disabled={isDeciding}
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors inline-flex items-center gap-1 disabled:opacity-50"
-                                title="Review and approve claim"
-                              >
-                                <Check className="w-3.5 h-3.5" />
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setDecisionError(null);
-                                  setPendingDecision({ claim, decision: 'Rejected' });
-                                }}
-                                disabled={isDeciding}
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-colors inline-flex items-center gap-1 disabled:opacity-50"
-                                title="Review and reject claim"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                                Reject
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-slate-400 font-medium">
-                              Decided ({claim.status})
-                            </span>
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {/* Admin Decision Confirmation Dialog (Bottom Drawer on Mobile) */}
-      {pendingDecision && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-t-[28px] sm:rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
-            {/* Mobile Grab Handle Bar */}
-            <div className="sm:hidden pt-3 pb-1 flex justify-center shrink-0">
-              <div className="w-12 h-1.5 rounded-full bg-slate-300" />
-            </div>
-
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`p-2 rounded-xl ${
-                    pendingDecision.decision === 'Approved'
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-rose-100 text-rose-700'
+                <tr
+                  key={claim.id}
+                  className={`hover:bg-slate-50/80 transition-colors ${
+                    isSelected ? 'bg-emerald-50/30' : ''
                   }`}
                 >
-                  {pendingDecision.decision === 'Approved' ? (
-                    <CheckCircle2 className="w-5 h-5" />
-                  ) : (
-                    <XCircle className="w-5 h-5" />
+                  {/* Row Checkbox */}
+                  <td className="pl-5 pr-2 py-4">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(claim.id)}
+                      className="rounded border-slate-300 text-[#00c569] focus:ring-[#00c569] cursor-pointer"
+                    />
+                  </td>
+
+                  {/* Claim ID */}
+                  <td className="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
+                    {claim.id}
+                  </td>
+
+                  {/* Customer Info (Figma Match: C1/C2 pill with name + username) */}
+                  {isAdmin && (
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-md bg-blue-100 text-blue-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+                          {custShort}
+                        </span>
+                        <div>
+                          <span className="font-bold text-slate-900 text-xs block leading-tight">
+                            {claim.customer?.name || claim.customer?.username || 'Customer'}
+                          </span>
+                          <span className="text-[11px] text-slate-400 block leading-tight">
+                            @{claim.customer?.username}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
                   )}
-                </span>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-base">
-                    Confirm Claim {pendingDecision.decision === 'Approved' ? 'Approval' : 'Rejection'}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Administrator Decision Review
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setPendingDecision(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
-                aria-label="Close dialog"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="p-5 space-y-4 text-sm">
-              {decisionError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-                  <span>{decisionError}</span>
-                </div>
-              )}
+                  {/* Policy ID */}
+                  <td className="px-4 py-4 whitespace-nowrap text-slate-600 font-medium">
+                    {claim.policyId}
+                  </td>
 
-              <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200 space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Claim ID:</span>
-                  <span className="font-mono font-bold text-slate-900">{pendingDecision.claim.id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Policy ID:</span>
-                  <span className="font-mono font-bold text-slate-900">{pendingDecision.claim.policyId}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Customer:</span>
-                  <span className="font-medium text-slate-800">
-                    {pendingDecision.claim.customer?.name || pendingDecision.claim.customer?.username || 'Customer'}
-                  </span>
-                </div>
-                <div className="flex justify-between border-t border-slate-200/80 pt-2 font-semibold">
-                  <span className="text-slate-700">Claim Amount:</span>
-                  <span className="text-sm font-extrabold text-slate-900">
-                    {formatCurrency(pendingDecision.claim.amount)}
-                  </span>
-                </div>
-              </div>
+                  {/* Incident Date */}
+                  <td className="px-4 py-4 whitespace-nowrap text-slate-600">
+                    <div className="flex items-center gap-1.5 text-xs font-medium">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      {formatDate(claim.incidentDate)}
+                    </div>
+                  </td>
 
-              <p className="text-xs text-slate-600">
-                {pendingDecision.decision === 'Approved' ? (
-                  <span>
-                    Approving this claim will permanently finalize this amount as consumed against Policy{' '}
-                    <strong className="font-mono">{pendingDecision.claim.policyId}</strong>. This action cannot be reversed.
-                  </span>
-                ) : (
-                  <span>
-                    Rejecting this claim will immediately release the reserved amount of{' '}
-                    <strong>{formatCurrency(pendingDecision.claim.amount)}</strong> back to the remaining claimable coverage of Policy{' '}
-                    <strong className="font-mono">{pendingDecision.claim.policyId}</strong>.
-                  </span>
-                )}
-              </p>
-            </div>
+                  {/* Claim Amount */}
+                  <td className="px-4 py-4 whitespace-nowrap font-black text-slate-900">
+                    {formatCurrency(claim.amount)}
+                  </td>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
-              <button
-                type="button"
-                onClick={() => setPendingDecision(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDecision}
-                disabled={isLoadingDecision === pendingDecision.claim.id}
-                className={`px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xs transition-colors inline-flex items-center gap-1.5 ${
-                  pendingDecision.decision === 'Approved'
-                    ? 'bg-emerald-600 hover:bg-emerald-700'
-                    : 'bg-rose-600 hover:bg-rose-700'
-                } disabled:opacity-50`}
-              >
-                {isLoadingDecision === pendingDecision.claim.id ? (
-                  'Processing...'
-                ) : (
-                  `Confirm ${pendingDecision.decision === 'Approved' ? 'Approval' : 'Rejection'}`
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                  {/* Status Badge */}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {getStatusBadge(claim.status)}
+                  </td>
+
+                  {/* Review Action (Figma Match: Approve / Reject or Decided state) */}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {canDecide ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => onDecideClaim && onDecideClaim(claim.id, 'Approved')}
+                          disabled={isDeciding}
+                          className="px-2.5 py-1 rounded-lg bg-[#00c569] hover:bg-[#08a558] text-white text-[11px] font-bold shadow-2xs cursor-pointer disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => onDecideClaim && onDecideClaim(claim.id, 'Rejected')}
+                          disabled={isDeciding}
+                          className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shadow-2xs cursor-pointer disabled:opacity-50"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 font-medium text-xs">
+                        Decided ({claim.status})
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Actions 3 dots */}
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <button
+                      type="button"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                      title="Actions"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
