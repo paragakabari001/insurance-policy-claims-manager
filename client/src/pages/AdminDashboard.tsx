@@ -1,10 +1,19 @@
-import React from 'react';
-import { Policy, Claim, CustomerUser } from '../types';
+import React, { useState } from 'react';
+import { Policy, Claim, CustomerUser, User } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { Card } from '../components/ui/card';
 import { PolicyTable } from '../components/PolicyTable';
 import { ClaimTable } from '../components/ClaimTable';
 import { ActiveView } from '../components/Sidebar';
+import { CustomersView, AnalyticsView, ReportsView } from './InsightsViews';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu';
 import {
   FileText,
   Layers,
@@ -15,16 +24,18 @@ import {
   TrendingDown,
   Calendar,
   Plus,
-  PieChart as PieChartIcon,
   BarChart3,
-  Bot,
+  ChevronDown,
+  Check,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
+  user?: User;
   policies: Policy[];
   claims: Claim[];
   customers: CustomerUser[];
   activeView: ActiveView;
+  setActiveView?: (view: ActiveView) => void;
   onDecideClaim: (claimId: string, decision: 'Approved' | 'Rejected') => Promise<void>;
   isLoadingDecision: string | null;
   onOpenCreatePolicy?: () => void;
@@ -33,16 +44,19 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  user,
   policies,
   claims,
   customers,
   activeView,
+  setActiveView,
   onDecideClaim,
   isLoadingDecision,
   onOpenCreatePolicy,
   isAIOpen = false,
   onToggleAI,
 }) => {
+  const [dateRange, setDateRange] = useState('Jan 1, 2026 – Dec 31, 2026');
   const totalPolicies = policies.length;
   const activePolicies = policies.filter((p) => p.coverageStatus === 'Active').length;
   const expiredPolicies = policies.filter((p) => p.coverageStatus === 'Expired').length;
@@ -54,6 +68,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const remainingPercent = totalSI > 0 ? Math.round((remainingSI / totalSI) * 100) : 0;
   const usedPercent = 100 - remainingPercent;
+
+  const datePresets = [
+    'Jan 1, 2026 – Dec 31, 2026',
+    'Q1 2026 (Jan – Mar)',
+    'Q2 2026 (Apr – Jun)',
+    'H2 2026 (Jul – Dec)',
+  ];
+
+  const adminUser = user || {
+    id: 'admin',
+    username: 'admin',
+    name: 'Administrator',
+    role: 'Administrator',
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -67,11 +95,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Date Range Filter Button */}
-          <div className="h-9 px-3.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            <span>Jan 1, 2026 – Dec 31, 2026</span>
-          </div>
+          {/* Date Range Filter Button (Interactive Dropdown) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="h-9 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
+              >
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                <span>{dateRange}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-60 p-1.5">
+              <DropdownMenuLabel>Coverage Period Preset</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {datePresets.map((preset) => (
+                <DropdownMenuItem
+                  key={preset}
+                  onSelect={() => setDateRange(preset)}
+                  className="flex items-center justify-between"
+                >
+                  <span>{preset}</span>
+                  {dateRange === preset && <Check className="w-3.5 h-3.5 text-[#00ba63]" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Primary Action Button: Create Policy */}
           {onOpenCreatePolicy && (
@@ -431,6 +481,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             isLoadingDecision={isLoadingDecision}
           />
         </div>
+      )}
+
+      {/* View: CUSTOMERS */}
+      {activeView === 'customers' && (
+        <CustomersView
+          user={adminUser}
+          policies={policies}
+          claims={claims}
+          customers={customers}
+          onOpenPolicies={() => {
+            if (setActiveView) setActiveView('policies');
+          }}
+        />
+      )}
+
+      {/* View: ANALYTICS */}
+      {activeView === 'analytics' && (
+        <AnalyticsView
+          user={adminUser}
+          policies={policies}
+          claims={claims}
+        />
+      )}
+
+      {/* View: REPORTS */}
+      {activeView === 'reports' && (
+        <ReportsView
+          user={adminUser}
+          policies={policies}
+          claims={claims}
+        />
       )}
     </div>
   );

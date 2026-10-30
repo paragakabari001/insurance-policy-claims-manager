@@ -5,6 +5,7 @@ import { Card } from '../components/ui/card';
 import { PolicyTable } from '../components/PolicyTable';
 import { ClaimTable } from '../components/ClaimTable';
 import { ActiveView } from '../components/Sidebar';
+import { AnalyticsView, ReportsView } from './InsightsViews';
 import {
   ShieldCheck,
   Clock,
@@ -257,6 +258,55 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
             </span>
           </div>
           <ClaimTable claims={claims} isAdmin={false} />
+        </div>
+      )}
+
+      {/* View: ANALYTICS */}
+      {activeView === 'analytics' && (
+        <AnalyticsView user={user} policies={policies} claims={claims} />
+      )}
+
+      {/* View: REPORTS */}
+      {activeView === 'reports' && (
+        <ReportsView user={user} policies={policies} claims={claims} />
+      )}
+
+      {/* View: CUSTOMERS (Profile view for Customer) */}
+      {activeView === 'customers' && (
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">My Customer Profile</h1>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Account details & policy entitlements</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs max-w-lg space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 font-bold text-base flex items-center justify-center">
+                {user.name.slice(0, 2).toUpperCase()}
+              </span>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">{user.name}</h3>
+                <p className="text-xs text-slate-400 font-medium">@{user.username} &bull; Verified Customer</p>
+              </div>
+            </div>
+            <dl className="grid grid-cols-2 gap-3 text-xs pt-2">
+              <div className="rounded-xl bg-slate-50 p-3">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Policies</dt>
+                <dd className="mt-1 font-extrabold text-slate-900 text-sm">{totalPolicies}</dd>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Policies</dt>
+                <dd className="mt-1 font-extrabold text-slate-900 text-sm">{activePolicies}</dd>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Sum Insured</dt>
+                <dd className="mt-1 font-extrabold text-slate-900 text-sm">{formatCurrency(totalCoveredSI)}</dd>
+              </div>
+              <div className="rounded-xl bg-emerald-50 p-3">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Remaining Balance</dt>
+                <dd className="mt-1 font-extrabold text-[#008f4c] text-sm">{formatCurrency(remainingSI)}</dd>
+              </div>
+            </dl>
+          </div>
         </div>
       )}
     </div>

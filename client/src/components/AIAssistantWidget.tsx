@@ -196,7 +196,8 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[410px] h-screen shrink-0 flex flex-col bg-gradient-to-b from-[#e8faf1] via-[#f3fdf8] to-[#dff5ea] border-l border-emerald-100 md:rounded-l-[28px] shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
+          style={{ backgroundImage: "url(/chat-bg.png)" }}
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[410px] h-screen shrink-0 flex flex-col bg-[#eafaf2] bg-cover bg-center border-l border-emerald-100 md:rounded-l-[28px] shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
         >
           {/* Header (Figma Match: Dark Green Header with Badge and Window Controls) */}
           <div className="shrink-0 h-16 px-4 bg-[#031d16] text-white flex items-center justify-between border-b border-[#093529]">

@@ -244,6 +244,10 @@ export function App() {
         <TopBar
           user={user}
           activeView={activeView}
+          setActiveView={setActiveView}
+          policies={policies}
+          claims={claims}
+          customers={customers}
           onOpenCreatePolicy={() => setIsPolicyModalOpen(true)}
           onOpenSubmitClaim={() => handleOpenClaimModalForPolicy()}
           onRefresh={loadData}
@@ -251,15 +255,19 @@ export function App() {
           onOpenMobileMenu={handleMenuToggle}
           isAIOpen={isAIOpen}
           onToggleAI={() => setIsAIOpen((prev) => !prev)}
+          onQuickSwitch={handleQuickSwitch}
+          onLogout={handleLogout}
         />
 
         <main className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-24 md:pb-6">
           {user.role === 'Administrator' ? (
             <AdminDashboard
+              user={user}
               policies={policies}
               claims={claims}
               customers={customers}
               activeView={activeView}
+              setActiveView={setActiveView}
               onDecideClaim={handleDecideClaim}
               isLoadingDecision={isLoadingDecision}
               onOpenCreatePolicy={() => setIsPolicyModalOpen(true)}
