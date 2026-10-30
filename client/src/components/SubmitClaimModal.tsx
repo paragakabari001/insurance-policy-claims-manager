@@ -235,6 +235,7 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
               minDate={activePolicy?.startDate}
               maxDate={activePolicy?.endDate}
               placeholder="Select incident calendar date"
+              placement="top"
             />
             {activePolicy && (
               <p className="text-[11px] text-slate-500 mt-1">

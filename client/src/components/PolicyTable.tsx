@@ -23,8 +23,13 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
   isAdmin = false,
   onSelectForClaim,
 }) => {
-  // Default to Grid view so policies show as handsome cards on both mobile & desktop!
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  // Default to Table view on web (desktop >= 768px) and Cards view on mobile
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      return 'table';
+    }
+    return 'grid';
+  });
 
   if (policies.length === 0) {
     return (
