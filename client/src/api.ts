@@ -111,4 +111,52 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  // Streaming AI chat (SSE over fetch) - calls onToken for each chunk
+  chatWithAIStream: async (
+    data: { message: string; history?: Array<{ role: 'user' | 'assistant'; content: string }> },
+    onToken: (token: string) => void
+  ): Promise<{ suggestedQuestions?: string[] }> => {
+    const token = getStoredToken();
+    const response = await fetch('/api/ai/chat/stream', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok || !response.body) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Request failed with status ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let suggestedQuestions: string[] | undefined;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split('\n\n');
+      buffer = events.pop() || '';
+      for (const evt of events) {
+        const line = evt.trim();
+        if (!line.startsWith('data:')) continue;
+        try {
+          const payload = JSON.parse(line.slice(5).trim());
+          if (payload.error) throw new Error(payload.error);
+          if (payload.token) onToken(payload.token);
+          if (payload.done) suggestedQuestions = payload.suggestedQuestions;
+        } catch (e: any) {
+          if (e instanceof SyntaxError) continue;
+          throw e;
+        }
+      }
+    }
+    return { suggestedQuestions };
+  },
 };

@@ -12,11 +12,31 @@ export interface ChatRequestOptions {
   userName: string;
   message: string;
   history?: ChatMessage[];
+  /** When provided, the provider response is streamed and each token is forwarded here. */
+  onToken?: (token: string) => void;
 }
 
 export interface ChatResponse {
   reply: string;
   suggestedQuestions?: string[];
+  /** True when tokens were already forwarded through onToken. */
+  streamed?: boolean;
+}
+
+const CUSTOMER_SUGGESTIONS = [
+  'What is my remaining coverage?',
+  'Show my claim statuses.',
+  'How do I submit a claim?',
+  'What happens when a claim is rejected?',
+];
+const ADMIN_SUGGESTIONS = [
+  'Show portfolio summary',
+  'Which claims are pending review?',
+  'Which customer has the highest claims?',
+  'List expired policies',
+];
+export function suggestionsForRole(role: string): string[] {
+  return role === 'Administrator' ? ADMIN_SUGGESTIONS : CUSTOMER_SUGGESTIONS;
 }
 
 export async function processAIChat({
@@ -25,18 +45,14 @@ export async function processAIChat({
   userName,
   message,
   history = [],
+  onToken,
 }: ChatRequestOptions): Promise<ChatResponse> {
   const trimmedMessage = (message || '').trim().slice(0, 1000);
 
   if (!trimmedMessage) {
     return {
       reply: 'Please ask a question about your policies, remaining coverage, or claims.',
-      suggestedQuestions: [
-        'What is my remaining coverage?',
-        'Show my claim statuses.',
-        'How do I submit a claim?',
-        'What happens when a claim is rejected?',
-      ],
+      suggestedQuestions: suggestionsForRole(userRole),
     };
   }
 
@@ -183,11 +199,7 @@ export async function processAIChat({
     );
     return {
       reply: `The AI Assistant is currently offline because the AI_API_KEY environment variable is not configured. However, here is your summary from the system database:\n\n• Policies on file: ${authorizedPoliciesData.length}\n• Total Remaining Coverage: ${formatINR(totalRemaining)}\n• Total Claims: ${authorizedClaimsData.length}\n\nYou can use the "Submit Claim" and "Policies" sections in the application to manage your policies and file claims directly.`,
-      suggestedQuestions: [
-        'What is my remaining coverage?',
-        'Show my claim statuses.',
-        'How do I submit a claim?',
-      ],
+      suggestedQuestions: suggestionsForRole(userRole),
     };
   }
 
@@ -195,6 +207,11 @@ export async function processAIChat({
   const systemPrompt = `You are the AI Policy & Claims Assistant for the Insurance Policy & Claims Management System.
 Current Application Date (Asia/Kolkata): ${today}.
 Current User: ${userName} (Role: ${userRole}).
+${
+  userRole === 'Administrator'
+    ? 'AUDIENCE: You are assisting an ADMINISTRATOR. Answer from a portfolio-management perspective: aggregate across all customers, name customers, highlight pending claims needing review, risk and utilisation. Admins can decide claims in the Claims page.'
+    : 'AUDIENCE: You are assisting a CUSTOMER. Speak directly to them ("your policy"). Only discuss their own policies and claims, never other customers or portfolio-wide data. Guide them on submitting claims and tracking status.'
+}
 
 AUTHORITATIVE REAL-TIME USER DATA FROM SECURE DATABASE:
 === POLICIES ===
@@ -253,8 +270,9 @@ OPERATIONAL BOUNDARIES & STRICT GUIDELINES:
       body: JSON.stringify({
         model,
         messages,
-        max_tokens: 500,
+        max_tokens: 600,
         temperature: 0.2,
+        ...(onToken ? { stream: true } : {}),
       }),
       signal: controller.signal,
     });
@@ -267,12 +285,42 @@ OPERATIONAL BOUNDARIES & STRICT GUIDELINES:
 
       return {
         reply: `I am currently experiencing connectivity difficulties with the AI service. However, your data is completely safe. You have ${authorizedPoliciesData.length} policy record(s) and ${authorizedClaimsData.length} claim record(s) on file in this session.`,
-        suggestedQuestions: [
-          'What is my remaining coverage?',
-          'Show my claim statuses.',
-          'How do I submit a claim?',
-        ],
+        suggestedQuestions: suggestionsForRole(userRole),
       };
+    }
+
+    if (onToken && res.body) {
+      const reader = (res.body as any).getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let full = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          const t = line.trim();
+          if (!t.startsWith('data:')) continue;
+          const payload = t.slice(5).trim();
+          if (!payload || payload === '[DONE]') continue;
+          try {
+            const delta = JSON.parse(payload)?.choices?.[0]?.delta?.content;
+            if (delta) {
+              full += delta;
+              onToken(delta);
+            }
+          } catch {
+            /* ignore partial JSON */
+          }
+        }
+      }
+      return {
+        reply: full.trim() || 'I was unable to retrieve a response. Please ask your question again.',
+        suggestedQuestions: suggestionsForRole(userRole),
+        streamed: full.length > 0,
+      } as ChatResponse;
     }
 
     const data: any = await res.json();
@@ -282,22 +330,13 @@ OPERATIONAL BOUNDARIES & STRICT GUIDELINES:
 
     return {
       reply,
-      suggestedQuestions: [
-        'What is my remaining coverage?',
-        'Show my claim statuses.',
-        'How do I submit a claim?',
-        'What happens when a claim is rejected?',
-      ],
+      suggestedQuestions: suggestionsForRole(userRole),
     };
   } catch (err: any) {
     console.warn('AI Request failed:', err?.message || err);
     return {
       reply: 'The AI assistant is temporarily unavailable. You can continue managing your policies and filing claims directly through the application interface.',
-      suggestedQuestions: [
-        'What is my remaining coverage?',
-        'Show my claim statuses.',
-        'How do I submit a claim?',
-      ],
+      suggestedQuestions: suggestionsForRole(userRole),
     };
   }
 }

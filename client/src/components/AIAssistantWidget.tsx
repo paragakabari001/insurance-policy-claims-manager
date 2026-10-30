@@ -28,6 +28,7 @@ interface MessageItem {
   content: string;
   timestamp?: string;
   isError?: boolean;
+  isStreaming?: boolean;
 }
 
 export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
@@ -39,12 +40,19 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([
+  const customerSuggestions = [
     'What is my remaining coverage?',
-    'Show claim statistics',
-    'List active policies',
-    'Total sum insured',
-  ]);
+    'Show my claim statuses.',
+    'How do I submit a claim?',
+    'What happens when a claim is rejected?',
+  ];
+  const adminSuggestions = [
+    'Show portfolio summary',
+    'Which claims are pending review?',
+    'Which customer has the highest claims?',
+    'List expired policies',
+  ];
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>(customerSuggestions);
 
   const launcherRef = useRef<HTMLButtonElement>(null);
   const textareaRef = useRef<HTMLInputElement>(null);
@@ -57,6 +65,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
       return;
     }
 
+    setSuggestedQuestions(user.role === 'Administrator' ? adminSuggestions : customerSuggestions);
     setMessages([
       {
         id: 'welcome',
@@ -73,7 +82,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
   // Auto-scroll to latest message
   useEffect(() => {
     if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: messages.some((m) => m.isStreaming) ? 'auto' : 'smooth' });
     }
   }, [messages, isLoading, isOpen]);
 
@@ -100,9 +109,12 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
 
   if (!user) return null;
 
+  const isAdminUser = user.role === 'Administrator';
+  const busy = isLoading || messages.some((m) => m.isStreaming);
+
   const handleSend = async (messageText?: string) => {
     const textToSend = (messageText || input).trim();
-    if (!textToSend || isLoading) return;
+    if (!textToSend || busy) return;
 
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -117,33 +129,48 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
     setInput('');
     setIsLoading(true);
 
+    const asstId = `asst-${Date.now()}`;
+    let started = false;
+
     try {
       const historyPayload = messages
         .filter((m) => !m.isError && m.id !== 'welcome')
         .slice(-6)
         .map((m) => ({ role: m.role, content: m.content }));
 
-      const res = await api.chatWithAI({
-        message: textToSend,
-        history: historyPayload,
-      });
+      const res = await api.chatWithAIStream(
+        { message: textToSend, history: historyPayload },
+        (token) => {
+          if (!started) {
+            started = true;
+            // First token: hide the "thinking" indicator and create the streaming bubble
+            setIsLoading(false);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: asstId,
+                role: 'assistant',
+                content: token,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isStreaming: true,
+              },
+            ]);
+          } else {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === asstId ? { ...m, content: m.content + token } : m))
+            );
+          }
+        }
+      );
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `asst-${Date.now()}`,
-          role: 'assistant',
-          content: res.reply,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        },
-      ]);
+      setMessages((prev) => prev.map((m) => (m.id === asstId ? { ...m, isStreaming: false } : m)));
 
       if (res.suggestedQuestions && res.suggestedQuestions.length > 0) {
         setSuggestedQuestions(res.suggestedQuestions);
       }
     } catch (err: any) {
       setMessages((prev) => [
-        ...prev,
+        ...prev.filter((m) => !(m.id === asstId && !m.content)),
         {
           id: `err-${Date.now()}`,
           role: 'assistant',
@@ -262,6 +289,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
               <span className="w-5 h-5 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center"><Clock className="w-3 h-3" /></span>
               Claims
             </button>
+            {isAdminUser && (
             <button
               type="button"
               onClick={() => handleSend('Provide customer-wise insights')}
@@ -270,6 +298,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
               <span className="w-5 h-5 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center"><Users className="w-3 h-3" /></span>
               Insights
             </button>
+            )}
           </div>
 
           {/* Messages Flow Area with Markdown Rendering */}
@@ -300,7 +329,12 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                       {isUser ? (
                         <p className="whitespace-pre-line">{msg.content}</p>
                       ) : (
-                        <MarkdownMessage content={msg.content} />
+                        <>
+                          <MarkdownMessage content={msg.content} />
+                          {msg.isStreaming && (
+                            <span className="inline-block w-1.5 h-3.5 ml-0.5 -mb-0.5 bg-[#00ba63] rounded-sm animate-pulse" />
+                          )}
+                        </>
                       )}
                     </div>
 
@@ -326,10 +360,14 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
 
             {/* In-flight typing indicator */}
             {isLoading && (
-              <div className="flex items-start">
-                <div className="bg-white border border-slate-200 rounded-2xl px-3.5 py-2 shadow-2xs flex items-center gap-2 text-slate-600 text-xs font-medium">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00ba63]" />
-                  <span>Analyzing authoritative policy data...</span>
+              <div className="flex items-end gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#011f17] text-[#00c569] flex items-center justify-center shrink-0 shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-2xs flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" />
                 </div>
               </div>
             )}
@@ -338,7 +376,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
           </div>
 
           {/* Quick Query Pill Suggestions */}
-          {!isLoading && suggestedQuestions.length > 0 && (
+          {!busy && suggestedQuestions.length > 0 && (
             <div className="relative z-10 px-3 py-2 bg-white border-t border-slate-200/80 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
               {suggestedQuestions.map((q) => (
                 <button
@@ -369,18 +407,18 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about coverage, or policies..."
-                  disabled={isLoading}
+                  disabled={busy}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00ba63]/25 focus:border-[#00ba63] text-xs font-medium text-slate-900 bg-slate-50/80 focus:bg-white placeholder:text-slate-400 shadow-2xs transition-all"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={busy || !input.trim()}
                 aria-label="Send message"
                 className="w-10 h-10 rounded-xl bg-[#011f17] hover:bg-[#032e22] text-[#00c569] hover:text-white flex items-center justify-center shrink-0 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#011f17]/20 transition-all cursor-pointer"
               >
-                {isLoading ? (
+                {busy ? (
                   <Loader2 className="w-4 h-4 animate-spin text-[#00ba63]" />
                 ) : (
                   <Send className="w-4 h-4" />
