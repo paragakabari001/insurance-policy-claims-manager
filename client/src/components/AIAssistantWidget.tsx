@@ -185,67 +185,65 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
         </button>
       )}
 
-      {/* Right-Side Layout Panel: Outer dark green frame with inner floating rounded glass box */}
+      {/* Right-Side AI Assistant Panel: Clean unified floating card with proper gap and rounded corners */}
       {isOpen && (
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[420px] xl:w-[450px] h-screen shrink-0 flex flex-col bg-[#011f17] p-2.5 sm:p-3 rounded-l-[32px] md:rounded-l-[36px] shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[410px] xl:w-[440px] h-screen md:h-[calc(100vh-20px)] md:my-2.5 md:mr-2.5 md:ml-3 shrink-0 flex flex-col bg-[#eafaf2] rounded-l-[28px] md:rounded-[28px] border border-emerald-500/20 shadow-xl overflow-hidden relative"
         >
-          {/* Inner Floating Box with custom background image and smooth rounded corners */}
-          <div className="flex-1 min-h-0 flex flex-col rounded-[26px] sm:rounded-[30px] overflow-hidden border border-emerald-500/20 shadow-2xl bg-[#f0faf5] relative">
-            {/* Background image layer with controlled lowered opacity and rounded corners */}
-            <div
-              className="absolute inset-0 bg-cover bg-center pointer-events-none rounded-[26px] sm:rounded-[30px]"
-              style={{
-                backgroundImage: 'url(/chat-bg.png)',
-                opacity: 0.35,
-              }}
-            />
+          {/* Background Wallpaper Image with lowered opacity and matching rounded corners */}
+          <div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none rounded-l-[28px] md:rounded-[28px]"
+            style={{
+              backgroundImage: 'url(/chat-bg.png)',
+              opacity: 0.28,
+            }}
+          />
 
-            {/* Ultra-Modern Frosted Glass Header */}
-            <div className="relative z-10 shrink-0 px-4 py-3 bg-white/40 backdrop-blur-md border-b border-emerald-900/10 flex items-center justify-between shadow-2xs">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-2xl bg-[#00ba63]/15 border border-[#00ba63]/30 flex items-center justify-center text-[#008f4c] shrink-0 shadow-2xs">
-                  <Sparkles className="w-4 h-4 text-[#008f4c]" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-black text-slate-900 tracking-tight truncate">
-                      AI Assistant
-                    </h3>
-                    <span className="inline-flex items-center gap-1.5 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-[#008f4c] border border-emerald-200/80 uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00ba63] animate-pulse" />
-                      Online
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 font-medium truncate">
-                    Policy & Claims Support
-                  </p>
-                </div>
+          {/* Ultra-Modern Frosted Glass Header */}
+          <div className="relative z-10 shrink-0 px-4 py-3.5 bg-white/70 backdrop-blur-md border-b border-emerald-900/10 flex items-center justify-between shadow-2xs rounded-tl-[28px] md:rounded-t-[28px]">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-2xl bg-[#00ba63]/15 border border-[#00ba63]/30 flex items-center justify-center text-[#008f4c] shrink-0 shadow-2xs">
+                <Sparkles className="w-4 h-4 text-[#008f4c]" />
               </div>
-
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Minimize"
-                  title="Minimize"
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close"
-                  title="Close"
-                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-black text-slate-900 tracking-tight truncate">
+                    AI Assistant
+                  </h3>
+                  <span className="inline-flex items-center gap-1.5 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-[#008f4c] border border-emerald-200/80 uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00ba63] animate-pulse" />
+                    Online
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 font-medium truncate">
+                  Policy & Claims Support
+                </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Minimize"
+                title="Minimize"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                title="Close"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
 
             {/* Quick Action Top Cards (Translucent glass floating directly on wallpaper) */}
             <div className="relative z-10 p-3 bg-white/20 backdrop-blur-xs border-b border-emerald-900/10 shrink-0">
@@ -416,7 +414,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
             )}
 
             {/* Chat Composer Input Form */}
-            <div className="relative z-10 shrink-0 p-3 bg-white/50 backdrop-blur-md border-t border-emerald-900/10">
+            <div className="relative z-10 shrink-0 p-3 bg-white/70 backdrop-blur-md border-t border-emerald-900/10 rounded-bl-[28px] md:rounded-b-[28px]">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -453,7 +451,6 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                 Press Enter to send &bull; Shift+Enter for newline
               </p>
             </div>
-          </div>
         </aside>
       )}
     </>

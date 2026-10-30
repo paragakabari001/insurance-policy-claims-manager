@@ -222,7 +222,7 @@ export function App() {
   const pendingClaimsCount = claims.filter((c) => c.status === 'Submitted').length;
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-slate-50 flex">
+    <div className="h-screen w-screen overflow-hidden bg-[#f1f5f9] flex">
       {/* Responsive Sidebar (Desktop & Mobile Drawer) */}
       <Sidebar
         user={user}
@@ -239,8 +239,12 @@ export function App() {
         onOpenAI={() => setIsAIOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      {/* Main Content Area (Center Part - Rounded on the right facing the chat drawer, with proper gap) */}
+      <div className={`flex-1 flex flex-col min-w-0 bg-white transition-all overflow-hidden ${
+        isAIOpen
+          ? 'md:my-2.5 md:ml-2.5 md:rounded-[28px] md:border md:border-slate-200/90 md:shadow-xs md:h-[calc(100vh-20px)]'
+          : 'h-screen'
+      }`}>
         <TopBar
           user={user}
           activeView={activeView}

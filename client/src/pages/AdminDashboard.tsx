@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Policy, Claim, CustomerUser, User } from '../types';
-import { formatCurrency, formatDate } from '../utils/formatters';
+import { formatCurrency, formatCompactCurrency, formatDate } from '../utils/formatters';
 import { Card } from '../components/ui/card';
 import { PolicyTable } from '../components/PolicyTable';
 import { ClaimTable } from '../components/ClaimTable';
@@ -154,36 +154,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* View: DASHBOARD (Overview) */}
       {activeView === 'dashboard' && (
         <div className="space-y-6">
-          {/* Top 4 KPI Cards with mini wave graphs & trend tags (Figma Match) */}
-          <div className={`grid gap-3.5 ${isAIOpen ? 'grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4'}`}>
+                    {/* Top 4 KPI Cards with mini wave graphs & trend tags (Responsive 3-Grid Mobile + Compact Chat Mode) */}
+          <div className={`grid gap-2 sm:gap-3.5 ${isAIOpen ? 'grid-cols-3 sm:grid-cols-2 2xl:grid-cols-4' : 'grid-cols-3 sm:grid-cols-2 lg:grid-cols-4'}`}>
             {/* Card 1: Total Policies */}
-            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
-              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
-                    <FileText className="w-5 h-5 text-[#00ba63]" />
+            <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
+              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
+            }`}>
+              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
+                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+                  <div className={`rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0 ${
+                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
+                  }`}>
+                    <FileText className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00ba63]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#00ba63]'} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-500 leading-tight">Total Policies</p>
-                    <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{totalPolicies}</p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{activePolicies} Active</p>
+                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
+                      Total Policies
+                    </p>
+                    <p className={`font-black text-slate-900 tracking-tight leading-tight truncate mt-0.5 ${
+                      isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
+                    }`}>
+                      {totalPolicies}
+                    </p>
+                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
+                      {activePolicies} active
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="w-6 h-6 rounded-lg bg-orange-50 border border-orange-100/80 flex items-center justify-center text-orange-400">
+                <div className="hidden xs:flex flex-col items-end justify-between h-full shrink-0">
+                  <div className="w-5 h-5 rounded-md bg-orange-50 border border-orange-100/80 flex items-center justify-center text-orange-400">
                     <FileText className="w-3.5 h-3.5 text-orange-400" />
                   </div>
-                  <div className="mt-4">
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
-                      <TrendingUp className="w-3 h-3 text-[#00ba63]" /> +12%
+                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
+                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] font-bold ${
+                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
+                    }`}>
+                      <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" /> +12%
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-green-1" x1="0" y1="0" x2="0" y2="1">
@@ -198,35 +212,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 2: Total Sum Insured */}
-            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
-              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
-                    <Layers className="w-5 h-5 text-[#2563eb]" />
+            <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
+              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
+            }`}>
+              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
+                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+                  <div className={`rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0 ${
+                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
+                  }`}>
+                    <Layers className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#2563eb]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#2563eb]'} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-500 leading-tight">Total Sum Insured</p>
-                    <p className="text-base sm:text-lg xl:text-xl 2xl:text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight truncate">
-                      {formatCurrency(totalSI)}
+                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
+                      Total Sum Insured
                     </p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight truncate">Across all policies</p>
+                    <p
+                      title={formatCurrency(totalSI)}
+                      className={`font-black text-slate-900 tracking-tight leading-tight truncate mt-0.5 cursor-help ${
+                        isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
+                      }`}
+                    >
+                      {formatCompactCurrency(totalSI)}
+                    </p>
+                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
+                      Across all policies
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-500">
+                <div className="hidden xs:flex flex-col items-end justify-between h-full shrink-0">
+                  <div className="w-5 h-5 rounded-md bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-500">
                     <Sparkles className="w-3.5 h-3.5 text-blue-500" />
                   </div>
-                  <div className="mt-4">
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eff6ff] text-[#2563eb] text-xs font-bold">
-                      <TrendingUp className="w-3 h-3 text-[#2563eb]" /> +8%
+                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
+                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#eff6ff] text-[#2563eb] font-bold ${
+                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
+                    }`}>
+                      <TrendingUp className="w-2.5 h-2.5 text-[#2563eb]" /> +8%
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-blue-1" x1="0" y1="0" x2="0" y2="1">
@@ -241,33 +270,48 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 3: Remaining Coverage */}
-            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
-              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-5 h-5 text-[#00ba63]" />
+            <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
+              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
+            }`}>
+              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
+                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+                  <div className={`rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0 ${
+                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
+                  }`}>
+                    <ShieldCheck className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00ba63]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#00ba63]'} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-500 leading-tight">Remaining Coverage</p>
-                    <p className="text-base sm:text-lg xl:text-xl 2xl:text-2xl font-black text-[#008f4c] tracking-tight mt-1 leading-tight truncate">
-                      {formatCurrency(remainingSI)}
+                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
+                      Remaining Coverage
                     </p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight truncate">Available to use</p>
+                    <p
+                      title={formatCurrency(remainingSI)}
+                      className={`font-black text-[#008f4c] tracking-tight leading-tight truncate mt-0.5 cursor-help ${
+                        isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
+                      }`}
+                    >
+                      {formatCompactCurrency(remainingSI)}
+                    </p>
+                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
+                      Available to use
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="h-6" />
-                  <div className="mt-4">
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
-                      <TrendingUp className="w-3 h-3 text-[#00ba63]" /> +18%
+                <div className="hidden xs:flex flex-col items-end justify-between h-full shrink-0">
+                  <div className="w-5 h-5" />
+                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
+                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] font-bold ${
+                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
+                    }`}>
+                      <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" /> +18%
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-green-rem-1" x1="0" y1="0" x2="0" y2="1">
@@ -281,32 +325,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
 
-            {/* Card 4: Pending Claims */}
-            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
-              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5 text-[#ea580c]" />
+            {/* Card 4: Pending Claims (Spans across all 3 columns on mobile for a balanced grid) */}
+            <div className={`col-span-3 sm:col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
+              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
+            }`}>
+              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
+                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
+                  <div className={`rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0 ${
+                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
+                  }`}>
+                    <Clock className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#ea580c]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#ea580c]'} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-500 leading-tight">Pending Claims</p>
-                    <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{pendingClaims}</p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{approvedClaims} approved</p>
+                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
+                      Pending Claims
+                    </p>
+                    <p className={`font-black text-slate-900 tracking-tight leading-tight truncate mt-0.5 ${
+                      isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
+                    }`}>
+                      {pendingClaims}
+                    </p>
+                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
+                      {approvedClaims} approved
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="h-6" />
-                  <div className="mt-4">
-                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] text-xs font-bold">
-                      <TrendingDown className="w-3 h-3 text-[#ea580c]" /> -100%
+                  <div className="hidden xs:flex w-5 h-5" />
+                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
+                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] font-bold ${
+                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
+                    }`}>
+                      <TrendingDown className="w-2.5 h-2.5 text-[#ea580c]" /> -100%
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none overflow-hidden">
+              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-orange-1" x1="0" y1="0" x2="0" y2="1">
@@ -314,8 +372,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <stop offset="100%" stopColor="#ea580c" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
-                  <path d="M0 44 C 60 46, 120 38, 180 36 C 230 34, 260 20, 300 12 L 300 50 L 0 50 Z" fill="url(#wave-orange-1)" />
-                  <path d="M0 44 C 60 46, 120 38, 180 36 C 230 34, 260 20, 300 12" fill="none" stroke="#ea580c" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 44 C 60 46, 120 40, 180 42 C 230 44, 260 30, 300 24 L 300 50 L 0 50 Z" fill="url(#wave-orange-1)" />
+                  <path d="M0 44 C 60 46, 120 40, 180 42 C 230 44, 260 30, 300 24" fill="none" stroke="#ea580c" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
             </div>
