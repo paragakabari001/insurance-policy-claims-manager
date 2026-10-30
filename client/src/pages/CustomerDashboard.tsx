@@ -94,7 +94,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="h-9 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
+                    className="h-8 sm:h-9 px-3 sm:px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] sm:text-xs font-semibold text-slate-700 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
                   >
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>{dateRange}</span>
@@ -145,27 +145,14 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           </div>
 
           {/* Mobile Action Buttons: 2 Equal Columns Matching Mobile Design Reference */}
-          <div className="grid grid-cols-2 gap-2.5 sm:hidden">
+          <div className="flex items-center gap-2 sm:hidden">
             <button
               onClick={() => onOpenSubmitClaim()}
-              className="h-11 px-3 rounded-2xl bg-[#031d16] active:bg-[#072d22] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-[#031d16]/25 transition-all cursor-pointer"
+              className="h-8 px-3 rounded-xl bg-[#031d16] active:bg-[#072d22] text-white text-[11px] font-bold flex items-center justify-center gap-1 shadow-sm shadow-[#031d16]/20 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4 text-[#00c569]" />
               <span>Submit Claim</span>
             </button>
-
-            {onToggleAI && (
-              <button
-                onClick={onToggleAI}
-                className="h-11 px-3.5 rounded-2xl bg-[#eaf8f1] border border-emerald-200/80 active:bg-[#d8f3e5] text-[#022c21] text-xs font-bold flex items-center justify-between shadow-2xs transition-all cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[#00ba63]" />
-                  <span>AI Assistant</span>
-                </div>
-                <ArrowRight className="w-3.5 h-3.5 text-[#00ba63]" />
-              </button>
-            )}
           </div>
 
           {/* Top 4 KPI Cards: 2x2 Grid on Mobile, 4-Cols on Desktop (Clean Flat Executive Style without bottom wave) */}
