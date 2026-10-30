@@ -185,24 +185,24 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
         </button>
       )}
 
-      {/* Right-Side AI Assistant Panel: Clean unified floating card with proper gap and rounded corners */}
+      {/* Right-Side AI Assistant Panel: Clean, integrated Copilot Rail aligned with TopBar */}
       {isOpen && (
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[410px] xl:w-[440px] h-screen md:h-[calc(100vh-20px)] md:my-2.5 md:mr-2.5 md:ml-3 shrink-0 flex flex-col bg-[#eafaf2] rounded-l-[28px] md:rounded-[28px] border border-emerald-500/20 shadow-xl overflow-hidden relative"
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[410px] xl:w-[440px] h-screen shrink-0 flex flex-col bg-[#eafaf2] border-l border-slate-200/80 shadow-2xl md:shadow-none overflow-hidden relative"
         >
-          {/* Background Wallpaper Image with lowered opacity and matching rounded corners */}
+          {/* Background Wallpaper Image with lowered opacity */}
           <div
-            className="absolute inset-0 bg-cover bg-center pointer-events-none rounded-l-[28px] md:rounded-[28px]"
+            className="absolute inset-0 bg-cover bg-center pointer-events-none"
             style={{
               backgroundImage: 'url(/chat-bg.png)',
               opacity: 0.28,
             }}
           />
 
-          {/* Ultra-Modern Frosted Glass Header */}
-          <div className="relative z-10 shrink-0 px-4 py-3.5 bg-white/70 backdrop-blur-md border-b border-emerald-900/10 flex items-center justify-between shadow-2xs rounded-tl-[28px] md:rounded-t-[28px]">
+          {/* Unified 64px Header - Matches TopBar height & styling for a seamless top navigation band */}
+          <div className="relative z-10 shrink-0 h-16 px-4 bg-white border-b border-slate-200/80 flex items-center justify-between shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-9 h-9 rounded-2xl bg-[#00ba63]/15 border border-[#00ba63]/30 flex items-center justify-center text-[#008f4c] shrink-0 shadow-2xs">
                 <Sparkles className="w-4 h-4 text-[#008f4c]" />
@@ -229,7 +229,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                 onClick={onClose}
                 aria-label="Minimize"
                 title="Minimize"
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all cursor-pointer"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -238,7 +238,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                 onClick={onClose}
                 aria-label="Close"
                 title="Close"
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -414,7 +414,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
             )}
 
             {/* Chat Composer Input Form */}
-            <div className="relative z-10 shrink-0 p-3 bg-white/70 backdrop-blur-md border-t border-emerald-900/10 rounded-bl-[28px] md:rounded-b-[28px]">
+            <div className="relative z-10 shrink-0 p-3 bg-white/70 backdrop-blur-md border-t border-emerald-900/10">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();

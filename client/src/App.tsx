@@ -222,7 +222,7 @@ export function App() {
   const pendingClaimsCount = claims.filter((c) => c.status === 'Submitted').length;
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#eef2f6] flex">
+    <div className="h-screen w-screen overflow-hidden bg-[#f8fafc] flex">
       {/* Responsive Sidebar (Desktop & Mobile Drawer) */}
       <Sidebar
         user={user}
@@ -239,12 +239,8 @@ export function App() {
         onOpenAI={() => setIsAIOpen(true)}
       />
 
-      {/* Main Content Area (Center Part - Rounded on the right facing the chat drawer, with soft gray canvas) */}
-      <div className={`flex-1 flex flex-col min-w-0 bg-[#f8fafc] transition-all overflow-hidden ${
-        isAIOpen
-          ? 'md:my-2.5 md:ml-2.5 md:rounded-[28px] md:border md:border-slate-200/90 md:shadow-xs md:h-[calc(100vh-20px)]'
-          : 'h-screen'
-      }`}>
+      {/* Main Content Area (Unified full-height canvas, flush with sidebar & topbar, zero double-backgrounds) */}
+      <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc] h-screen transition-all overflow-hidden">
         <TopBar
           user={user}
           activeView={activeView}
