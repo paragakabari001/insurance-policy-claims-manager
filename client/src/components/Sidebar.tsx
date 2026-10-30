@@ -93,24 +93,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
               aria-current={isActive ? 'page' : undefined}
               className={`group relative w-full flex items-center ${
                 collapsed ? 'justify-center px-0' : 'justify-between pl-2 pr-3'
-              } py-2 rounded-xl text-[13px] border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
+              } py-1.5 rounded-xl text-[13px] border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
                 isActive
-                  ? 'bg-gradient-to-r from-emerald-400/20 via-emerald-400/10 to-transparent border-emerald-400/20 text-white font-bold'
+                  ? 'bg-[#e9fbf1] border-white/70 text-[#063a28] font-bold shadow-[0_6px_16px_-6px_rgba(0,0,0,0.45)]'
                   : 'border-transparent text-emerald-50/65 font-medium hover:text-white hover:bg-white/[0.05]'
               }`}
             >
-              {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-[3px] rounded-r-full bg-[#2bec8f] shadow-[0_0_12px_rgba(43,236,143,0.9)]" />
-              )}
               <div className="flex items-center gap-3 min-w-0">
                 <span
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#00c569] text-[#022c21] shadow-[0_4px_14px_-2px_rgba(0,197,105,0.6)]'
+                      ? 'bg-[#00ba63] text-white shadow-sm'
                       : 'bg-white/[0.05] text-emerald-200/75 group-hover:bg-white/10 group-hover:text-emerald-100'
                   }`}
                 >
-                  <Icon className="w-4 h-4" strokeWidth={isActive ? 2.4 : 2} />
+                  <Icon className="w-[15px] h-[15px]" strokeWidth={isActive ? 2.4 : 2} />
                 </span>
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </div>
@@ -120,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     item.badgeTone === 'amber'
                       ? 'bg-amber-400 text-slate-950'
                       : isActive
-                      ? 'bg-emerald-300/25 text-emerald-100'
+                      ? 'bg-[#00ba63] text-white'
                       : 'bg-emerald-400/15 text-emerald-300'
                   }`}
                 >
