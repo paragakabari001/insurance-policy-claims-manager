@@ -9,6 +9,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { CustomerDashboard } from './pages/CustomerDashboard';
 import { CreatePolicyModal } from './components/CreatePolicyModal';
 import { SubmitClaimModal } from './components/SubmitClaimModal';
+import { AIAssistantWidget } from './components/AIAssistantWidget';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { formatCurrency } from './utils/formatters';
 
@@ -287,6 +288,9 @@ export function App() {
         preselectedPolicyId={preselectedPolicyId}
         onSubmit={handleSubmitClaim}
       />
+
+      {/* AI Policy & Claims Assistant Widget */}
+      <AIAssistantWidget user={user} />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>

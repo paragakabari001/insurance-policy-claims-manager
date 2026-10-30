@@ -101,4 +101,14 @@ export const api = {
   // Customers (Admin only)
   getCustomers: () =>
     request<{ customers: CustomerUser[] }>('/api/customers'),
+
+  // AI Assistant
+  chatWithAI: (data: {
+    message: string;
+    history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+  }) =>
+    request<{ reply: string; suggestedQuestions?: string[] }>('/api/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 };

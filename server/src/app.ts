@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes';
 import policyRoutes from './routes/policyRoutes';
 import claimRoutes from './routes/claimRoutes';
 import customerRoutes from './routes/customerRoutes';
+import aiRoutes from './routes/aiRoutes';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/policies', policyRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Serve static frontend in production
 const clientDistPath = path.resolve(__dirname, '../../client/dist');

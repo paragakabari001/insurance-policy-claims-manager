@@ -1,4 +1,8 @@
 import dotenv from 'dotenv';
+import path from 'path';
+
+// Load server/.env or root .env
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 dotenv.config();
 
 import app from './app';

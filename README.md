@@ -205,7 +205,25 @@ npm test
 
 ---
 
-## 8. Assumptions, Trade-offs & Limitations
+## 8. AI Policy & Claims Assistant (Optional Feature)
+
+### Architecture & Security Boundaries
+- **Floating Chat Widget:** Fixed launcher located at `fixed right-4 top-1/2 -translate-y-1/2 z-50` with label "Open AI Assistant", opening a compact $380\text{px} \times 520\text{px}$ panel (responsive down to mobile viewports).
+- **Zero-Trust Access Control:** Chat requests hit an authenticated server-side endpoint (`POST /api/ai/chat`). Identity and role are derived strictly from the verified JWT bearer session.
+- **Data Isolation:** Customers receive answers grounded exclusively in their own policies and claims. The backend queries the database for authorized records, prepares a factual context block, and never passes passwords, session tokens, or other users' data.
+- **Read-Only Assistant:** The assistant cannot modify balances, create policies, or decide claims; balances are calculated strictly using backend logic ($SI - \text{Submitted} - \text{Approved}$).
+- **Polite Scope Redirection:** For questions outside the scope of insurance policies or claims in this app, the assistant politely declines:
+  > *"I can help with your insurance policies and claims in this app. Please ask about coverage, remaining balance, claim status, or submitting a claim."*
+- **Multilingual Support:** Tested and verified to respond fluently in English, Gujarati, and Hindi.
+- **Provider Configuration via Server Environment Variables:**
+  - `AI_API_KEY`: Read securely from local `server/.env`.
+  - `AI_BASE_URL`: Defaults to `https://openrouter.ai/api/v1`.
+  - `AI_MODEL`: Defaults to `openai/gpt-4o-mini`.
+  - Keys are never bundled into client JavaScript assets or exposed in git.
+
+---
+
+## 9. Assumptions, Trade-offs & Limitations
 
 - **Assumptions:** Demo accounts are pre-seeded for evaluator convenience. Indian numbering format (`₹ 10,00,000`) is used in the UI to match the illustrative example in the specification.
 - **Trade-offs:** SQLite was selected as the default durable store for frictionless local evaluation and zero external dependencies, while Prisma allows swapping to PostgreSQL simply by changing `DATABASE_URL`.
