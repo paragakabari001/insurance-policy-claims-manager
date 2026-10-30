@@ -32,7 +32,16 @@ export function App() {
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const [isAIOpen, setIsAIOpen] = useState(true);
+  const [isAIOpen, setIsAIOpen] = useState(false);
+
+  // Hamburger: opens the drawer on mobile, collapses/expands the sidebar on desktop.
+  const handleMenuToggle = () => {
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      setIsSidebarCollapsed((prev) => !prev);
+    } else {
+      setIsMobileDrawerOpen(true);
+    }
+  };
 
   const addToast = (type: 'success' | 'error', text: string) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -227,6 +236,7 @@ export function App() {
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         isMobileOpen={isMobileDrawerOpen}
         onCloseMobile={() => setIsMobileDrawerOpen(false)}
+        onOpenAI={() => setIsAIOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -238,7 +248,7 @@ export function App() {
           onOpenSubmitClaim={() => handleOpenClaimModalForPolicy()}
           onRefresh={loadData}
           isLoading={isDataLoading}
-          onOpenMobileMenu={() => setIsMobileDrawerOpen(true)}
+          onOpenMobileMenu={handleMenuToggle}
           isAIOpen={isAIOpen}
           onToggleAI={() => setIsAIOpen((prev) => !prev)}
         />

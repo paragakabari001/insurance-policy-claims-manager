@@ -44,9 +44,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         {onOpenMobileMenu && (
           <button
             onClick={onOpenMobileMenu}
-            className="md:hidden p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shrink-0 cursor-pointer"
-            title="Open Menu"
-            aria-label="Open Menu"
+            className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63]"
+            title="Toggle sidebar"
+            aria-label="Toggle sidebar"
           >
             <Menu className="w-5 h-5" />
           </button>

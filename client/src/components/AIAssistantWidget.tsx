@@ -196,7 +196,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
         <aside
           role="complementary"
           aria-label="AI Policy & Claims Assistant"
-          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[410px] h-screen shrink-0 flex flex-col bg-[#f8fafc] border-l border-slate-200/90 shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
+          className="fixed inset-y-0 right-0 z-40 md:relative md:inset-auto md:z-0 w-full sm:w-[380px] xl:w-[410px] h-screen shrink-0 flex flex-col bg-gradient-to-b from-[#e8faf1] via-[#f3fdf8] to-[#dff5ea] border-l border-emerald-100 md:rounded-l-[28px] shadow-2xl md:shadow-none animate-in slide-in-from-right duration-200 overflow-hidden"
         >
           {/* Header (Figma Match: Dark Green Header with Badge and Window Controls) */}
           <div className="shrink-0 h-16 px-4 bg-[#031d16] text-white flex items-center justify-between border-b border-[#093529]">
@@ -242,7 +242,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
           </div>
 
           {/* Quick Action Cards (Shown at top like in Figma design) */}
-          <div className="p-3 bg-gradient-to-b from-[#ebfdf4] to-white border-b border-slate-200/80 shrink-0">
+          <div className="p-3 bg-gradient-to-b from-[#d6f7e6]/70 to-transparent border-b border-emerald-100/80 shrink-0">
             {/* Robot Avatar Illustration */}
             <div className="flex flex-col items-center justify-center text-center py-2">
               <div className="w-14 h-14 rounded-full bg-white shadow-md border border-emerald-100 flex items-center justify-center text-emerald-600 mb-2">
@@ -334,7 +334,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
           </div>
 
           {/* Messages Flow Area (flex-1 overflow-y-auto) */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3.5 bg-white scrollbar-thin scrollbar-thumb-slate-200">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3.5 bg-transparent scrollbar-thin scrollbar-thumb-slate-200">
             {messages.map((msg) => {
               const isUser = msg.role === 'user';
 
@@ -389,7 +389,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
 
           {/* Quick Query Pill Suggestions (Figma Match) */}
           {!isLoading && suggestedQuestions.length > 0 && (
-            <div className="px-3 py-2 bg-slate-50 border-t border-slate-200/70 flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+            <div className="px-3 py-2 bg-white/40 border-t border-emerald-100/70 flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto shrink-0">
               {suggestedQuestions.map((q) => (
                 <button
                   key={q}
@@ -404,7 +404,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
           )}
 
           {/* Chat Composer Input Form (Figma Match) */}
-          <div className="shrink-0 p-3 bg-white border-t border-slate-200">
+          <div className="shrink-0 p-3 bg-white/60 backdrop-blur-sm border-t border-emerald-100">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
