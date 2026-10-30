@@ -638,88 +638,59 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         })}
       </div>
 
-      {/* 3. Space-Efficient Executive KPI Metrics (Clean Flat Style without Bottom Wave) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
-        {/* Card 1: Total Policies */}
-        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-emerald-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+      {/* 3. KPI Metrics: stacked responsive cards (2x2 on mobile, 4 cols on wide) */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3.5">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-emerald-300 transition-all min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4 text-[#00ba63]" />
             </div>
-            <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Policies</p>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
-                  {analyticsData.totalPolicies}
-                </span>
-                <span className="text-[10px] font-bold text-slate-400">policies</span>
-              </div>
-            </div>
+            <span className="inline-flex items-center rounded-full bg-[#eafaf1] text-[#00ba63] font-bold px-2 py-0.5 text-[10px] sm:text-xs shrink-0">↑ 20%</span>
           </div>
-          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
-            ↑ 20%
-          </span>
-        </div>
-
-        {/* Card 2: Total Sum Insured */}
-        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-blue-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-              <Layers className="w-4 h-4 text-blue-600" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Sum Insured</p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
-                  {formatCurrency(analyticsData.totalSI)}
-                </span>
-              </div>
-            </div>
+          <div className="mt-2.5 min-w-0">
+            <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight truncate">Total Policies</p>
+            <p className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight mt-0.5 truncate">{analyticsData.totalPolicies}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">Across all policies</p>
           </div>
-          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 shrink-0">
-            ↑ 8%
-          </span>
         </div>
-
-        {/* Card 3: Total Coverage (Available) */}
-        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-emerald-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-blue-300 transition-all min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <div className="w-8 h-8 rounded-xl bg-[#eef4ff] flex items-center justify-center shrink-0">
+              <Layers className="w-4 h-4 text-[#2563eb]" />
+            </div>
+            <span className="inline-flex items-center rounded-full bg-[#eff6ff] text-[#2563eb] font-bold px-2 py-0.5 text-[10px] sm:text-xs shrink-0">↑ 8%</span>
+          </div>
+          <div className="mt-2.5 min-w-0">
+            <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight truncate">Total Sum Insured</p>
+            <p className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight mt-0.5 truncate">{formatCurrency(analyticsData.totalSI)}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">Total insured value</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-emerald-300 transition-all min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
             </div>
-            <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Coverage (Available)</p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="text-base sm:text-lg font-black text-[#008f4c] tracking-tight leading-tight">
-                  {formatCurrency(analyticsData.totalRemaining)}
-                </span>
-              </div>
-            </div>
+            <span className="inline-flex items-center rounded-full bg-[#eafaf1] text-[#00ba63] font-bold px-2 py-0.5 text-[10px] sm:text-xs shrink-0">{remainingPct}%</span>
           </div>
-          <span className="text-[10px] font-bold text-slate-500 shrink-0">
-            {remainingPct}% of total
-          </span>
+          <div className="mt-2.5 min-w-0">
+            <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight truncate">Available Coverage</p>
+            <p className="text-lg sm:text-2xl font-black text-[#008f4c] tracking-tight leading-tight mt-0.5 truncate">{formatCurrency(analyticsData.totalRemaining)}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">Remaining to claim</p>
+          </div>
         </div>
-
-        {/* Card 4: Total Claims */}
-        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-orange-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:border-orange-300 transition-all min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
               <Target className="w-4 h-4 text-orange-500" />
             </div>
-            <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 leading-tight truncate">Total Claims</p>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
-                  {analyticsData.totalClaims}
-                </span>
-                <span className="text-[10px] font-medium text-slate-400">claims</span>
-              </div>
-            </div>
+            <span className="inline-flex items-center rounded-full bg-orange-50 text-orange-600 font-bold px-2 py-0.5 text-[10px] sm:text-xs shrink-0">Claims</span>
           </div>
-          <span className="text-[9px] font-bold text-slate-400 shrink-0">
-            {analyticsData.approvedClaims} App &bull; {analyticsData.rejectedClaims} Rej
-          </span>
+          <div className="mt-2.5 min-w-0">
+            <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight truncate">Total Claims</p>
+            <p className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight mt-0.5 truncate">{analyticsData.totalClaims}</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">{analyticsData.approvedClaims} approved • {analyticsData.rejectedClaims} rejected</p>
+          </div>
         </div>
       </div>
 

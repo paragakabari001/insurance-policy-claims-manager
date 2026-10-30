@@ -236,139 +236,90 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
             </div>
           </div>
 
-          {/* Quick Action Top Cards (Crisp executive styling on clean white header card) */}
-          <div className="relative z-10 p-3.5 bg-white border-b border-slate-200/80 shrink-0">
-            {/* Rounded 3D-effect Avatar Card */}
-            <div className="flex flex-col items-center justify-center text-center py-1">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#011f17] via-[#022c21] to-[#011f17] text-[#00c569] shadow-md shadow-[#011f17]/15 flex items-center justify-center mb-2 transition-transform hover:scale-105">
-                <svg className="w-6 h-6 text-[#00c569]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                  <rect x="4" y="6" width="16" height="12" rx="3.5" stroke="#00c569" strokeWidth="1.75" />
-                  <circle cx="9" cy="11" r="1.5" fill="#00c569" />
-                  <circle cx="15" cy="11" r="1.5" fill="#00c569" />
-                  <path d="M10 14h4" stroke="#00c569" strokeWidth="1.5" strokeLinecap="round" />
-                  <line x1="12" y1="2" x2="12" y2="6" stroke="#00c569" strokeWidth="1.75" strokeLinecap="round" />
-                  <circle cx="12" cy="2" r="1" fill="#00c569" />
-                </svg>
-              </div>
-              <h4 className="text-xs font-black text-slate-900 tracking-tight">
-                Hello {user.role === 'Administrator' ? 'Administrator' : user.name}!
-              </h4>
-              <p className="text-[10px] text-slate-500 font-medium max-w-[280px] mt-0.5 leading-snug">
-                {user.role === 'Administrator'
-                  ? 'I am your AI Policy & Claims Assistant. Ask about portfolio statistics, coverage balances, or claim adjudications.'
-                  : 'I am your AI Policy & Claims Assistant. Ask about coverage, remaining sum insured, or claim history.'}
-              </p>
-            </div>
-
-            {/* 4 Interactive Feature Tiles */}
-            <div className="grid grid-cols-2 gap-2 mt-2.5">
-              <button
-                type="button"
-                onClick={() => handleSend('Show policy summary and total coverage')}
-                className="p-2.5 rounded-xl bg-slate-50/80 hover:bg-emerald-50/40 border border-slate-200/80 hover:border-emerald-300 text-left transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-md bg-emerald-50 text-[#008f4c] flex items-center justify-center shrink-0">
-                    <FileText className="w-3 h-3 text-[#008f4c]" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 group-hover:text-emerald-800 leading-tight">
-                    Policy Summary
-                  </span>
-                </div>
-                <p className="text-[9px] text-slate-400 mt-0.5">View portfolio stats</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSend('What is the coverage balance and remaining sum insured?')}
-                className="p-2.5 rounded-xl bg-slate-50/80 hover:bg-blue-50/40 border border-slate-200/80 hover:border-blue-300 text-left transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-3 h-3" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 group-hover:text-blue-800 leading-tight">
-                    Coverage Details
-                  </span>
-                </div>
-                <p className="text-[9px] text-slate-400 mt-0.5">Check remaining balance</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSend('Show status of all submitted claims')}
-                className="p-2.5 rounded-xl bg-slate-50/80 hover:bg-amber-50/40 border border-slate-200/80 hover:border-amber-300 text-left transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                    <Clock className="w-3 h-3" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 group-hover:text-amber-800 leading-tight">
-                    Claims Status
-                  </span>
-                </div>
-                <p className="text-[9px] text-slate-400 mt-0.5">Track & analyze claims</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSend('Provide customer-wise insights')}
-                className="p-2.5 rounded-xl bg-slate-50/80 hover:bg-purple-50/40 border border-slate-200/80 hover:border-purple-300 text-left transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                    <Users className="w-3 h-3" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 group-hover:text-purple-800 leading-tight">
-                    Customer Insights
-                  </span>
-                </div>
-                <p className="text-[9px] text-slate-400 mt-0.5">Customer analysis</p>
-              </button>
-            </div>
+          {/* Compact quick actions: single horizontally-scrollable row (saves vertical space) */}
+          <div className="relative z-10 shrink-0 px-3 py-2 bg-white border-b border-slate-200/80 flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <button
+              type="button"
+              onClick={() => handleSend('Show policy summary and total coverage')}
+              className="shrink-0 h-8 pl-1.5 pr-3 rounded-full bg-white border border-slate-200 hover:border-emerald-300 flex items-center gap-1.5 text-[11px] font-bold text-slate-700 shadow-2xs transition-all cursor-pointer"
+            >
+              <span className="w-5 h-5 rounded-full bg-emerald-50 text-[#008f4c] flex items-center justify-center"><FileText className="w-3 h-3" /></span>
+              Policy Summary
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSend('What is the coverage balance and remaining sum insured?')}
+              className="shrink-0 h-8 pl-1.5 pr-3 rounded-full bg-white border border-slate-200 hover:border-blue-300 flex items-center gap-1.5 text-[11px] font-bold text-slate-700 shadow-2xs transition-all cursor-pointer"
+            >
+              <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><ShieldCheck className="w-3 h-3" /></span>
+              Coverage
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSend('Show status of all submitted claims')}
+              className="shrink-0 h-8 pl-1.5 pr-3 rounded-full bg-white border border-slate-200 hover:border-amber-300 flex items-center gap-1.5 text-[11px] font-bold text-slate-700 shadow-2xs transition-all cursor-pointer"
+            >
+              <span className="w-5 h-5 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center"><Clock className="w-3 h-3" /></span>
+              Claims
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSend('Provide customer-wise insights')}
+              className="shrink-0 h-8 pl-1.5 pr-3 rounded-full bg-white border border-slate-200 hover:border-purple-300 flex items-center gap-1.5 text-[11px] font-bold text-slate-700 shadow-2xs transition-all cursor-pointer"
+            >
+              <span className="w-5 h-5 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center"><Users className="w-3 h-3" /></span>
+              Insights
+            </button>
           </div>
 
           {/* Messages Flow Area with Markdown Rendering */}
-          <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3 bg-[#f8fafc] scrollbar-thin scrollbar-thumb-slate-200">
+          <div className="relative z-10 flex-1 min-h-0 overflow-y-auto p-3.5 space-y-4 bg-[#f8fafc] scrollbar-thin scrollbar-thumb-slate-200">
             {messages.map((msg) => {
               const isUser = msg.role === 'user';
 
               return (
                 <div
                   key={msg.id}
-                  className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
+                  className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
                 >
-                  <div
-                    className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-xs shadow-2xs ${
-                      isUser
-                        ? 'bg-[#011f17] text-white rounded-2xl font-medium shadow-sm shadow-[#011f17]/20'
-                        : msg.isError
-                        ? 'bg-rose-50 text-rose-900 border border-rose-200 rounded-2xl'
-                        : 'bg-white text-slate-800 border border-slate-200/90 rounded-2xl shadow-2xs'
-                    }`}
-                  >
-                    {isUser ? (
-                      <p className="whitespace-pre-line leading-relaxed">{msg.content}</p>
-                    ) : (
-                      <MarkdownMessage content={msg.content} />
+                  {!isUser && (
+                    <div className="w-7 h-7 rounded-full bg-[#011f17] text-[#00c569] flex items-center justify-center shrink-0 mb-4 shadow-sm">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                  )}
+                  <div className={`flex flex-col min-w-0 max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
+                    <div
+                      className={`px-3.5 py-2.5 text-[12.5px] leading-relaxed break-words ${
+                        isUser
+                          ? 'bg-gradient-to-br from-[#022c21] to-[#011f17] text-white font-medium rounded-2xl rounded-br-md shadow-sm'
+                          : msg.isError
+                          ? 'bg-rose-50 text-rose-900 border border-rose-200 rounded-2xl rounded-bl-md'
+                          : 'bg-white text-slate-800 border border-slate-200/90 rounded-2xl rounded-bl-md shadow-2xs'
+                      }`}
+                    >
+                      {isUser ? (
+                        <p className="whitespace-pre-line">{msg.content}</p>
+                      ) : (
+                        <MarkdownMessage content={msg.content} />
+                      )}
+                    </div>
+
+                    {msg.timestamp && (
+                      <span className="text-[10px] text-slate-400 px-1 mt-1 font-medium">
+                        {msg.timestamp}
+                      </span>
+                    )}
+
+                    {msg.isError && (
+                      <button
+                        type="button"
+                        onClick={handleRetry}
+                        className="mt-1 text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <RefreshCw className="w-3 h-3" /> Retry question
+                      </button>
                     )}
                   </div>
-
-                  {msg.timestamp && (
-                    <span className="text-[9px] text-slate-400 px-1 mt-0.5 font-medium">
-                      {msg.timestamp}
-                    </span>
-                  )}
-
-                  {msg.isError && (
-                    <button
-                      type="button"
-                      onClick={handleRetry}
-                      className="mt-1 text-[11px] font-semibold text-rose-700 hover:text-rose-800 flex items-center gap-1 hover:underline cursor-pointer"
-                    >
-                      <RefreshCw className="w-3 h-3" /> Retry question
-                    </button>
-                  )}
                 </div>
               );
             })}
@@ -388,7 +339,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
 
           {/* Quick Query Pill Suggestions */}
           {!isLoading && suggestedQuestions.length > 0 && (
-            <div className="relative z-10 px-3.5 py-2 bg-white border-t border-slate-200/80 flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto shrink-0">
+            <div className="relative z-10 px-3 py-2 bg-white border-t border-slate-200/80 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
               {suggestedQuestions.map((q) => (
                 <button
                   key={q}
