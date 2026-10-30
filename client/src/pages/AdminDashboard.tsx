@@ -155,22 +155,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {activeView === 'dashboard' && (
         <div className="space-y-6">
           {/* Top 4 KPI Cards with mini wave graphs & trend tags (Figma Match) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className={`grid gap-3.5 ${isAIOpen ? 'grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4'}`}>
             {/* Card 1: Total Policies */}
-            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
-              <div className="flex items-start justify-between gap-2 z-10">
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
+              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
                     <FileText className="w-5 h-5 text-[#00ba63]" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold text-slate-500 leading-tight">Total Policies</p>
                     <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{totalPolicies}</p>
                     <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{activePolicies} Active</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full">
+                <div className="flex flex-col items-end justify-between h-full shrink-0">
                   <div className="w-6 h-6 rounded-lg bg-orange-50 border border-orange-100/80 flex items-center justify-center text-orange-400">
                     <FileText className="w-3.5 h-3.5 text-orange-400" />
                   </div>
@@ -198,22 +198,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 2: Total Sum Insured */}
-            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
-              <div className="flex items-start justify-between gap-2 z-10">
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
+            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
+              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
                     <Layers className="w-5 h-5 text-[#2563eb]" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold text-slate-500 leading-tight">Total Sum Insured</p>
-                    <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">
+                    <p className="text-base sm:text-lg xl:text-xl 2xl:text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight truncate">
                       {formatCurrency(totalSI)}
                     </p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">Across all policies</p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight truncate">Across all policies</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full">
+                <div className="flex flex-col items-end justify-between h-full shrink-0">
                   <div className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-500">
                     <Sparkles className="w-3.5 h-3.5 text-blue-500" />
                   </div>
@@ -241,22 +241,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 3: Remaining Coverage */}
-            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
-              <div className="flex items-start justify-between gap-2 z-10">
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
+            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
+              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-5 h-5 text-[#00ba63]" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold text-slate-500 leading-tight">Remaining Coverage</p>
-                    <p className="text-xl sm:text-2xl font-black text-[#008f4c] tracking-tight mt-1 leading-tight">
+                    <p className="text-base sm:text-lg xl:text-xl 2xl:text-2xl font-black text-[#008f4c] tracking-tight mt-1 leading-tight truncate">
                       {formatCurrency(remainingSI)}
                     </p>
-                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">Available to use</p>
+                    <p className="text-xs text-slate-400 font-medium mt-1 leading-tight truncate">Available to use</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full">
+                <div className="flex flex-col items-end justify-between h-full shrink-0">
                   <div className="h-6" />
                   <div className="mt-4">
                     <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] text-xs font-bold">
@@ -282,20 +282,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 4: Pending Claims */}
-            <div className="relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[155px]">
-              <div className="flex items-start justify-between gap-2 z-10">
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
+            <div className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between h-[150px]">
+              <div className="flex items-start justify-between gap-2 z-10 min-w-0">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
                     <Clock className="w-5 h-5 text-[#ea580c]" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold text-slate-500 leading-tight">Pending Claims</p>
                     <p className="text-2xl font-black text-slate-900 tracking-tight mt-1 leading-tight">{pendingClaims}</p>
                     <p className="text-xs text-slate-400 font-medium mt-1 leading-tight">{approvedClaims} approved</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end justify-between h-full">
+                <div className="flex flex-col items-end justify-between h-full shrink-0">
                   <div className="h-6" />
                   <div className="mt-4">
                     <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] text-xs font-bold">
