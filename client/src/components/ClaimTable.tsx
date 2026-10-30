@@ -35,6 +35,8 @@ import {
   Check,
   X,
   Loader2,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 
 type SortKey = 'newest' | 'oldest' | 'amount-desc' | 'amount-asc';
@@ -78,6 +80,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   isLoadingDecision,
 }) => {
   const { ref, width } = useElementWidth<HTMLDivElement>();
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'Submitted' | 'Approved' | 'Rejected'>('ALL');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [searchQuery, setSearchQuery] = useState('');
@@ -113,7 +116,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   const selectedCount = filteredClaims.filter((c) => selected[c.id]).length;
   const allSelected = filteredClaims.length > 0 && selectedCount === filteredClaims.length;
 
-  const useTable = width >= 640;
+  const useTable = viewMode === 'table' && width >= 640;
   const showCustomerColumn = isAdmin && width >= 760;
   const showReviewColumn = isAdmin && width >= 880;
 
@@ -310,6 +313,33 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
               </button>
             ))}
           </div>
+
+          <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-xl border border-slate-200/80">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              aria-pressed={viewMode === 'grid'}
+              className={`h-8 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+                viewMode === 'grid'
+                  ? 'bg-[#011f17] text-white shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" /> Cards
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              aria-pressed={viewMode === 'table'}
+              className={`h-8 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+                viewMode === 'table'
+                  ? 'bg-[#011f17] text-white shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" /> Table
+            </button>
+          </div>
         </div>
       </div>
 
@@ -332,11 +362,11 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
         </div>
       )}
 
-      {/* Stacked cards on narrow containers */}
+      {/* Cards View (Grid mode or narrow container) */}
       {filteredClaims.length > 0 && !useTable && (
-        <div className="p-4 grid grid-cols-1 gap-3">
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {filteredClaims.map((claim) => (
-            <div key={claim.id} className="rounded-2xl border border-slate-200/90 p-4 flex flex-col gap-3">
+            <div key={claim.id} className="rounded-2xl border border-slate-200/90 bg-white p-4 flex flex-col justify-between gap-3 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <span className="font-bold text-slate-900 text-sm block truncate">{claim.id}</span>

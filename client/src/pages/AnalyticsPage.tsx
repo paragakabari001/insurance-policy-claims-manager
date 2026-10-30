@@ -33,6 +33,8 @@ import {
   Users,
   BarChart3,
   SlidersHorizontal,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 
 export interface AnalyticsPageProps {
@@ -167,6 +169,8 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   const [datePreset, setDatePreset] = useState<string>('FY 2026 (Full Year)');
   const [activeTab, setActiveTab] = useState<TabType>('Overview');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [summaryViewMode, setSummaryViewMode] = useState<'table' | 'cards'>('table');
+  const [claimsAnalysisViewMode, setClaimsAnalysisViewMode] = useState<'table' | 'cards'>('table');
 
   // Column visibility controls for table
   const [visibleColumns, setVisibleColumns] = useState({
@@ -957,71 +961,179 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             </h3>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Live Search Input */}
-            <div className="relative w-52 sm:w-60">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative w-48 sm:w-56">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={isAdmin ? 'Search customers...' : 'Search policies...'}
-                className="w-full pl-8 pr-3 py-1 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00ba63] focus:bg-white transition-all"
+                className="w-full h-8 pl-8 pr-3 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00ba63] focus:bg-white transition-all"
               />
             </div>
 
             {/* Column Toggling Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="h-7.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-                >
-                  <Columns3 className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Columns</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 p-1.5">
-                <DropdownMenuLabel>Visible Columns</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.sumInsured}
-                  onCheckedChange={(checked) =>
-                    setVisibleColumns((prev) => ({ ...prev, sumInsured: !!checked }))
-                  }
-                >
-                  Sum Insured
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.usedReserved}
-                  onCheckedChange={(checked) =>
-                    setVisibleColumns((prev) => ({ ...prev, usedReserved: !!checked }))
-                  }
-                >
-                  Used / Reserved
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.remainingCoverage}
-                  onCheckedChange={(checked) =>
-                    setVisibleColumns((prev) => ({ ...prev, remainingCoverage: !!checked }))
-                  }
-                >
-                  Remaining Coverage
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.totalClaims}
-                  onCheckedChange={(checked) =>
-                    setVisibleColumns((prev) => ({ ...prev, totalClaims: !!checked }))
-                  }
-                >
-                  Total Claims
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {summaryViewMode === 'table' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="h-8 px-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                  >
+                    <Columns3 className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Columns</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 p-1.5">
+                  <DropdownMenuLabel>Visible Columns</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.sumInsured}
+                    onCheckedChange={(checked) =>
+                      setVisibleColumns((prev) => ({ ...prev, sumInsured: !!checked }))
+                    }
+                  >
+                    Sum Insured
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.usedReserved}
+                    onCheckedChange={(checked) =>
+                      setVisibleColumns((prev) => ({ ...prev, usedReserved: !!checked }))
+                    }
+                  >
+                    Used / Reserved
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.remainingCoverage}
+                    onCheckedChange={(checked) =>
+                      setVisibleColumns((prev) => ({ ...prev, remainingCoverage: !!checked }))
+                    }
+                  >
+                    Remaining Coverage
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.totalClaims}
+                    onCheckedChange={(checked) =>
+                      setVisibleColumns((prev) => ({ ...prev, totalClaims: !!checked }))
+                    }
+                  >
+                    Total Claims
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Cards vs Table View Toggle */}
+            <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-xl border border-slate-200/80">
+              <button
+                type="button"
+                onClick={() => setSummaryViewMode('cards')}
+                aria-pressed={summaryViewMode === 'cards'}
+                className={`h-7 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+                  summaryViewMode === 'cards'
+                    ? 'bg-[#011f17] text-white shadow-2xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" /> Cards
+              </button>
+              <button
+                type="button"
+                onClick={() => setSummaryViewMode('table')}
+                aria-pressed={summaryViewMode === 'table'}
+                className={`h-7 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+                  summaryViewMode === 'table'
+                    ? 'bg-[#011f17] text-white shadow-2xs font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <List className="w-3.5 h-3.5" /> Table
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Scrollable Customer Table with Rounded Corners */}
+        {/* View Mode: Cards */}
+        {summaryViewMode === 'cards' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+            {filteredCustomers.map((row) => (
+              <div
+                key={row.id}
+                className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all flex flex-col justify-between gap-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-9 h-9 rounded-xl bg-emerald-50 text-[#008f4c] font-black text-xs flex items-center justify-center shrink-0">
+                      {row.id}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-black text-slate-900 text-xs truncate">{row.name}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        {row.totalPolicies} {row.totalPolicies === 1 ? 'Policy' : 'Policies'} &bull; {row.totalClaims} {row.totalClaims === 1 ? 'Claim' : 'Claims'}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="Actions"
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40 p-1.5 text-xs">
+                      <DropdownMenuItem
+                        onClick={() => onOpenPolicies?.(row.name)}
+                        className="cursor-pointer"
+                      >
+                        View Policies
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onOpenClaims?.(row.name)}
+                        className="cursor-pointer"
+                      >
+                        View Claims
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100">
+                  <div className="bg-slate-50/80 rounded-xl p-2.5">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Sum Insured</p>
+                    <p className="font-black text-slate-900 text-xs mt-0.5">{formatCurrency(row.sumInsured)}</p>
+                  </div>
+                  <div className="bg-emerald-50/60 rounded-xl p-2.5">
+                    <p className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">Remaining</p>
+                    <p className="font-black text-[#008f4c] text-xs mt-0.5">{formatCurrency(row.remainingCoverage)}</p>
+                  </div>
+                  <div className="bg-slate-50/80 rounded-xl p-2.5">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Used / Reserved</p>
+                    <p className="font-bold text-slate-800 text-xs mt-0.5">{formatCurrency(row.usedReserved)}</p>
+                  </div>
+                  <div className="bg-slate-50/80 rounded-xl p-2.5">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Claims Outcome</p>
+                    <p className="font-bold text-xs mt-0.5 text-slate-800">
+                      <span className="text-[#008f4c]">{row.approvedClaims} App</span>
+                      {row.rejectedClaims > 0 && <span className="text-rose-500 ml-1">&bull; {row.rejectedClaims} Rej</span>}
+                      {row.pendingClaims > 0 && <span className="text-amber-500 ml-1">&bull; {row.pendingClaims} Pend</span>}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {filteredCustomers.length === 0 && (
+              <div className="col-span-full py-8 text-center text-xs text-slate-400">
+                No customers found matching &quot;{searchQuery}&quot;
+              </div>
+            )}
+          </div>
+        ) : (
+        /* Scrollable Customer Table with Rounded Corners */
         <div className="overflow-x-auto rounded-xl border border-slate-200/80">
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-50/90 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
@@ -1187,6 +1299,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             )}
           </table>
         </div>
+        )}
       </div>
 )}
       {/* Coverage tab: coverage by policy */}
@@ -1227,12 +1340,83 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <h3 className="text-xs font-bold text-slate-900">Claims Breakdown</h3>
-            <div className="flex gap-3 text-[11px] font-semibold text-slate-500">
-              <span>Approved {formatCurrency(claimAmounts.Approved)}</span>
-              <span>Pending {formatCurrency(claimAmounts.Submitted)}</span>
-              <span>Rejected {formatCurrency(claimAmounts.Rejected)}</span>
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex gap-3 text-[11px] font-semibold text-slate-500">
+                <span>Approved {formatCurrency(claimAmounts.Approved)}</span>
+                <span>Pending {formatCurrency(claimAmounts.Submitted)}</span>
+                <span>Rejected {formatCurrency(claimAmounts.Rejected)}</span>
+              </div>
+              <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-xl border border-slate-200/80">
+                <button
+                  type="button"
+                  onClick={() => setClaimsAnalysisViewMode('cards')}
+                  aria-pressed={claimsAnalysisViewMode === 'cards'}
+                  className={`h-7 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+                    claimsAnalysisViewMode === 'cards'
+                      ? 'bg-[#011f17] text-white shadow-2xs font-bold'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" /> Cards
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClaimsAnalysisViewMode('table')}
+                  aria-pressed={claimsAnalysisViewMode === 'table'}
+                  className={`h-7 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+                    claimsAnalysisViewMode === 'table'
+                      ? 'bg-[#011f17] text-white shadow-2xs font-bold'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <List className="w-3.5 h-3.5" /> Table
+                </button>
+              </div>
             </div>
           </div>
+
+          {claimsAnalysisViewMode === 'cards' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {claims.map((c) => (
+                <div
+                  key={c.id}
+                  className="bg-white rounded-xl border border-slate-200/80 p-3.5 shadow-2xs hover:border-emerald-300 hover:shadow-xs transition-all flex flex-col justify-between gap-2.5"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-slate-900 text-xs">{c.id}</p>
+                      <p className="text-[10px] text-slate-500 font-medium">Policy: {c.policyId}</p>
+                    </div>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        c.status === 'Approved'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : c.status === 'Rejected'
+                          ? 'bg-rose-50 text-rose-600'
+                          : 'bg-amber-50 text-amber-600'
+                      }`}
+                    >
+                      {c.status === 'Submitted' ? 'Pending' : c.status}
+                    </span>
+                  </div>
+                  {isAdmin && c.customer?.name && (
+                    <p className="text-[11px] text-slate-600 font-semibold">{c.customer.name}</p>
+                  )}
+                  <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-100">
+                    <span className="text-slate-500 text-[10px] flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-slate-400" /> {c.incidentDate}
+                    </span>
+                    <span className="font-extrabold text-slate-900">{formatCurrency(c.amount)}</span>
+                  </div>
+                </div>
+              ))}
+              {claims.length === 0 && (
+                <div className="col-span-full py-8 text-center text-xs text-slate-400">
+                  No claims yet.
+                </div>
+              )}
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
@@ -1276,6 +1460,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               </tbody>
             </table>
           </div>
+          )}
         </div>
       )}
     </div>
