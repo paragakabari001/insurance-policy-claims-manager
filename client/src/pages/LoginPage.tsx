@@ -247,26 +247,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNotify }
           </div>
         </div>
 
-        {/* Bottom Hero Stats Ribbon */}
+        {/* Bottom Enterprise Compliance & Copyright Footer */}
         <div className="relative z-10 pt-6 border-t border-emerald-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="grid grid-cols-3 gap-6">
-            <div>
-              <p className="text-xl sm:text-2xl font-black text-white tracking-tight">3+</p>
-              <p className="text-[11px] text-slate-400 font-medium mt-0.5">Active Customers</p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#00c569] shadow-[0_0_8px_#00c569]" />
+              <p className="text-xs sm:text-sm font-bold text-white tracking-tight">
+                &copy; 2026 TailVaR Technologies &amp; Consulting Inc.
+              </p>
             </div>
-            <div>
-              <p className="text-xl sm:text-2xl font-black text-white tracking-tight">12+</p>
-              <p className="text-[11px] text-slate-400 font-medium mt-0.5">Policies Managed</p>
-            </div>
-            <div>
-              <p className="text-xl sm:text-2xl font-black text-white tracking-tight">7+</p>
-              <p className="text-[11px] text-slate-400 font-medium mt-0.5">Claims Processed</p>
-            </div>
+            <p className="text-[11px] text-slate-400 font-medium">
+              Enterprise Policy &amp; Claims Management Platform &bull; v1.2.0
+            </p>
           </div>
 
-          <p className="text-[10px] text-slate-500 font-medium">
-            TailVaR Consulting &bull; Insurance Management System
-          </p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400/90 bg-[#022c21]/90 border border-emerald-500/30 px-3 py-1.5 rounded-full shadow-2xs">
+              <Shield className="w-3 h-3 text-[#00c569]" />
+              <span>SOC-2 Type II Certified</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400/90 bg-[#022c21]/90 border border-emerald-500/30 px-3 py-1.5 rounded-full shadow-2xs">
+              <Lock className="w-3 h-3 text-[#00c569]" />
+              <span>256-Bit TLS End-to-End</span>
+            </div>
+          </div>
         </div>
       </div>
 

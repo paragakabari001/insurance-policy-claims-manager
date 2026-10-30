@@ -27,6 +27,7 @@ import {
   BarChart3,
   ChevronDown,
   Check,
+  ArrowRight,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -76,6 +77,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     'H2 2026 (Jul – Dec)',
   ];
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   const adminUser = user || {
     id: 'admin',
     username: 'admin',
@@ -87,17 +95,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     <div className="space-y-6 w-full">
       {/* View: DASHBOARD (Overview - Header only shown when on dashboard view to prevent double headers) */}
       {activeView === 'dashboard' && (
-        <div className="space-y-6">
-          {/* Page Title & Action Bar (Figma Match) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-4 sm:space-y-6">
+          {/* Page Title & Action Bar (Mobile Responsive Greeting & Controls) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Dashboard</h1>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+                <span>{getGreeting()}, Administrator</span>
+                <span className="inline-block origin-bottom-right hover:rotate-12 transition-transform">👋</span>
+              </h1>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Overview & Portfolio Analytics
+                Here's your overview for policies, claims and coverage.
               </p>
             </div>
 
-            <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
               {/* Date Range Filter Button (Interactive Dropdown) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -126,77 +137,88 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Primary Action Button: Create Policy */}
-              {onOpenCreatePolicy && (
-                <button
-                  onClick={onOpenCreatePolicy}
-                  className="h-9 px-4 rounded-xl bg-[#031d16] hover:bg-[#072d22] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#031d16]/20 transition-all cursor-pointer"
-                >
-                  <Plus className="w-4 h-4 text-[#00c569]" />
-                  <span>Create Policy</span>
-                </button>
-              )}
+              {/* Desktop-only Action Buttons */}
+              <div className="hidden sm:flex items-center gap-2">
+                {onOpenCreatePolicy && (
+                  <button
+                    onClick={onOpenCreatePolicy}
+                    className="h-9 px-4 rounded-xl bg-[#031d16] hover:bg-[#072d22] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#031d16]/20 transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 text-[#00c569]" />
+                    <span>Create Policy</span>
+                  </button>
+                )}
 
-              {/* AI Assistant Toggle Button (Figma Match) */}
-              {onToggleAI && (
-                <button
-                  onClick={onToggleAI}
-                  className={`h-9 px-3.5 rounded-xl border text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer ${
-                    isAIOpen
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
-                      : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#00c569]" />
-                  <span>AI Assistant</span>
-                </button>
-              )}
+                {onToggleAI && (
+                  <button
+                    onClick={onToggleAI}
+                    className={`h-9 px-3.5 rounded-xl border text-xs font-bold flex items-center gap-2 shadow-2xs transition-all cursor-pointer ${
+                      isAIOpen
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
+                        : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#00c569]" />
+                    <span>AI Assistant</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-                    {/* Top 4 KPI Cards with mini wave graphs & trend tags (Responsive 3-Grid Mobile + Compact Chat Mode) */}
-          <div className={`grid gap-2 sm:gap-3.5 ${isAIOpen ? 'grid-cols-3 sm:grid-cols-2 2xl:grid-cols-4' : 'grid-cols-3 sm:grid-cols-2 lg:grid-cols-4'}`}>
-            {/* Card 1: Total Policies */}
-            <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
-              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
-            }`}>
-              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
-                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
-                  <div className={`rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0 ${
-                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
-                  }`}>
-                    <FileText className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00ba63]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#00ba63]'} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
-                      Total Policies
-                    </p>
-                    <p className={`font-black text-slate-900 tracking-tight leading-tight truncate mt-0.5 ${
-                      isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
-                    }`}>
-                      {totalPolicies}
-                    </p>
-                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
-                      {activePolicies} active
-                    </p>
-                  </div>
-                </div>
 
-                <div className="hidden xs:flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="w-5 h-5 rounded-md bg-orange-50 border border-orange-100/80 flex items-center justify-center text-orange-400">
-                    <FileText className="w-3.5 h-3.5 text-orange-400" />
-                  </div>
-                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
-                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] font-bold ${
-                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
-                    }`}>
-                      <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" /> +12%
-                    </span>
-                  </div>
+          {/* Mobile Action Buttons: 2 Equal Columns Matching Mobile Design Reference */}
+          <div className="grid grid-cols-2 gap-2.5 sm:hidden">
+            {onOpenCreatePolicy && (
+              <button
+                onClick={onOpenCreatePolicy}
+                className="h-11 px-3 rounded-2xl bg-[#031d16] active:bg-[#072d22] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-[#031d16]/25 transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-[#00c569]" />
+                <span>Create Policy</span>
+              </button>
+            )}
+
+            {onToggleAI && (
+              <button
+                onClick={onToggleAI}
+                className="h-11 px-3.5 rounded-2xl bg-[#eaf8f1] border border-emerald-200/80 active:bg-[#d8f3e5] text-[#022c21] text-xs font-bold flex items-center justify-between shadow-2xs transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#00ba63]" />
+                  <span>AI Assistant</span>
                 </div>
+                <ArrowRight className="w-3.5 h-3.5 text-[#00ba63]" />
+              </button>
+            )}
+          </div>
+
+          {/* Top 4 KPI Cards: 2x2 Grid on Mobile, 4-Cols on Desktop Matching Mobile Reference */}
+          <div className={`grid grid-cols-2 gap-2.5 sm:gap-3.5 ${isAIOpen ? 'lg:grid-cols-2 2xl:grid-cols-4' : 'lg:grid-cols-4'}`}>
+            {/* Card 1: Total Policies */}
+            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
+              <div className="flex items-center justify-between gap-1 z-10">
+                <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-[#00ba63]" />
+                </div>
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] font-bold px-2 py-0.5 text-[10px] sm:text-xs">
+                  <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" /> +12%
+                </span>
+              </div>
+
+              <div className="z-10 mt-1">
+                <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
+                  Total Policies
+                </p>
+                <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight mt-0.5">
+                  {totalPolicies}
+                </p>
+                <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">
+                  {activePolicies} active &bull; {expiredPolicies} expired
+                </p>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
+              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-green-1" x1="0" y1="0" x2="0" y2="1">
@@ -211,50 +233,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 2: Total Sum Insured */}
-            <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
-              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
-            }`}>
-              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
-                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
-                  <div className={`rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0 ${
-                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
-                  }`}>
-                    <Layers className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#2563eb]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#2563eb]'} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
-                      Total Sum Insured
-                    </p>
-                    <p
-                      title={formatCurrency(totalSI)}
-                      className={`font-black text-slate-900 tracking-tight leading-tight truncate mt-0.5 cursor-help ${
-                        isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
-                      }`}
-                    >
-                      {formatCompactCurrency(totalSI)}
-                    </p>
-                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
-                      Across all policies
-                    </p>
-                  </div>
+            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
+              <div className="flex items-center justify-between gap-1 z-10">
+                <div className="w-8 h-8 rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
+                  <Layers className="w-4 h-4 text-[#2563eb]" />
                 </div>
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#eff6ff] text-[#2563eb] font-bold px-2 py-0.5 text-[10px] sm:text-xs">
+                  <TrendingUp className="w-2.5 h-2.5 text-[#2563eb]" /> +8%
+                </span>
+              </div>
 
-                <div className="hidden xs:flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="w-5 h-5 rounded-md bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-500">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-                  </div>
-                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
-                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#eff6ff] text-[#2563eb] font-bold ${
-                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
-                    }`}>
-                      <TrendingUp className="w-2.5 h-2.5 text-[#2563eb]" /> +8%
-                    </span>
-                  </div>
-                </div>
+              <div className="z-10 mt-1">
+                <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
+                  Total Sum Insured
+                </p>
+                <p
+                  title={formatCurrency(totalSI)}
+                  className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight mt-0.5 cursor-help truncate"
+                >
+                  {formatCompactCurrency(totalSI)}
+                </p>
+                <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">
+                  Across all policies
+                </p>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
+              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-blue-1" x1="0" y1="0" x2="0" y2="1">
@@ -269,48 +274,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Card 3: Remaining Coverage */}
-            <div className={`col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
-              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
-            }`}>
-              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
-                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
-                  <div className={`rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0 ${
-                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
-                  }`}>
-                    <ShieldCheck className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00ba63]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#00ba63]'} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
-                      Remaining Coverage
-                    </p>
-                    <p
-                      title={formatCurrency(remainingSI)}
-                      className={`font-black text-[#008f4c] tracking-tight leading-tight truncate mt-0.5 cursor-help ${
-                        isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
-                      }`}
-                    >
-                      {formatCompactCurrency(remainingSI)}
-                    </p>
-                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
-                      Available to use
-                    </p>
-                  </div>
+            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
+              <div className="flex items-center justify-between gap-1 z-10">
+                <div className="w-8 h-8 rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
                 </div>
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] font-bold px-2 py-0.5 text-[10px] sm:text-xs">
+                  <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" /> +15%
+                </span>
+              </div>
 
-                <div className="hidden xs:flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="w-5 h-5" />
-                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
-                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#eafaf1] text-[#00ba63] font-bold ${
-                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
-                    }`}>
-                      <TrendingUp className="w-2.5 h-2.5 text-[#00ba63]" /> +18%
-                    </span>
-                  </div>
-                </div>
+              <div className="z-10 mt-1">
+                <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
+                  Remaining Coverage
+                </p>
+                <p
+                  title={formatCurrency(remainingSI)}
+                  className="text-xl sm:text-2xl font-black text-[#008f4c] tracking-tight leading-tight mt-0.5 cursor-help truncate"
+                >
+                  {formatCompactCurrency(remainingSI)}
+                </p>
+                <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">
+                  Available to use
+                </p>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
+              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-green-rem-1" x1="0" y1="0" x2="0" y2="1">
@@ -324,46 +314,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
 
-            {/* Card 4: Pending Claims (Spans across all 3 columns on mobile for a balanced grid) */}
-            <div className={`col-span-3 sm:col-span-1 relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between transition-all ${
-              isAIOpen ? 'p-2 sm:p-2.5 h-[108px] sm:h-[114px]' : 'p-2.5 sm:p-3.5 h-[120px] sm:h-[138px]'
-            }`}>
-              <div className="flex items-start justify-between gap-1 z-10 min-w-0">
-                <div className="flex items-start gap-1.5 sm:gap-2.5 min-w-0 flex-1">
-                  <div className={`rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0 ${
-                    isAIOpen ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-7 h-7 sm:w-9 sm:h-9'
-                  }`}>
-                    <Clock className={isAIOpen ? 'w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#ea580c]' : 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-[#ea580c]'} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className={`font-semibold text-slate-500 leading-tight truncate ${isAIOpen ? 'text-[10px] sm:text-[11px]' : 'text-[11px] sm:text-xs'}`}>
-                      Pending Claims
-                    </p>
-                    <p className={`font-black text-slate-900 tracking-tight leading-tight truncate mt-0.5 ${
-                      isAIOpen ? 'text-base sm:text-lg' : 'text-lg sm:text-2xl'
-                    }`}>
-                      {pendingClaims}
-                    </p>
-                    <p className={`text-slate-400 font-medium leading-tight truncate mt-0.5 ${isAIOpen ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'}`}>
-                      {approvedClaims} approved
-                    </p>
-                  </div>
+            {/* Card 4: Pending Claims */}
+            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
+              <div className="flex items-center justify-between gap-1 z-10">
+                <div className="w-8 h-8 rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4 text-[#ea580c]" />
                 </div>
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] font-bold px-2 py-0.5 text-[10px] sm:text-xs">
+                  <TrendingDown className="w-2.5 h-2.5 text-[#ea580c]" /> -100%
+                </span>
+              </div>
 
-                <div className="flex flex-col items-end justify-between h-full shrink-0">
-                  <div className="hidden xs:flex w-5 h-5" />
-                  <div className={isAIOpen ? 'mt-0.5' : 'mt-1.5'}>
-                    <span className={`inline-flex items-center gap-0.5 rounded-full bg-[#fff7ed] text-[#ea580c] font-bold ${
-                      isAIOpen ? 'px-1.5 py-0.2 text-[9px]' : 'px-2 py-0.5 text-xs'
-                    }`}>
-                      <TrendingDown className="w-2.5 h-2.5 text-[#ea580c]" /> -100%
-                    </span>
-                  </div>
-                </div>
+              <div className="z-10 mt-1">
+                <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
+                  Pending Claims
+                </p>
+                <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight mt-0.5">
+                  {pendingClaims}
+                </p>
+                <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">
+                  {approvedClaims} approved
+                </p>
               </div>
 
               {/* Glowing Wave SVG */}
-              <div className={`absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden ${isAIOpen ? 'h-6 sm:h-7' : 'h-8 sm:h-10'}`}>
+              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
                 <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="wave-orange-1" x1="0" y1="0" x2="0" y2="1">

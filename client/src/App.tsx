@@ -324,7 +324,7 @@ export function App() {
           onLogout={handleLogout}
         />
 
-        <main className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-24 md:pb-6 bg-[#f8fafc]">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 md:px-8 py-5 sm:py-6 w-full pb-28 md:pb-6 bg-[#f8fafc]">
           {user.role === 'Administrator' ? (
             <AdminDashboard
               user={user}
@@ -347,6 +347,7 @@ export function App() {
               activeView={activeView}
               onOpenSubmitClaim={handleOpenClaimModalForPolicy}
               isAIOpen={isAIOpen}
+              onToggleAI={() => setIsAIOpen((prev) => !prev)}
             />
           )}
         </main>
