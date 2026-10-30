@@ -152,12 +152,15 @@ const SvgDonutChart: React.FC<{
 };
 
 export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
+  user,
   policies = [],
   claims = [],
   customers = [],
   onOpenPolicies,
   onOpenClaims,
 }) => {
+  const isAdmin = user?.role === 'Administrator';
+
   // Preset selector: matches the user's reference screenshot default 'H2 2026 (Jul - Dec)'
   const [datePreset, setDatePreset] = useState<string>('H2 2026 (Jul - Dec)');
   const [activeTab, setActiveTab] = useState<TabType>('Overview');
@@ -181,53 +184,69 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   // Filter state for modal/dropdown
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Upcoming' | 'Expired'>('All');
 
-  // Compute live data with fallback to reference demo figures if DB is minimal
+  // Compute live data with strict isolation:
+  // Customers ONLY see their own data; Administrator sees full portfolio
   const analyticsData = useMemo(() => {
-    // Reference dataset exactly matching user's design image
-    const referenceCustomers: CustomerSummaryRow[] = [
-      {
-        id: 'C1',
-        name: 'Customer 1',
-        totalPolicies: 6,
-        sumInsured: 1500000,
-        usedReserved: 250000,
-        remainingCoverage: 1250000,
-        totalClaims: 3,
-        approvedClaims: 2,
-        rejectedClaims: 1,
-        pendingClaims: 0,
-      },
-      {
-        id: 'C2',
-        name: 'Customer 2',
-        totalPolicies: 4,
-        sumInsured: 1000000,
-        usedReserved: 200000,
-        remainingCoverage: 800000,
-        totalClaims: 3,
-        approvedClaims: 3,
-        rejectedClaims: 0,
-        pendingClaims: 0,
-      },
-      {
-        id: 'C3',
-        name: 'Customer 3',
-        totalPolicies: 2,
-        sumInsured: 800000,
-        usedReserved: 130000,
-        remainingCoverage: 670000,
-        totalClaims: 1,
-        approvedClaims: 1,
-        rejectedClaims: 0,
-        pendingClaims: 0,
-      },
-    ];
+    // 1. Customer Mode: Strictly calculate only for the logged-in customer's policies & claims
+    if (!isAdmin) {
+      const totalPolicies = policies.length;
+      const totalSI = policies.reduce((a, p) => a + p.sumInsured, 0);
+      const totalRemaining = policies.reduce((a, p) => a + p.remainingClaimableSI, 0);
+      const totalUsed = totalSI - totalRemaining;
+      const totalClaims = claims.length;
+      const approvedClaims = claims.filter((c) => c.status === 'Approved').length;
+      const rejectedClaims = claims.filter((c) => c.status === 'Rejected').length;
+      const pendingClaims = claims.filter((c) => c.status === 'Submitted').length;
 
-    // If live policies exist and date preset is not fixed to the reference benchmark, compute dynamically
-    const isLiveMode = datePreset === 'Live Database Data';
+      const activePol = policies.filter((p) => p.coverageStatus === 'Active').length;
+      const upcomingPol = policies.filter((p) => p.coverageStatus === 'Upcoming').length;
+      const expiredPol = policies.filter((p) => p.coverageStatus === 'Expired').length;
 
-    if (isLiveMode && policies.length > 0) {
-      // Dynamic live calculation from props
+      // Each row represents one of the customer's own policies
+      const customerRows: CustomerSummaryRow[] = policies.map((p) => {
+        const pClaims = claims.filter((c) => c.policyId === p.id);
+        const approved = pClaims.filter((c) => c.status === 'Approved').length;
+        const rejected = pClaims.filter((c) => c.status === 'Rejected').length;
+        const pending = pClaims.filter((c) => c.status === 'Submitted').length;
+        return {
+          id: p.id,
+          name: p.coverageStatus || 'Active',
+          totalPolicies: 1,
+          sumInsured: p.sumInsured,
+          usedReserved: p.sumInsured - p.remainingClaimableSI,
+          remainingCoverage: p.remainingClaimableSI,
+          totalClaims: pClaims.length,
+          approvedClaims: approved,
+          rejectedClaims: rejected,
+          pendingClaims: pending,
+        };
+      });
+
+      // Bar distribution across the customer's policies (in ₹ Lakhs)
+      const barDistribution = policies.map((p) => ({
+        name: p.id,
+        value: Math.max(1, Math.round(p.sumInsured / 100000)),
+      }));
+
+      return {
+        customerRows,
+        totalPolicies,
+        totalSI,
+        totalRemaining,
+        totalUsed,
+        totalClaims,
+        approvedClaims,
+        rejectedClaims,
+        pendingClaims,
+        activePol,
+        upcomingPol,
+        expiredPol,
+        barDistribution,
+      };
+    }
+
+    // 2. Administrator Mode: If real DB data exists, calculate dynamically across all customers
+    if (policies.length > 0) {
       const custMap = new Map<string, CustomerSummaryRow>();
 
       // Initialize all customers
@@ -316,7 +335,46 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
       };
     }
 
-    // Default reference dataset from the exact image
+    // 3. Fallback benchmark figures if Admin has fresh unseeded database
+    const referenceCustomers: CustomerSummaryRow[] = [
+      {
+        id: 'C1',
+        name: 'Customer 1',
+        totalPolicies: 6,
+        sumInsured: 1500000,
+        usedReserved: 250000,
+        remainingCoverage: 1250000,
+        totalClaims: 3,
+        approvedClaims: 2,
+        rejectedClaims: 1,
+        pendingClaims: 0,
+      },
+      {
+        id: 'C2',
+        name: 'Customer 2',
+        totalPolicies: 4,
+        sumInsured: 1000000,
+        usedReserved: 200000,
+        remainingCoverage: 800000,
+        totalClaims: 3,
+        approvedClaims: 3,
+        rejectedClaims: 0,
+        pendingClaims: 0,
+      },
+      {
+        id: 'C3',
+        name: 'Customer 3',
+        totalPolicies: 2,
+        sumInsured: 800000,
+        usedReserved: 130000,
+        remainingCoverage: 670000,
+        totalClaims: 1,
+        approvedClaims: 1,
+        rejectedClaims: 0,
+        pendingClaims: 0,
+      },
+    ];
+
     const customerRows = referenceCustomers;
     const totalPolicies = 12;
     const totalSI = 3300000;
@@ -352,7 +410,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
       expiredPol,
       barDistribution,
     };
-  }, [policies, claims, customers, datePreset]);
+  }, [policies, claims, customers, datePreset, isAdmin]);
 
   // Percentage calculations
   const remainingPct =
@@ -472,7 +530,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const tabs: TabType[] = ['Overview', 'Customer Wise', 'Trends', 'Coverage', 'Claims Analysis'];
+  const tabs: TabType[] = isAdmin
+    ? ['Overview', 'Customer Wise', 'Trends', 'Coverage', 'Claims Analysis']
+    : ['Overview', 'Trends', 'Coverage', 'Claims Analysis'];
 
   return (
     <div className="space-y-5 w-full pb-10">
@@ -481,7 +541,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Analytics</h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Complete overview of policies, coverage and claims
+            {isAdmin
+              ? 'Complete overview of policies, coverage and claims across all customers'
+              : 'Personal overview of your coverage, policies and claims history'}
           </p>
         </div>
 
@@ -576,11 +638,11 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
         })}
       </div>
 
-      {/* 3. Space-Efficient Executive KPI Metrics (Compact Height: ~62px, 0 wasted vertical space) */}
+      {/* 3. Space-Efficient Executive KPI Metrics (Clean Flat Style without Bottom Wave) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {/* Card 1: Total Policies */}
-        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-emerald-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0 z-10">
+        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-emerald-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4 text-[#00ba63]" />
             </div>
@@ -594,18 +656,14 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               </div>
             </div>
           </div>
-          <span className="z-10 inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
+          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
             ↑ 20%
           </span>
-          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
-            <path d="M0,20 Q25,8 50,16 T100,6 L100,25 L0,25 Z" fill="rgba(0, 186, 99, 0.15)" />
-            <path d="M0,20 Q25,8 50,16 T100,6" fill="none" stroke="#00ba63" strokeWidth="1.5" />
-          </svg>
         </div>
 
         {/* Card 2: Total Sum Insured */}
-        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-blue-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0 z-10">
+        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-blue-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <Layers className="w-4 h-4 text-blue-600" />
             </div>
@@ -618,15 +676,14 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               </div>
             </div>
           </div>
-          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
-            <path d="M0,22 Q30,12 60,18 T100,8 L100,25 L0,25 Z" fill="rgba(37, 99, 235, 0.15)" />
-            <path d="M0,22 Q30,12 60,18 T100,8" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
-          </svg>
+          <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 shrink-0">
+            ↑ 8%
+          </span>
         </div>
 
         {/* Card 3: Total Coverage (Available) */}
-        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-emerald-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0 z-10">
+        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-emerald-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
             </div>
@@ -639,18 +696,14 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               </div>
             </div>
           </div>
-          <span className="z-10 text-[10px] font-bold text-slate-500 shrink-0">
+          <span className="text-[10px] font-bold text-slate-500 shrink-0">
             {remainingPct}% of total
           </span>
-          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
-            <path d="M0,20 Q20,10 50,15 T100,5 L100,25 L0,25 Z" fill="rgba(0, 186, 99, 0.15)" />
-            <path d="M0,20 Q20,10 50,15 T100,5" fill="none" stroke="#00ba63" strokeWidth="1.5" />
-          </svg>
         </div>
 
         {/* Card 4: Total Claims */}
-        <div className="relative bg-white rounded-xl border border-slate-200/80 px-3.5 py-2.5 shadow-2xs overflow-hidden flex items-center justify-between group hover:border-orange-300 transition-all">
-          <div className="flex items-center gap-2.5 min-w-0 z-10">
+        <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 py-3 shadow-2xs flex items-center justify-between group hover:border-orange-300 transition-all">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
               <Target className="w-4 h-4 text-orange-500" />
             </div>
@@ -664,13 +717,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
               </div>
             </div>
           </div>
-          <span className="z-10 text-[9px] font-bold text-slate-400 shrink-0">
+          <span className="text-[9px] font-bold text-slate-400 shrink-0">
             {analyticsData.approvedClaims} App &bull; {analyticsData.rejectedClaims} Rej
           </span>
-          <svg className="absolute bottom-0 right-0 w-24 h-6 pointer-events-none opacity-40" viewBox="0 0 100 25" preserveAspectRatio="none">
-            <path d="M0,22 Q30,14 65,18 T100,10 L100,25 L0,25 Z" fill="rgba(249, 115, 22, 0.15)" />
-            <path d="M0,22 Q30,14 65,18 T100,10" fill="none" stroke="#f97316" strokeWidth="1.5" />
-          </svg>
         </div>
       </div>
 
@@ -801,7 +850,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <div className="w-5 h-5 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
               <Users className="w-3 h-3 text-[#00ba63]" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">Customer Wise Distribution</h3>
+            <h3 className="text-xs font-bold text-slate-900">
+              {isAdmin ? 'Customer Wise Distribution' : 'Policy Coverage Distribution'}
+            </h3>
           </div>
 
           <div className="relative pt-2 pb-1 flex-1 flex flex-col justify-end">
@@ -938,7 +989,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             <div className="w-6 h-6 rounded-md bg-[#e6f9f0] flex items-center justify-center text-[#00ba63]">
               <Users className="w-3.5 h-3.5 text-[#00ba63]" />
             </div>
-            <h3 className="text-xs font-bold text-slate-900">Customer Wise Summary</h3>
+            <h3 className="text-xs font-bold text-slate-900">
+              {isAdmin ? 'Customer Wise Summary' : 'My Policies Coverage Summary'}
+            </h3>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -949,7 +1002,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search customers..."
+                placeholder={isAdmin ? 'Search customers...' : 'Search policies...'}
                 className="w-full pl-8 pr-3 py-1 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#00ba63] focus:bg-white transition-all"
               />
             </div>
@@ -1010,8 +1063,12 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-50/90 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
               <tr>
-                {visibleColumns.customerId && <th className="px-3 py-2">Customer ID</th>}
-                {visibleColumns.customerName && <th className="px-3 py-2">Customer Name</th>}
+                {visibleColumns.customerId && (
+                  <th className="px-3 py-2">{isAdmin ? 'Customer ID' : 'Policy ID'}</th>
+                )}
+                {visibleColumns.customerName && (
+                  <th className="px-3 py-2">{isAdmin ? 'Customer Name' : 'Coverage Status'}</th>
+                )}
                 {visibleColumns.totalPolicies && <th className="px-3 py-2 text-center">Total Policies</th>}
                 {visibleColumns.sumInsured && <th className="px-3 py-2">Sum Insured</th>}
                 {visibleColumns.usedReserved && <th className="px-3 py-2">Used / Reserved</th>}

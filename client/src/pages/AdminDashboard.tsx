@@ -192,11 +192,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             )}
           </div>
 
-          {/* Top 4 KPI Cards: 2x2 Grid on Mobile, 4-Cols on Desktop Matching Mobile Reference */}
+          {/* Top 4 KPI Cards: 2x2 Grid on Mobile, 4-Cols on Desktop (Clean Flat Executive Style without bottom wave) */}
           <div className={`grid grid-cols-2 gap-2.5 sm:gap-3.5 ${isAIOpen ? 'lg:grid-cols-2 2xl:grid-cols-4' : 'lg:grid-cols-4'}`}>
             {/* Card 1: Total Policies */}
-            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
-              <div className="flex items-center justify-between gap-1 z-10">
+            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+              <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#e6f9f0] text-[#00ba63] flex items-center justify-center shrink-0">
                   <FileText className="w-4 h-4 text-[#00ba63]" />
                 </div>
@@ -205,7 +205,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </span>
               </div>
 
-              <div className="z-10 mt-1">
+              <div className="mt-2.5">
                 <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
                   Total Policies
                 </p>
@@ -216,25 +216,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {activePolicies} active &bull; {expiredPolicies} expired
                 </p>
               </div>
-
-              {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
-                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="wave-green-1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 14, 300 8 L 300 50 L 0 50 Z" fill="url(#wave-green-1)" />
-                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 14, 300 8" fill="none" stroke="#00ba63" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
             </div>
 
             {/* Card 2: Total Sum Insured */}
-            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
-              <div className="flex items-center justify-between gap-1 z-10">
+            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-blue-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+              <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#eef4ff] text-[#2563eb] flex items-center justify-center shrink-0">
                   <Layers className="w-4 h-4 text-[#2563eb]" />
                 </div>
@@ -243,7 +229,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </span>
               </div>
 
-              <div className="z-10 mt-1">
+              <div className="mt-2.5">
                 <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
                   Total Sum Insured
                 </p>
@@ -257,25 +243,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   Across all policies
                 </p>
               </div>
-
-              {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
-                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="wave-blue-1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0 42 C 60 44, 110 32, 170 34 C 220 36, 250 16, 300 10 L 300 50 L 0 50 Z" fill="url(#wave-blue-1)" />
-                  <path d="M0 42 C 60 44, 110 32, 170 34 C 220 36, 250 16, 300 10" fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
             </div>
 
             {/* Card 3: Remaining Coverage */}
-            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
-              <div className="flex items-center justify-between gap-1 z-10">
+            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-emerald-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+              <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#eafaf1] text-[#00ba63] flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4 text-[#00ba63]" />
                 </div>
@@ -284,7 +256,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </span>
               </div>
 
-              <div className="z-10 mt-1">
+              <div className="mt-2.5">
                 <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
                   Remaining Coverage
                 </p>
@@ -298,25 +270,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   Available to use
                 </p>
               </div>
-
-              {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
-                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="wave-green-rem-1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#00ba63" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#00ba63" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 12, 300 8 L 300 50 L 0 50 Z" fill="url(#wave-green-rem-1)" />
-                  <path d="M0 38 C 70 42, 130 28, 190 28 C 240 28, 270 12, 300 8" fill="none" stroke="#00ba63" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
             </div>
 
             {/* Card 4: Pending Claims */}
-            <div className="relative bg-white rounded-2xl border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col justify-between p-3 sm:p-3.5 h-[126px] sm:h-[138px] transition-all">
-              <div className="flex items-center justify-between gap-1 z-10">
+            <div className="relative bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-amber-300 p-3.5 sm:p-4 flex flex-col justify-between transition-all">
+              <div className="flex items-center justify-between gap-1">
                 <div className="w-8 h-8 rounded-xl bg-[#fff7ed] text-[#ea580c] flex items-center justify-center shrink-0">
                   <Clock className="w-4 h-4 text-[#ea580c]" />
                 </div>
@@ -325,7 +283,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </span>
               </div>
 
-              <div className="z-10 mt-1">
+              <div className="mt-2.5">
                 <p className="text-[11px] sm:text-xs font-semibold text-slate-500 leading-tight">
                   Pending Claims
                 </p>
@@ -335,20 +293,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <p className="text-[10px] sm:text-xs text-slate-400 font-medium leading-tight truncate mt-0.5">
                   {approvedClaims} approved
                 </p>
-              </div>
-
-              {/* Glowing Wave SVG */}
-              <div className="absolute -bottom-1 left-0 right-0 pointer-events-none overflow-hidden h-8 sm:h-10">
-                <svg viewBox="0 0 300 50" className="w-full h-full" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="wave-orange-1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ea580c" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#ea580c" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0 44 C 60 46, 120 40, 180 42 C 230 44, 260 30, 300 24 L 300 50 L 0 50 Z" fill="url(#wave-orange-1)" />
-                  <path d="M0 44 C 60 46, 120 40, 180 42 C 230 44, 260 30, 300 24" fill="none" stroke="#ea580c" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
               </div>
             </div>
           </div>

@@ -145,13 +145,13 @@ export const TopBar: React.FC<TopBarProps> = ({
       ).slice(0, 4)
     : claims.slice(0, 3);
 
-  const matchedCustomers = q
+  const matchedCustomers = (user.role === 'Administrator' && q)
     ? customers.filter(
         (c) =>
           c.name.toLowerCase().includes(q) ||
           c.username.toLowerCase().includes(q)
       ).slice(0, 4)
-    : customers.slice(0, 3);
+    : (user.role === 'Administrator' ? customers.slice(0, 3) : []);
 
   const handleSelectResult = (view: ActiveView) => {
     if (setActiveView) setActiveView(view);
@@ -188,7 +188,11 @@ export const TopBar: React.FC<TopBarProps> = ({
               type="text"
               readOnly
               value={searchQuery}
-              placeholder="Search policies, claims, customers..."
+              placeholder={
+                user.role === 'Administrator'
+                  ? 'Search policies, claims, customers...'
+                  : 'Search your policies and claims...'
+              }
               className="w-full pl-9 pr-14 py-2 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none group-hover:border-emerald-400 group-hover:bg-white transition-all cursor-pointer"
             />
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono font-semibold bg-white px-1.5 py-0.5 rounded border border-slate-200 shadow-2xs group-hover:text-slate-700">
