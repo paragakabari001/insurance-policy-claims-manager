@@ -30,6 +30,7 @@ router.post('/chat', authenticateToken, async (req: AuthenticatedRequest, res: R
       userId: user.id,
       userRole: user.role,
       userName: user.name,
+      userUsername: user.username,
       message,
       history: Array.isArray(history) ? history : [],
     });
@@ -74,6 +75,7 @@ router.post('/chat/stream', authenticateToken, async (req: AuthenticatedRequest,
       userId: user.id,
       userRole: user.role,
       userName: user.name,
+      userUsername: user.username,
       message,
       history: Array.isArray(history) ? history : [],
       onToken: (token) => {

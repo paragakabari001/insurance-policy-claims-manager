@@ -10,6 +10,7 @@ export interface ChatRequestOptions {
   userId: string;
   userRole: string;
   userName: string;
+  userUsername?: string;
   message: string;
   history?: ChatMessage[];
   /** When provided, the provider response is streamed and each token is forwarded here. */
@@ -43,6 +44,7 @@ export async function processAIChat({
   userId,
   userRole,
   userName,
+  userUsername,
   message,
   history = [],
   onToken,
@@ -54,6 +56,17 @@ export async function processAIChat({
       reply: 'Please ask a question about your policies, remaining coverage, or claims.',
       suggestedQuestions: suggestionsForRole(userRole),
     };
+  }
+
+  // Resolve actual user ID from DB if userUsername is provided
+  let resolvedUserId = userId;
+  if (userUsername) {
+    try {
+      const dbUser = await prisma.user.findUnique({ where: { username: userUsername } });
+      if (dbUser) {
+        resolvedUserId = dbUser.id;
+      }
+    } catch {}
   }
 
   // 1. Fetch authorized data from database
@@ -126,7 +139,12 @@ export async function processAIChat({
   } else {
     // Customer: Strictly restricted to their own policies and claims
     const userPolicies = await prisma.policy.findMany({
-      where: { customerId: userId },
+      where: {
+        OR: [
+          { customerId: resolvedUserId },
+          ...(userUsername ? [{ customer: { username: userUsername } }] : []),
+        ],
+      },
       include: { claims: true },
       orderBy: { createdAt: 'desc' },
     });
@@ -148,7 +166,12 @@ export async function processAIChat({
 
     const userClaims = await prisma.claim.findMany({
       where: {
-        policy: { customerId: userId },
+        policy: {
+          OR: [
+            { customerId: resolvedUserId },
+            ...(userUsername ? [{ customer: { username: userUsername } }] : []),
+          ],
+        },
       },
       include: { policy: true },
       orderBy: { createdAt: 'desc' },
