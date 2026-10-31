@@ -1,5 +1,8 @@
 FROM node:20-alpine AS builder
 
+# Install OpenSSL and libc6-compat for Prisma engine on Alpine
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 # Copy root and package files
@@ -29,6 +32,9 @@ RUN cd server && npm run build
 # Production Runner stage
 FROM node:20-alpine AS runner
 
+# Install OpenSSL and libc6-compat for Prisma engine on Alpine
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -47,11 +53,10 @@ RUN npm install --omit=dev
 
 COPY server/prisma ./prisma
 RUN npx prisma generate
-RUN npx prisma db push
 
 COPY --from=builder /app/server/dist ./dist
 COPY --from=builder /app/client/dist /app/client/dist
 
 EXPOSE 5001
 
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push && node dist/index.js"]
