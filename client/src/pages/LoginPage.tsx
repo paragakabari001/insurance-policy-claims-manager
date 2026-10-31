@@ -66,7 +66,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNotify }
       const res = await api.login({ username: loginUser, password: loginPass });
       setStoredToken(res.token);
       onLoginSuccess(res.user);
-      onNotify('success', `Signed in as ${res.user.name} (${res.user.role}).`);
     } catch (err: any) {
       setError(err.message || 'Authentication failed. Please verify credentials.');
       onNotify('error', err.message || 'Authentication failed.');
