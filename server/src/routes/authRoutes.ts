@@ -55,6 +55,26 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 
 // GET /api/auth/me
 router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    if (req.user?.username) {
+      const dbUser = await prisma.user.findUnique({
+        where: { username: req.user.username },
+      });
+      if (dbUser) {
+        res.json({
+          user: {
+            id: dbUser.id,
+            username: dbUser.username,
+            role: dbUser.role,
+            name: dbUser.name,
+          },
+        });
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Auth /me db lookup warning:', err);
+  }
   res.json({ user: req.user });
 });
 

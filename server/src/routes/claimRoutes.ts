@@ -22,7 +22,10 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
       ? {}
       : {
           policy: {
-            customerId: user.id,
+            OR: [
+              { customerId: user.id },
+              ...(user.username ? [{ customer: { username: user.username } }] : []),
+            ],
           },
         };
 
@@ -107,14 +110,14 @@ router.post('/', ...requireCustomer, async (req: AuthenticatedRequest, res: Resp
       // 1. Fetch policy and verify ownership
       const policy = await tx.policy.findUnique({
         where: { id: policyId },
-        include: { claims: true },
+        include: { claims: true, customer: true },
       });
 
       if (!policy) {
         throw { statusCode: 404, message: `Policy with ID "${policyId}" not found.` };
       }
 
-      if (policy.customerId !== user.id) {
+      if (policy.customerId !== user.id && policy.customer?.username !== user.username) {
         throw {
           statusCode: 403,
           message: 'Access denied. You can only submit claims against your own policies.',

@@ -49,12 +49,11 @@ export async function seed() {
   console.log(' - Customer 2: customer2 / Customer2@Demo26');
   console.log(' - Administrator: admin / Admin@Demo26');
 
-  // Seed initial demo policies only if database has no policies yet
-  const existingPolicies = await prisma.policy.count();
-  if (existingPolicies === 0) {
-    console.log('Seeding clean demonstration policies and claims...');
+  // Seed initial demo policies and claims safely if they do not exist
+  console.log('Ensuring clean demonstration policies and claims...');
 
-    // Policy 1: Customer 1 active policy (10 Lakhs SI)
+  const pol1 = await prisma.policy.findUnique({ where: { id: 'POL-1001' } });
+  if (!pol1) {
     await prisma.policy.create({
       data: {
         id: 'POL-1001',
@@ -80,8 +79,10 @@ export async function seed() {
         },
       },
     });
+  }
 
-    // Policy 2: Customer 2 active policy (5 Lakhs SI)
+  const pol2 = await prisma.policy.findUnique({ where: { id: 'POL-1002' } });
+  if (!pol2) {
     await prisma.policy.create({
       data: {
         id: 'POL-1002',
@@ -101,8 +102,10 @@ export async function seed() {
         },
       },
     });
+  }
 
-    // Policy 3: Customer 1 expired coverage policy (3 Lakhs SI)
+  const pol3 = await prisma.policy.findUnique({ where: { id: 'POL-1003' } });
+  if (!pol3) {
     await prisma.policy.create({
       data: {
         id: 'POL-1003',
@@ -122,9 +125,19 @@ export async function seed() {
         },
       },
     });
-
-    console.log('Demo policies and claims created successfully.');
   }
+
+  // Ensure foreign keys stay synchronized even if user UUIDs were re-generated
+  await prisma.policy.updateMany({
+    where: { id: { in: ['POL-1001', 'POL-1003'] } },
+    data: { customerId: customer1.id },
+  });
+  await prisma.policy.updateMany({
+    where: { id: 'POL-1002' },
+    data: { customerId: customer2.id },
+  });
+
+  console.log('Demo policies and claims verified and synchronized successfully.');
 }
 
 if (require.main === module) {
