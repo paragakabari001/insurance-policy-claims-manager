@@ -136,7 +136,40 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           </span>
         </a>
 
-        {/* 4. Analytics */}
+        {/* 4. Customers (Admin Only) */}
+        {user.role === 'Administrator' ? (
+          <a
+            href="/customers"
+            onClick={(e) => {
+              if (!e.metaKey && !e.ctrlKey) {
+                e.preventDefault();
+                setActiveView('customers');
+              }
+            }}
+            className="flex-1 py-1 px-1 flex flex-col items-center justify-center gap-1 transition-all"
+          >
+            <div
+              className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all ${
+                activeView === 'customers'
+                  ? 'bg-emerald-50 text-[#00ba63] ring-1 ring-[#00ba63]/25 scale-105'
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <Users className={`w-5 h-5 ${activeView === 'customers' ? 'text-[#00ba63]' : 'text-slate-400'}`} />
+            </div>
+            <span
+              className={`text-[10px] tracking-tight transition-colors ${
+                activeView === 'customers'
+                  ? 'font-bold text-[#00ba63]'
+                  : 'font-medium text-slate-500'
+              }`}
+            >
+              Customers
+            </span>
+          </a>
+        ) : null}
+
+        {/* 5. Analytics */}
         <a
           href="/analytics"
           onClick={(e) => {
@@ -167,18 +200,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           </span>
         </a>
 
-        {/* 5. Profiles / Quick Switch */}
-        <button
-          onClick={onOpenProfileDrawer}
-          className="flex-1 py-1 px-1 flex flex-col items-center justify-center gap-1 transition-all"
-        >
-          <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all">
-            <Users className="w-5 h-5" />
-          </div>
-          <span className="text-[10px] font-medium text-slate-500 tracking-tight">
-            Profiles
-          </span>
-        </button>
+        {/* 6. Customer Role (Non-Admin): Menu drawer trigger */}
+        {user.role !== 'Administrator' && (
+          <button
+            onClick={onOpenProfileDrawer}
+            className="flex-1 py-1 px-1 flex flex-col items-center justify-center gap-1 transition-all"
+          >
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all">
+              <Users className="w-5 h-5" />
+            </div>
+            <span className="text-[10px] font-medium text-slate-500 tracking-tight">
+              Profiles
+            </span>
+          </button>
+        )}
       </nav>
     </div>
   );

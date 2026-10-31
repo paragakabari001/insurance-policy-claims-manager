@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-export type ActiveView = 'dashboard' | 'policies' | 'claims' | 'analytics' | 'reports';
+export type ActiveView = 'dashboard' | 'policies' | 'claims' | 'customers' | 'analytics' | 'reports';
 
 interface SidebarProps {
   user: User;
@@ -55,6 +55,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { key: 'dashboard', label: 'Dashboard', icon: LayoutGrid, view: 'dashboard', highlightable: true },
     { key: 'policies', label: 'Policies', icon: FileText, view: 'policies', highlightable: true, badge: policiesCount, badgeTone: 'green' },
     { key: 'claims', label: 'Claims', icon: FileCheck2, view: 'claims', highlightable: true, badge: pendingClaimsCount, badgeTone: 'amber' },
+    ...(user.role === 'Administrator'
+      ? [{ key: 'customers', label: 'Customers', icon: Users, view: 'customers' as ActiveView, highlightable: true }]
+      : []),
     { key: 'analytics', label: 'Analytics', icon: TrendingUp, view: 'analytics', highlightable: true },
     { key: 'reports', label: 'Reports', icon: FileSpreadsheet, view: 'reports', highlightable: true },
   ];

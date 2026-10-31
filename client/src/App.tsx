@@ -20,6 +20,8 @@ export const pathToView = (path: string): ActiveView => {
       return 'policies';
     case 'claims':
       return 'claims';
+    case 'customers':
+      return 'customers';
     case 'analytics':
       return 'analytics';
     case 'reports':
@@ -70,6 +72,13 @@ export function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // Role-based route protection: Customer cannot access '/customers'
+  useEffect(() => {
+    if (user && user.role !== 'Administrator' && activeView === 'customers') {
+      setActiveView('dashboard', true);
+    }
+  }, [user?.role, activeView]);
 
   // Core Data
   const [policies, setPolicies] = useState<Policy[]>([]);

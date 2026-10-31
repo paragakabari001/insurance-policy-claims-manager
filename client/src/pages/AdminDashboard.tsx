@@ -6,7 +6,7 @@ import { Card } from '../components/ui/card';
 import { PolicyTable } from '../components/PolicyTable';
 import { ClaimTable } from '../components/ClaimTable';
 import { ActiveView } from '../components/Sidebar';
-import { AnalyticsView, ReportsView } from './InsightsViews';
+import { AnalyticsView, ReportsView, CustomersView } from './InsightsViews';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -424,6 +424,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             isLoadingDecision={isLoadingDecision}
           />
         </div>
+      )}
+
+      {/* View: CUSTOMERS */}
+      {activeView === 'customers' && (
+        <CustomersView
+          user={adminUser}
+          policies={allPolicies}
+          claims={allClaims}
+          customers={customers}
+          onOpenPolicies={() => {
+            if (setActiveView) setActiveView('policies');
+          }}
+        />
       )}
 
       {/* View: ANALYTICS (Matches exact UI design with charts, KPIs & customer summary) */}

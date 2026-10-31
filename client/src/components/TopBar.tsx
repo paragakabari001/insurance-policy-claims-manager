@@ -441,7 +441,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <button
                       key={cu.id}
                       type="button"
-                      onClick={() => handleSelectResult('policies')}
+                      onClick={() => handleSelectResult('customers')}
                       className="w-full p-2.5 rounded-xl hover:bg-emerald-50/60 flex items-center justify-between text-left text-xs transition-colors cursor-pointer group"
                     >
                       <div>
