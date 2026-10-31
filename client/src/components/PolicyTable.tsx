@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Policy } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { useElementWidth } from '../hooks/useElementWidth';
@@ -67,6 +67,24 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
     }
     return 'table';
   });
+
+  // Automatically switch to Cards view on mobile devices or narrow screen sizes
+  useEffect(() => {
+    const checkMobile = () => {
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        setViewMode('grid');
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (width > 0 && width < 768) {
+      setViewMode('grid');
+    }
+  }, [width]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [selected, setSelected] = useState<Record<string, boolean>>({});
