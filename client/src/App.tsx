@@ -9,6 +9,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { CustomerDashboard } from './pages/CustomerDashboard';
 import { CreatePolicyModal } from './components/CreatePolicyModal';
 import { SubmitClaimModal } from './components/SubmitClaimModal';
+import { AIAssistantWidget } from './components/AIAssistantWidget';
 import { Toaster } from './components/ui/toaster';
 import { toast } from './components/ui/use-toast';
 import { formatCurrency } from './utils/formatters';
@@ -93,6 +94,7 @@ export function App() {
   const [isLoadingDecision, setIsLoadingDecision] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
 
   // Hamburger: opens the drawer on mobile, collapses/expands the sidebar on desktop.
   const handleMenuToggle = () => {
@@ -302,6 +304,7 @@ export function App() {
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         isMobileOpen={isMobileDrawerOpen}
         onCloseMobile={() => setIsMobileDrawerOpen(false)}
+        onOpenAI={() => setIsAIOpen((prev) => !prev)}
       />
 
       {/* Main Content Area (Unified full-height canvas, flush with sidebar & topbar, zero double-backgrounds) */}
@@ -318,6 +321,8 @@ export function App() {
           onRefresh={loadData}
           isLoading={isDataLoading}
           onOpenMobileMenu={handleMenuToggle}
+          isAIOpen={isAIOpen}
+          onToggleAI={() => setIsAIOpen((prev) => !prev)}
           onQuickSwitch={handleQuickSwitch}
           onLogout={handleLogout}
         />
@@ -348,6 +353,14 @@ export function App() {
           </div>
         </main>
       </div>
+
+      {/* AI Policy & Claims Assistant Layout Panel */}
+      <AIAssistantWidget
+        user={user}
+        isOpen={isAIOpen}
+        onToggle={() => setIsAIOpen((prev) => !prev)}
+        onClose={() => setIsAIOpen(false)}
+      />
 
       {/* Native-feeling Mobile Bottom Navigation Bar */}
       <MobileBottomNav

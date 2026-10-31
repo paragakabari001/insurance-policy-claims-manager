@@ -48,6 +48,8 @@ interface TopBarProps {
   onRefresh: () => void;
   isLoading?: boolean;
   onOpenMobileMenu?: () => void;
+  isAIOpen?: boolean;
+  onToggleAI?: () => void;
   onQuickSwitch?: (username: string) => void;
   onLogout?: () => void;
 }
@@ -71,6 +73,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   onRefresh,
   isLoading = false,
   onOpenMobileMenu,
+  isAIOpen = false,
+  onToggleAI,
   onLogout,
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -203,6 +207,23 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span className="w-2 h-2 rounded-full bg-[#00c569] animate-pulse" />
             <span>IST (Asia/Kolkata)</span>
           </div>
+
+          {/* AI Copilot Toggle Button */}
+          {onToggleAI && (
+            <button
+              type="button"
+              onClick={onToggleAI}
+              aria-label="Toggle AI Assistant"
+              className={`h-9 px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
+                isAIOpen
+                  ? 'bg-[#011f17] text-[#00c569] border-[#00ba63]/50 ring-2 ring-[#00ba63]/20'
+                  : 'bg-white text-slate-700 hover:text-emerald-800 hover:bg-emerald-50/70 border-slate-200/90'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#00ba63]" />
+              <span className="hidden sm:inline">AI Copilot</span>
+            </button>
+          )}
 
           {/* Functional Notification Bell Dropdown */}
           <DropdownMenu>
