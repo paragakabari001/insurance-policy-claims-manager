@@ -82,10 +82,29 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNotify }
 
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#021b14] selection:bg-[#00ba63] selection:text-white">
+      {/* Mobile-only sleek branding header (Prevents user having to scroll past desktop hero) */}
+      <div className="lg:hidden flex items-center justify-between px-5 py-4 bg-gradient-to-r from-[#021b14] via-[#03271d] to-[#021b14] text-white shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-[#00c569] flex items-center justify-center text-[#021b14] shadow-md shadow-[#00c569]/30">
+            <Shield className="w-5 h-5 text-[#021b14] stroke-[2.5]" />
+          </div>
+          <div>
+            <h1 className="text-sm font-black tracking-tight text-white leading-tight">TailVaR</h1>
+            <p className="text-[10px] text-emerald-300/80 font-medium leading-tight">
+              Insurance Policy & Claims
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2.5 py-1 rounded-full shadow-2xs">
+          <Lock className="w-3 h-3 text-[#00c569]" />
+          <span>Secure Sign In</span>
+        </div>
+      </div>
+
       {/* ========================================================
-          LEFT COLUMN: Forest Green Hero Showcase with 3D Illustration
+          LEFT COLUMN: Forest Green Hero Showcase with 3D Illustration (Desktop Only)
           ======================================================== */}
-      <div className="relative flex-1 lg:w-[54%] bg-gradient-to-br from-[#021b14] via-[#03271d] to-[#011710] p-6 sm:p-10 lg:p-14 text-white flex flex-col justify-between overflow-hidden">
+      <div className="hidden lg:flex relative flex-1 lg:w-[54%] bg-gradient-to-br from-[#021b14] via-[#03271d] to-[#011710] p-6 sm:p-10 lg:p-14 text-white flex-col justify-between overflow-hidden">
         {/* Decorative Wave Glow Background Orbs */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00ba63]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-[#00e575]/10 rounded-full blur-3xl pointer-events-none" />
@@ -276,7 +295,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onNotify }
       {/* ========================================================
           RIGHT COLUMN: Clean White Modern Card with Form & Demo Logins
           ======================================================== */}
-      <div className="flex-1 lg:w-[46%] bg-white rounded-t-3xl lg:rounded-l-[32px] lg:rounded-tr-none shadow-2xl p-6 sm:p-10 lg:p-14 flex flex-col justify-between relative overflow-y-auto">
+      <div className="flex-1 lg:w-[46%] bg-white rounded-t-[32px] lg:rounded-l-[32px] lg:rounded-tr-none shadow-2xl p-5 sm:p-8 lg:p-14 flex flex-col justify-between relative overflow-y-auto">
         {/* Top Right Theme / Action Toggle Pill */}
         <div className="flex items-center justify-end">
           <button
