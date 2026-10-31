@@ -19,7 +19,14 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     const user = req.user!;
     const isAdmin = user.role === 'Administrator';
 
-    const whereClause = isAdmin ? {} : { customerId: user.id };
+    const whereClause = isAdmin
+      ? {}
+      : {
+          OR: [
+            { customerId: user.id },
+            ...(user.username ? [{ customer: { username: user.username } }] : []),
+          ],
+        };
 
     const policies = await prisma.policy.findMany({
       where: whereClause,
@@ -103,7 +110,11 @@ router.get('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Res
     }
 
     // Role-based access control: customer can only view their own policy
-    if (user.role === 'Customer' && policy.customerId !== user.id) {
+    if (
+      user.role === 'Customer' &&
+      policy.customerId !== user.id &&
+      policy.customer?.username !== user.username
+    ) {
       res.status(403).json({ error: 'Access denied. You can only view your own policies.' });
       return;
     }
