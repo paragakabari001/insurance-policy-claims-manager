@@ -9,7 +9,8 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { CustomerDashboard } from './pages/CustomerDashboard';
 import { CreatePolicyModal } from './components/CreatePolicyModal';
 import { SubmitClaimModal } from './components/SubmitClaimModal';
-import { ToastContainer, ToastMessage } from './components/Toast';
+import { Toaster } from './components/ui/toaster';
+import { toast } from './components/ui/use-toast';
 import { formatCurrency } from './utils/formatters';
 
 // Helper functions to map URL paths to application views and back
@@ -42,7 +43,6 @@ export function App() {
   const [activeView, setActiveViewState] = useState<ActiveView>(() => {
     return pathToView(window.location.pathname);
   });
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Synchronized navigation function: updates React view and browser history / URL
   const setActiveView = (view: ActiveView, replace = false) => {
@@ -104,15 +104,11 @@ export function App() {
   };
 
   const addToast = (type: 'success' | 'error', text: string) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { id, type, text }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4500);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    toast({
+      variant: type === 'success' ? 'success' : 'destructive',
+      title: type === 'success' ? 'Success' : 'Error',
+      description: text,
+    });
   };
 
   // Fetch all domain data
@@ -284,7 +280,7 @@ export function App() {
     return (
       <>
         <LoginPage onLoginSuccess={handleLoginSuccess} onNotify={addToast} />
-        <ToastContainer toasts={toasts} onDismiss={removeToast} />
+        <Toaster />
       </>
     );
   }
@@ -380,7 +376,7 @@ export function App() {
         onSubmit={handleSubmitClaim}
       />
 
-      <ToastContainer toasts={toasts} onDismiss={removeToast} />
+      <Toaster />
     </div>
   );
 }
