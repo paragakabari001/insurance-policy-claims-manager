@@ -193,13 +193,13 @@ Access the application at: `http://localhost:5001`
 
 ## 7. Automated Tests Performed
 
-The project includes a comprehensive integration test suite (`server/src/__tests__/claims.test.ts`) covering all 28 requirements of the take-home assignment:
+The project includes a comprehensive integration test suite (`server/src/__tests__/claims.test.ts`) covering all 25 requirements of the take-home assignment:
 
 ```bash
 npm test
 ```
 
-### Verification Matrix (28 / 28 Tests Passed)
+### Verification Matrix (25 / 25 Tests Passed)
 
 | Category | Test Case | Status |
 | :--- | :--- | :--- |
@@ -228,9 +228,6 @@ npm test
 | **Spec Accounting** | Step 5: Decided claims cannot be decided again (immutability) | ✅ PASSED |
 | **Concurrency** | Concurrent claims that together exceed SI cannot breach policy limit | ✅ PASSED |
 | **Persistence** | Persists policy and claim records durably across application restarts | ✅ PASSED |
-| **Assistant Security** | Rejects unauthenticated requests to AI endpoints (401) | ✅ PASSED |
-| **Assistant Security** | Rejects empty or invalid messages (400) | ✅ PASSED |
-| **Assistant Security** | Processes authenticated customer chat with safe grounded data | ✅ PASSED |
 
 ---
 

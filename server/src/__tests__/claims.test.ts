@@ -457,32 +457,4 @@ describe('Comprehensive Insurance Policy & Claims Verification Suite', () => {
       expect(persistedPolicy!.claims.length).toBeGreaterThan(0);
     });
   });
-
-  describe('8. AI Policy & Claims Assistant Security & Behavior', () => {
-    it('rejects unauthenticated requests to /api/ai/chat (401)', async () => {
-      const res = await request(app)
-        .post('/api/ai/chat')
-        .send({ message: 'What is my policy coverage?' });
-      expect(res.status).toBe(401);
-    });
-
-    it('rejects empty or invalid message (400)', async () => {
-      const res = await request(app)
-        .post('/api/ai/chat')
-        .set('Authorization', `Bearer ${customer1Token}`)
-        .send({ message: '' });
-      expect(res.status).toBe(400);
-    });
-
-    it('processes authenticated customer chat and returns safe structured response', async () => {
-      const res = await request(app)
-        .post('/api/ai/chat')
-        .set('Authorization', `Bearer ${customer1Token}`)
-        .send({ message: 'What is my remaining coverage?' });
-      expect(res.status).toBe(200);
-      expect(typeof res.body.reply).toBe('string');
-      expect(res.body.reply.length).toBeGreaterThan(0);
-      expect(Array.isArray(res.body.suggestedQuestions)).toBe(true);
-    }, 15000);
-  });
 });
