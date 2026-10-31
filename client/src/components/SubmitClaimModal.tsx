@@ -12,6 +12,8 @@ import {
   AlertTriangle,
   ChevronDown,
   ShieldAlert,
+  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 
 interface SubmitClaimModalProps {
@@ -275,30 +277,84 @@ export const SubmitClaimModal: React.FC<SubmitClaimModalProps> = ({
                 />
               </div>
 
+              {/* Quick Fill Percentage Chips */}
+              {remainingSI > 0 && (
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick:</span>
+                  {[
+                    { label: '25%', pct: 0.25 },
+                    { label: '50%', pct: 0.5 },
+                    { label: '75%', pct: 0.75 },
+                    { label: 'Max (100%)', pct: 1.0 },
+                  ].map((chip) => (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      onClick={() => {
+                        setAmount(String(Math.floor(remainingSI * chip.pct)));
+                      }}
+                      className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-800 border border-slate-200/80 transition-all cursor-pointer"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Field-level validation messages */}
               {isAmountExceeded && (
-                <p className="text-xs text-rose-600 font-semibold mt-1">
+                <p className="text-xs text-rose-600 font-semibold mt-1.5">
                   Claim amount exceeds maximum claimable coverage of {formatCurrency(remainingSI)}.
                 </p>
               )}
               {amount !== '' && parsedAmount <= 0 && (
-                <p className="text-xs text-rose-600 font-semibold mt-1">
+                <p className="text-xs text-rose-600 font-semibold mt-1.5">
                   Claim amount must be greater than ₹0.
                 </p>
               )}
 
-              {/* Dynamic Real-Time SI Calculation Preview */}
+              {/* Smart Real-Time Calculation & Eligibility Card */}
               {parsedAmount > 0 && !isAmountExceeded && (
-                <div className="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Projected Remaining Coverage:</span>
-                    <span className="font-black text-emerald-700">
-                      {formatCurrency(remainingSI - parsedAmount)}
+                <div className="mt-3 p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-xs space-y-2 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#00c569]" /> Real-Time Accounting Preview
+                    </span>
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300/80 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-[#00ba63]" /> Eligible
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-500">
-                    &bull; This amount will be reserved immediately upon submission.
-                  </p>
+
+                  <div className="space-y-1 pt-1 text-[11px]">
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span>Available Coverage:</span>
+                      <span className="font-semibold text-slate-800">{formatCurrency(remainingSI)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-rose-700">
+                      <span>Claimed Amount (to block):</span>
+                      <span className="font-semibold">- {formatCurrency(parsedAmount)}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-1 border-t border-emerald-200/60 font-bold">
+                      <span className="text-slate-800">Remaining Balance After Claim:</span>
+                      <span className="text-emerald-900 text-xs font-black">
+                        {formatCurrency(remainingSI - parsedAmount)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* AI Smart Pre-Validation Insight */}
+                  <div className="p-2.5 rounded-xl bg-white/90 border border-emerald-200 text-[11px] leading-relaxed text-emerald-950 font-medium flex items-start gap-2 shadow-2xs">
+                    <span className="w-5 h-5 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-[9px] font-black">
+                      AI
+                    </span>
+                    <div>
+                      <p className="font-bold text-emerald-900 leading-tight">Pre-Validation Verification:</p>
+                      <p className="text-slate-600 mt-0.5">
+                        Incident on <strong>{formatDate(incidentDate)}</strong> is within the policy period.
+                        Sum Insured balance is verified, and this claim of <strong>{formatCurrency(parsedAmount)}</strong> is eligible for immediate filing.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

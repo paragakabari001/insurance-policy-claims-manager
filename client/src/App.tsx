@@ -360,6 +360,15 @@ export function App() {
         isOpen={isAIOpen}
         onToggle={() => setIsAIOpen((prev) => !prev)}
         onClose={() => setIsAIOpen(false)}
+        onNavigate={setActiveView}
+        onOpenSubmitClaim={() => {
+          setIsAIOpen(false);
+          handleOpenClaimModalForPolicy();
+        }}
+        onOpenCreatePolicy={() => {
+          setIsAIOpen(false);
+          setIsPolicyModalOpen(true);
+        }}
       />
 
       {/* Native-feeling Mobile Bottom Navigation Bar */}

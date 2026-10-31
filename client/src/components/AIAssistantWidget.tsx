@@ -13,6 +13,10 @@ import {
   Clock,
   Users,
   Minus,
+  Plus,
+  TrendingUp,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 
 interface AIAssistantWidgetProps {
@@ -20,6 +24,9 @@ interface AIAssistantWidgetProps {
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
+  onNavigate?: (view: any) => void;
+  onOpenSubmitClaim?: () => void;
+  onOpenCreatePolicy?: () => void;
 }
 
 interface MessageItem {
@@ -36,10 +43,64 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
   isOpen,
   onToggle,
   onClose,
+  onNavigate,
+  onOpenSubmitClaim,
+  onOpenCreatePolicy,
 }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleVoiceInput = () => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Voice recognition is not supported in this browser. Please use Chrome, Safari or Edge.');
+      return;
+    }
+
+    if (isListening) {
+      try {
+        recognitionRef.current?.stop();
+      } catch {}
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
   const customerSuggestions = [
     'What is my remaining coverage?',
     'Show my claim statuses.',
@@ -351,6 +412,7 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                           {msg.isStreaming && (
                             <span className="inline-block w-1.5 h-3.5 ml-0.5 -mb-0.5 bg-[#00ba63] rounded-sm animate-pulse" />
                           )}
+
                         </>
                       )}
                     </div>
@@ -423,11 +485,35 @@ export const AIAssistantWidget: React.FC<AIAssistantWidgetProps> = ({
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about coverage, or policies..."
+                  placeholder={isListening ? 'Listening... Speak your question' : 'Ask about coverage, or policies...'}
                   disabled={busy}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00ba63]/25 focus:border-[#00ba63] text-xs font-medium text-slate-900 bg-slate-50/80 focus:bg-white placeholder:text-slate-400 shadow-2xs transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 text-xs font-medium text-slate-900 shadow-2xs transition-all ${
+                    isListening
+                      ? 'border-rose-400 bg-rose-50/50 focus:ring-rose-400 placeholder:text-rose-600 font-semibold animate-pulse'
+                      : 'border-slate-200 focus:ring-[#00ba63]/25 focus:border-[#00ba63] bg-slate-50/80 focus:bg-white placeholder:text-slate-400'
+                  }`}
                 />
               </div>
+
+              {/* Voice Input Microphone Button */}
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                disabled={busy}
+                title={isListening ? 'Stop listening' : 'Voice Input (Speak to AI)'}
+                aria-label={isListening ? 'Stop listening' : 'Voice Input (Speak to AI)'}
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                  isListening
+                    ? 'bg-rose-500 text-white border-rose-600 animate-pulse ring-4 ring-rose-200 shadow-md'
+                    : 'bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border-slate-200 shadow-2xs'
+                }`}
+              >
+                {isListening ? (
+                  <MicOff className="w-4 h-4 text-white" />
+                ) : (
+                  <Mic className="w-4 h-4 text-emerald-600" />
+                )}
+              </button>
 
               <button
                 type="submit"

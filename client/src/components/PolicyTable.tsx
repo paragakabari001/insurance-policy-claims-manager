@@ -34,6 +34,7 @@ import {
   FilePlus2,
   Check,
   X,
+  Printer,
 } from 'lucide-react';
 
 type StatusFilter = 'ALL' | 'Active' | 'Upcoming' | 'Expired';
@@ -61,7 +62,9 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
   onSelectForClaim,
 }) => {
   const { ref, width } = useElementWidth<HTMLDivElement>();
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() =>
+    typeof window !== 'undefined' && window.innerWidth < 640 ? 'grid' : 'table'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -84,7 +87,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
   const allSelected = filteredPolicies.length > 0 && selectedCount === filteredPolicies.length;
 
   // Responsive: table layout only when the container is wide enough, otherwise stacked cards.
-  const useTable = viewMode === 'table' && width >= 640;
+  const useTable = viewMode === 'table';
   const showUsageColumn = width >= 900;
   const showCustomerColumn = isAdmin && width >= 760;
 
@@ -115,6 +118,69 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
       ? Math.min(100, Math.round(((p.sumInsured - p.remainingClaimableSI) / p.sumInsured) * 100))
       : 0;
 
+  const printPolicyStatement = (policy: Policy) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Policy Statement - ${policy.id}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #0f172a; margin: 0; }
+            .header { border-bottom: 3px solid #00ba63; padding-bottom: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title { font-size: 24px; font-weight: 800; color: #011f17; }
+            .subtitle { font-size: 13px; color: #64748b; margin-top: 4px; }
+            .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+            .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+            .label { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px; }
+            .val { font-size: 18px; font-weight: 800; color: #0f172a; }
+            .val-green { color: #008f4c; }
+            .footer { margin-top: 60px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 11px; color: #94a3b8; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="title">TailVaR Insurance Certificate & Statement</div>
+              <div class="subtitle">Official Policy Record & Remaining Coverage</div>
+            </div>
+            <div>
+              <span class="badge">${policy.coverageStatus || 'Active'}</span>
+            </div>
+          </div>
+
+          <div style="font-size: 13px; margin-bottom: 20px; line-height: 1.6;">
+            <div><strong>Policy ID:</strong> ${policy.id}</div>
+            ${policy.customerName ? `<div><strong>Insured Customer:</strong> ${policy.customerName} (@${policy.customerUsername})</div>` : ''}
+            <div><strong>Coverage Duration:</strong> ${policy.startDate} &rarr; ${policy.endDate}</div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <div class="label">Original Sum Insured (SI)</div>
+              <div class="val">₹${policy.sumInsured.toLocaleString('en-IN')}</div>
+            </div>
+            <div class="card">
+              <div class="label">Remaining Available Coverage</div>
+              <div class="val val-green">₹${policy.remainingClaimableSI.toLocaleString('en-IN')}</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            TailVaR Technologies & Consulting &bull; Official Digital Insurance Record &bull; Generated on ${new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 350);
+  };
+
   const renderActions = (policy: Policy) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -132,6 +198,9 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
         <DropdownMenuLabel>{policy.id}</DropdownMenuLabel>
         <DropdownMenuItem onSelect={() => setDetailPolicy(policy)}>
           <Eye className="w-3.5 h-3.5 text-slate-400" /> View details
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => printPolicyStatement(policy)}>
+          <Printer className="w-3.5 h-3.5 text-emerald-600" /> Download Statement (PDF)
         </DropdownMenuItem>
         {!isAdmin && onSelectForClaim && (
           <DropdownMenuItem
@@ -228,25 +297,31 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
               type="button"
               onClick={() => setViewMode('grid')}
               aria-pressed={viewMode === 'grid'}
-              className={`h-8 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+              title="Cards view"
+              aria-label="Cards view"
+              className={`h-8 px-2 sm:px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
                 viewMode === 'grid'
                   ? 'bg-[#011f17] text-white shadow-2xs font-bold'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <LayoutGrid className="w-3.5 h-3.5" /> Cards
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Cards</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('table')}
               aria-pressed={viewMode === 'table'}
-              className={`h-8 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+              title="Table view"
+              aria-label="Table view"
+              className={`h-8 px-2 sm:px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
                 viewMode === 'table'
                   ? 'bg-[#011f17] text-white shadow-2xs font-bold'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <List className="w-3.5 h-3.5" /> Table
+              <List className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Table</span>
             </button>
           </div>
         </div>
@@ -330,17 +405,30 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
 
               {usageBar(policy)}
 
-              {!isAdmin && onSelectForClaim && (
+              <div className="flex items-center gap-2 pt-1">
+                {!isAdmin && onSelectForClaim && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={policy.remainingClaimableSI <= 0}
+                    onClick={() => onSelectForClaim(policy)}
+                    className="bg-[#011f17] hover:bg-[#072d22] flex-1 text-xs font-bold"
+                  >
+                    Submit Claim
+                  </Button>
+                )}
                 <Button
                   type="button"
+                  variant="outline"
                   size="sm"
-                  disabled={policy.remainingClaimableSI <= 0}
-                  onClick={() => onSelectForClaim(policy)}
-                  className="bg-[#011f17] hover:bg-[#072d22] w-full"
+                  onClick={() => printPolicyStatement(policy)}
+                  title="Download Statement (PDF / Print)"
+                  className="px-2.5 rounded-xl border-slate-200 text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 text-xs font-semibold gap-1 shrink-0"
                 >
-                  Submit Claim
+                  <Printer className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="hidden sm:inline">Statement</span>
                 </Button>
-              )}
+              </div>
             </div>
           ))}
         </div>
@@ -348,7 +436,8 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
 
       {/* Table (no horizontal scroll: columns wrap and low-priority columns collapse) */}
       {filteredPolicies.length > 0 && useTable && (
-        <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left text-xs min-w-[620px] sm:min-w-full">
           <thead className="text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
             <tr>
               <th scope="col" className="pl-5 pr-2 py-3 w-8">
@@ -452,6 +541,7 @@ export const PolicyTable: React.FC<PolicyTableProps> = ({
             })}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* Details dialog */}

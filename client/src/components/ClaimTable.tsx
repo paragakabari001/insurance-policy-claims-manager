@@ -80,7 +80,9 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   isLoadingDecision,
 }) => {
   const { ref, width } = useElementWidth<HTMLDivElement>();
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() =>
+    typeof window !== 'undefined' && window.innerWidth < 640 ? 'grid' : 'table'
+  );
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'Submitted' | 'Approved' | 'Rejected'>('ALL');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,7 +118,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   const selectedCount = filteredClaims.filter((c) => selected[c.id]).length;
   const allSelected = filteredClaims.length > 0 && selectedCount === filteredClaims.length;
 
-  const useTable = viewMode === 'table' && width >= 640;
+  const useTable = viewMode === 'table';
   const showCustomerColumn = isAdmin && width >= 760;
   const showReviewColumn = isAdmin && width >= 880;
 
@@ -319,25 +321,31 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
               type="button"
               onClick={() => setViewMode('grid')}
               aria-pressed={viewMode === 'grid'}
-              className={`h-8 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+              title="Cards view"
+              aria-label="Cards view"
+              className={`h-8 px-2 sm:px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
                 viewMode === 'grid'
                   ? 'bg-[#011f17] text-white shadow-2xs font-bold'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <LayoutGrid className="w-3.5 h-3.5" /> Cards
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Cards</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('table')}
               aria-pressed={viewMode === 'table'}
-              className={`h-8 px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
+              title="Table view"
+              aria-label="Table view"
+              className={`h-8 px-2 sm:px-2.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ba63] ${
                 viewMode === 'table'
                   ? 'bg-[#011f17] text-white shadow-2xs font-bold'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <List className="w-3.5 h-3.5" /> Table
+              <List className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Table</span>
             </button>
           </div>
         </div>
@@ -396,7 +404,8 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
 
       {/* Table: fits container, no horizontal scroll */}
       {filteredClaims.length > 0 && useTable && (
-        <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left text-xs min-w-[620px] sm:min-w-full">
           <thead className="text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
             <tr>
               <th scope="col" className="pl-5 pr-2 py-3 w-8">
@@ -473,6 +482,7 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
             })}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* Details dialog */}
