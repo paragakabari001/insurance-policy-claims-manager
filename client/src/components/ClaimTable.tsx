@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Claim } from '../types';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { useElementWidth } from '../hooks/useElementWidth';
@@ -80,9 +80,30 @@ export const ClaimTable: React.FC<ClaimTableProps> = ({
   isLoadingDecision,
 }) => {
   const { ref, width } = useElementWidth<HTMLDivElement>();
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() =>
-    typeof window !== 'undefined' && window.innerWidth < 640 ? 'grid' : 'table'
-  );
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return 'grid';
+    }
+    return 'table';
+  });
+
+  // Automatically switch to Cards view on mobile devices or narrow screen sizes
+  useEffect(() => {
+    const checkMobile = () => {
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        setViewMode('grid');
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (width > 0 && width < 768) {
+      setViewMode('grid');
+    }
+  }, [width]);
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'Submitted' | 'Approved' | 'Rejected'>('ALL');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [searchQuery, setSearchQuery] = useState('');
